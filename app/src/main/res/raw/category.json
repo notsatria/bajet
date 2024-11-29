@@ -1,0 +1,79 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "income",
+      "emoji": "💰"
+    },
+    {
+      "id": 2,
+      "name": "expenses",
+      "emoji": "💸"
+    },
+    {
+      "id": 3,
+      "name": "food",
+      "emoji": "🍔"
+    },
+    {
+      "id": 4,
+      "name": "transportation",
+      "emoji": "🚗"
+    },
+    {
+      "id": 5,
+      "name": "shopping",
+      "emoji": "🛍️"
+    },
+    {
+      "id": 6,
+      "name": "entertainment",
+      "emoji": "🎬"
+    },
+    {
+      "id": 7,
+      "name": "health",
+      "emoji": "🏥"
+    },
+    {
+      "id": 8,
+      "name": "utilities",
+      "emoji": "💡"
+    },
+    {
+      "id": 9,
+      "name": "education",
+      "emoji": "🎓"
+    },
+    {
+      "id": 10,
+      "name": "savings",
+      "emoji": "🏦"
+    },
+    {
+      "id": 11,
+      "name": "gifts",
+      "emoji": "🎁"
+    },
+    {
+      "id": 12,
+      "name": "travel",
+      "emoji": "✈️"
+    },
+    {
+      "id": 13,
+      "name": "pets",
+      "emoji": "🐾"
+    },
+    {
+      "id": 14,
+      "name": "subscriptions",
+      "emoji": "📺"
+    },
+    {
+      "id": 15,
+      "name": "miscellaneous",
+      "emoji": "🔧"
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 package com.notsatria.bajet.di
 
 import android.content.Context
-import androidx.room.Room
 import com.notsatria.bajet.data.room.CashFlowDao
 import com.notsatria.bajet.data.room.CashFlowDatabase
 import dagger.Module
@@ -18,7 +17,7 @@ class DatabaseModule {
     @Singleton
     @Provides
     fun provideCashflowDatabase(@ApplicationContext context: Context): CashFlowDatabase {
-        return Room.databaseBuilder(context, CashFlowDatabase::class.java, "cashflow.db").build()
+        return CashFlowDatabase.getInstance(context)
     }
 
     @Provides
