@@ -23,12 +23,12 @@ import com.notsatria.bajet.ui.theme.inversePrimaryLight
 import com.notsatria.bajet.utils.DataDummy
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(modifier: Modifier = Modifier, navigateToAddCashFlowScreen: () -> Unit = {}) {
     Scaffold(
         modifier,
         containerColor = backgroundLight,
         floatingActionButton = {
-            HomeFloatingActionButton()
+            HomeFloatingActionButton(navigateToAddCashFlowScreen)
         }
     ) { paddingValues ->
         Box(
@@ -74,8 +74,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HomeFloatingActionButton() {
-    FloatingActionButton(onClick = { }) {
+fun HomeFloatingActionButton(onClick: () -> Unit) {
+    FloatingActionButton(onClick = { onClick() }) {
         Icon(imageVector = Icons.Filled.Add, contentDescription = "Add cashflow")
     }
 }
