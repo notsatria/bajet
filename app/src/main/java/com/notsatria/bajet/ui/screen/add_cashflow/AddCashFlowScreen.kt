@@ -79,7 +79,8 @@ fun AddCashFlowScreen(
         }
     )
 
-    if (shouldShowDatePickerDialog.value) CashFlowDatePickerDialog(shouldShowDialog = shouldShowDatePickerDialog,
+    if (shouldShowDatePickerDialog.value) CashFlowDatePickerDialog(
+        shouldShowDialog = shouldShowDatePickerDialog,
         onDateSelected = { date ->
             if (date != null) viewModel.updateDate(date)
         },
@@ -92,13 +93,12 @@ fun AddCashFlowScreen(
     val fieldsEmpty =
         (viewModel.amount.isEmpty() || viewModel.amount == "0" || (viewModel.selectedCashflowTypeIndex == 1 && viewModel.categoryId == 0))
 
-    Scaffold(modifier.fillMaxSize(), containerColor = backgroundLight, topBar = {
+    Scaffold(modifier, containerColor = backgroundLight, topBar = {
         AddCashFlowTopAppBar(navigateBack)
     }) { paddingValues ->
         Box(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
             Column(
@@ -131,8 +131,12 @@ fun AddCashFlowScreen(
                 }
                 if (!expensesCategory) Spacer(modifier = Modifier.height(12.dp))
                 OutlinedTextField(modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.amount,
-                    onValueChange = { amount -> viewModel.updateAmount(amount) },
+                    value = viewModel.formattedAmount,
+                    onValueChange = { formattedAmount ->
+                        // Remove non-numeric characters from the input
+                        val rawAmount = formattedAmount.replace("\\D".toRegex(), "")
+                        viewModel.updateAmount(rawAmount)
+                    },
                     label = {
                         Text(text = "Amount")
                     },
@@ -161,6 +165,7 @@ fun AddCashFlowScreen(
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(modifier = Modifier.fillMaxWidth(), enabled = !fieldsEmpty, onClick = {
                     viewModel.insertCashFlow()
+                    navigateBack()
                 }) {
                     Text(text = "Save")
                 }

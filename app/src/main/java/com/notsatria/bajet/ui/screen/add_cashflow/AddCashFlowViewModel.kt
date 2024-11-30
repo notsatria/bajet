@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.repository.AddCashFlowRepository
+import com.notsatria.bajet.utils.formatToCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +29,11 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
     var selectedCashflowTypeIndex by mutableIntStateOf(0)
         private set
 
-    var amount by mutableStateOf("0")
+    var amount by mutableStateOf("")
+        private set
+
+    /* Formatted amount to be displayed in the UI */
+    var formattedAmount by mutableStateOf("")
         private set
 
     var note by mutableStateOf("")
@@ -46,8 +51,9 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
     var categoryText by mutableStateOf("")
         private set
 
-    fun updateAmount(value: String) {
-        amount = value
+    fun updateAmount(rawAmount: String) {
+        amount = rawAmount
+        formattedAmount = rawAmount.formatToCurrency()
     }
 
     fun updateNote(value: String) {
@@ -72,12 +78,14 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
 
     fun insertCashFlow() {
         viewModelScope.launch(Dispatchers.IO) {
+            val finalAmount: Double = if (amount.isEmpty()) 0.0 else amount.toDouble()
             val cashFlow = CashFlow(
-                amount = amount.toDouble(),
+                amount = if (selectedCashflowTypeIndex == 0) finalAmount else -finalAmount,
                 type = cashflowTypes[selectedCashflowTypeIndex],
                 note = note,
                 date = date,
-                categoryId = categoryId
+                /* If selected category is income, set category id to 1, otherwise set it to categoryId */
+                categoryId = if (selectedCashflowTypeIndex == 0) 1 else categoryId
             )
             addCashFlowRepository.insertCashFlow(cashFlow)
         }
