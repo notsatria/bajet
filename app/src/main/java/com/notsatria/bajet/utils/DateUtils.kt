@@ -5,6 +5,7 @@ import java.util.Date
 
 object DateUtils {
     val formatDate1 = SimpleDateFormat("EEE, dd MMM yyyy", LOCALE_ID)
+    val formatDate2 = SimpleDateFormat("dd MMM yyyy", LOCALE_ID)
 
     fun Long.formatDateTo(format: SimpleDateFormat = formatDate1): String {
         val date = Date(this)

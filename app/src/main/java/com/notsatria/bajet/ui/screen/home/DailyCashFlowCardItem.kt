@@ -32,7 +32,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.notsatria.bajet.data.entities.CashFlow
+import androidx.compose.ui.unit.sp
+import com.notsatria.bajet.data.entities.CashFlowAndCategory
 import com.notsatria.bajet.ui.theme.AppTypography
 import com.notsatria.bajet.ui.theme.errorLight
 import com.notsatria.bajet.ui.theme.onSecondaryLight
@@ -41,7 +42,6 @@ import com.notsatria.bajet.ui.theme.outlineLight
 import com.notsatria.bajet.ui.theme.tertiaryContainerDark
 import com.notsatria.bajet.ui.theme.tertiaryContainerLightMediumContrast
 import com.notsatria.bajet.utils.DataDummy
-import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import com.notsatria.bajet.utils.formatToRupiah
 
 /**
@@ -55,9 +55,9 @@ import com.notsatria.bajet.utils.formatToRupiah
 @Composable
 fun DailyCashFlowCardItem(
     modifier: Modifier = Modifier,
-    date: Long = 0L,
+    date: String,
     total: Double = 0.0,
-    cashFlowList: List<CashFlow>,
+    cashFlowList: List<CashFlowAndCategory>,
 ) {
     var itemRowVisible by remember { mutableStateOf(true) }
 
@@ -106,7 +106,7 @@ fun DailyCashFlowCardItem(
 fun DailyCashFlowHeader(
     modifier: Modifier = Modifier,
     total: Double,
-    date: Long,
+    date: String,
     onClick: () -> Unit = {},
 ) {
     Column(modifier.clickable {
@@ -118,7 +118,7 @@ fun DailyCashFlowHeader(
                 .padding(12.dp)
         ) {
             Text(
-                text = date.formatDateTo(),
+                text = date,
                 style = AppTypography.labelLarge,
                 color = outlineLight,
             )
@@ -139,7 +139,7 @@ fun DailyCashFlowHeader(
  * @param cashFlow
  */
 @Composable
-fun DailyCashFlowItemRow(modifier: Modifier = Modifier, cashFlow: CashFlow) {
+fun DailyCashFlowItemRow(modifier: Modifier = Modifier, cashFlow: CashFlowAndCategory) {
     Row(
         modifier = modifier
             .padding(12.dp)
@@ -156,24 +156,19 @@ fun DailyCashFlowItemRow(modifier: Modifier = Modifier, cashFlow: CashFlow) {
         }
         Spacer(modifier = Modifier.width(8.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = cashFlow.categoryId.toString(), style = AppTypography.titleMedium)
-            Text(
-                text = cashFlow.note,
+            Text(text = cashFlow.category.name, style = AppTypography.titleMedium)
+            if (cashFlow.cashFlow.note.isNotEmpty()) Text(
+                text = cashFlow.cashFlow.note,
                 color = outlineDark,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 12.sp
             )
         }
         Text(
-            text = cashFlow.amount.formatToRupiah(),
+            text = cashFlow.cashFlow.amount.formatToRupiah(),
             style = AppTypography.titleSmall,
-            color = errorLight
+            color = if (cashFlow.cashFlow.categoryId != 1) errorLight else tertiaryContainerLightMediumContrast
         )
     }
-}
-
-@Preview
-@Composable
-fun DailyCashFlowCardItemPreview() {
-    DailyCashFlowCardItem(cashFlowList = DataDummy.cashFlowList)
 }

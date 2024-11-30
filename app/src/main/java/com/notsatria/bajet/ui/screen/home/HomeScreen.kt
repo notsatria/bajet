@@ -15,15 +15,29 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.ui.theme.backgroundLight
 import com.notsatria.bajet.ui.theme.inversePrimaryLight
-import com.notsatria.bajet.utils.DataDummy
+import com.notsatria.bajet.utils.DateUtils
+import com.notsatria.bajet.utils.DateUtils.formatDateTo
+import timber.log.Timber.Forest.i
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, navigateToAddCashFlowScreen: () -> Unit = {}) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    navigateToAddCashFlowScreen: () -> Unit = {},
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+    val cashFlowAndCategoryList by viewModel.cashFlowAndCategoryList.collectAsStateWithLifecycle(
+        emptyList()
+    )
+    i("cashFlowAndCategoryList: $cashFlowAndCategoryList, size: ${cashFlowAndCategoryList.size}")
+
     Scaffold(
         modifier,
         containerColor = backgroundLight,
@@ -45,18 +59,21 @@ fun HomeScreen(modifier: Modifier = Modifier, navigateToAddCashFlowScreen: () ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
             ) {
                 CashFlowSummaryCard()
                 Spacer(modifier = Modifier.height(30.dp))
                 LazyColumn {
-                    val groupedCashflow = DataDummy.cashFlowList.groupBy { it.date }
+                    val groupedCashflow =
+                        cashFlowAndCategoryList.groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) }
+
+                    i("groupedCashflow: $groupedCashflow")
 
                     groupedCashflow.entries.forEachIndexed { _, entry ->
                         val date = entry.key
                         val cashFlowList = entry.value
                         val total =
-                            cashFlowList.sumOf { it.amount * if (it.type == "income") 1 else -1 }
+                            cashFlowList.sumOf { it.cashFlow.amount }
 
                         item {
                             DailyCashFlowCardItem(

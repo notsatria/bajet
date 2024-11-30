@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
@@ -78,4 +79,15 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+    // Hilt Compose
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Compose Navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // Compose Icon
+    implementation(libs.androidx.material.icons.extended)
+
+    // Timber
+    implementation(libs.timber)
 }

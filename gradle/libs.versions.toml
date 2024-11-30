@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.2"
+hiltNavigationCompose = "1.2.0"
 kotlin = "1.9.10"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -12,9 +13,12 @@ room = "2.6.1"
 devtoolsKsp = "1.9.10-1.0.13"
 hiltAndroid = "2.51.1"
 uiTextGoogleFonts = "1.7.5"
+navigationCompose = "2.8.4"
+timber = "5.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -34,6 +38,9 @@ roomKtx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
