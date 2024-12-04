@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -23,16 +24,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.notsatria.bajet.data.entities.CashFlowSummary
 import com.notsatria.bajet.ui.theme.AppTypography
 import com.notsatria.bajet.ui.theme.outlineLight
 import com.notsatria.bajet.ui.theme.surfaceContainerLight
+import com.notsatria.bajet.utils.DateUtils
+import com.notsatria.bajet.utils.DateUtils.formatDateTo
+import com.notsatria.bajet.utils.formatToRupiah
+import java.util.Calendar
 
 
 /**
  * To show cashflow summary by this month: Expenses, Income, and Balance
  */
 @Composable
-fun CashFlowSummaryCard(modifier: Modifier = Modifier) {
+fun CashFlowSummaryCard(
+    modifier: Modifier = Modifier,
+    cashFlowSummary: CashFlowSummary,
+    selectedMonth: Calendar,
+    onPreviousMonthClick: () -> Unit = {},
+    onNextMonthClick: () -> Unit = {}
+) {
     ElevatedCard(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(containerColor = surfaceContainerLight),
@@ -44,22 +56,23 @@ fun CashFlowSummaryCard(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(12.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { }) {
+                IconButton(onClick = { onPreviousMonthClick() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
                         contentDescription = null
                     )
                 }
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "January 2024",
+                    text = selectedMonth.formatDateTo(DateUtils.formatDate3),
                     style = AppTypography.bodyLarge,
                     fontWeight = FontWeight.SemiBold
                 )
-                IconButton(onClick = { }) {
+                Spacer(modifier = Modifier.width(4.dp))
+                IconButton(onClick = { onNextMonthClick() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
                         contentDescription = null,
-                        tint = outlineLight
                     )
                 }
             }
@@ -72,19 +85,17 @@ fun CashFlowSummaryCard(modifier: Modifier = Modifier) {
             ) {
                 CashflowColumnText(
                     title = "Expenses",
-                    value = "Rp 20.000",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
+                    value = cashFlowSummary.expenses.formatToRupiah(),
+                    modifier = Modifier.weight(1f)
                 )
                 CashflowColumnText(
                     title = "Income",
-                    value = "Rp 20.000",
+                    value = cashFlowSummary.income.formatToRupiah(),
                     modifier = Modifier.weight(1f)
                 )
                 CashflowColumnText(
                     title = "Balance",
-                    value = "Rp 20.000",
+                    value = cashFlowSummary.balance.formatToRupiah(),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -113,10 +124,4 @@ fun CashflowColumnText(modifier: Modifier = Modifier, title: String, value: Stri
             fontWeight = FontWeight.SemiBold
         )
     }
-}
-
-@Preview
-@Composable
-fun CashFlowSummaryCardPreview() {
-    CashFlowSummaryCard()
 }

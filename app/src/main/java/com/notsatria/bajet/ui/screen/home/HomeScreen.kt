@@ -15,12 +15,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.notsatria.bajet.data.entities.CashFlowSummary
 import com.notsatria.bajet.ui.theme.backgroundLight
 import com.notsatria.bajet.ui.theme.inversePrimaryLight
 import com.notsatria.bajet.utils.DateUtils
@@ -36,7 +38,8 @@ fun HomeScreen(
     val cashFlowAndCategoryList by viewModel.cashFlowAndCategoryList.collectAsStateWithLifecycle(
         emptyList()
     )
-    i("cashFlowAndCategoryList: $cashFlowAndCategoryList, size: ${cashFlowAndCategoryList.size}")
+    val cashFlowSummary by viewModel.cashFlowSummary.collectAsStateWithLifecycle()
+    val selectedMonth by viewModel.selectedMonth.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier,
@@ -61,13 +64,21 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp)
             ) {
-                CashFlowSummaryCard()
+                if (cashFlowSummary != null)
+                    CashFlowSummaryCard(
+                        cashFlowSummary = cashFlowSummary!!,
+                        selectedMonth = selectedMonth,
+                        onPreviousMonthClick = {
+                            viewModel.changeMonth(-1)
+                        },
+                        onNextMonthClick = {
+                            viewModel.changeMonth(1)
+                        }
+                    )
                 Spacer(modifier = Modifier.height(30.dp))
                 LazyColumn {
                     val groupedCashflow =
                         cashFlowAndCategoryList.groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) }
-
-                    i("groupedCashflow: $groupedCashflow")
 
                     groupedCashflow.entries.forEachIndexed { _, entry ->
                         val date = entry.key
