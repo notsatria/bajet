@@ -7,7 +7,7 @@ data class CashFlowAndCategory(
     @Embedded val cashFlow: CashFlow,
     @Relation(
         parentColumn = "categoryId",
-        entityColumn = "id"
+        entityColumn = "categoryId"
     )
     val category: Category
 )

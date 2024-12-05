@@ -39,6 +39,7 @@ abstract class CashFlowDatabase : RoomDatabase() {
                             }
                         }
                     })
+                    .fallbackToDestructiveMigration()
                     .build()
             }
         }
@@ -51,7 +52,7 @@ abstract class CashFlowDatabase : RoomDatabase() {
                         val item = jsonArray.getJSONObject(i)
                         dao.insertCategory(
                             Category(
-                                id = item.getInt("id"),
+                                categoryId = item.getInt("categoryId"),
                                 name = item.getString("name"),
                                 emoji = item.getString("emoji")
                             )

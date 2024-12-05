@@ -1,9 +1,11 @@
 package com.notsatria.bajet.data.room
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.CashFlowSummary
@@ -22,7 +24,8 @@ interface CashFlowDao {
     @Query("SELECT * FROM category")
     suspend fun getCategories(): List<Category>
 
-    @Query("SELECT * FROM cashflow JOIN category ON cashflow.categoryId = category.id WHERE date BETWEEN :startDate AND :endDate")
+    @Transaction
+    @Query("SELECT * FROM cashflow JOIN category ON cashflow.categoryId = category.categoryId WHERE date BETWEEN :startDate AND :endDate")
     fun getCashFlowsAndCategoryListByMonth(startDate: Long, endDate: Long): Flow<List<CashFlowAndCategory>>
 
     @Query(
@@ -37,4 +40,6 @@ interface CashFlowDao {
     )
     fun getCashFlowSummary(startDate: Long, endDate: Long): Flow<CashFlowSummary>
 
+    @Delete
+    suspend fun deleteCashFlow(cashFlow: CashFlow)
 }

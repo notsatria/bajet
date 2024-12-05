@@ -1,6 +1,8 @@
 package com.notsatria.bajet.data
 
 import com.notsatria.bajet.data.entities.CashFlow
+import com.notsatria.bajet.data.entities.CashFlowAndCategory
+import com.notsatria.bajet.domain.entity.CashFlowAndCategoryDomain
 import com.notsatria.bajet.ui.screen.add_cashflow.AddCashFlowData
 import com.notsatria.bajet.utils.CashFlowTypes
 
@@ -13,5 +15,13 @@ fun AddCashFlowData.toCashFlow(): CashFlow {
         date = this.date,
         /* If selected category is income, set category id to 1, otherwise set it to categoryId */
         categoryId = if (selectedCashflowTypeIndex == 0) 1 else categoryId
+    )
+}
+
+fun CashFlowAndCategory.toDomain(): CashFlowAndCategoryDomain {
+    return CashFlowAndCategoryDomain(
+        cashFlow = this.cashFlow,
+        category = this.category,
+        isOptionsRevealed = false
     )
 }

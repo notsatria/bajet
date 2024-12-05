@@ -59,31 +59,16 @@ import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import java.util.Date
 
 @Composable
-fun AddCashFlowScreen(
+fun AddCashFlowRoute(
     modifier: Modifier = Modifier,
-    navigateBack: () -> Unit = {},
-    viewModel: AddCashFlowViewModel = hiltViewModel<AddCashFlowViewModel>()
+    navigateBack: () -> Unit,
+    viewModel: AddCashFlowViewModel = hiltViewModel()
 ) {
     val shouldShowCategoryDialog = rememberSaveable { mutableStateOf(false) }
     val shouldShowDatePickerDialog = rememberSaveable { mutableStateOf(false) }
-
-
-    if (shouldShowCategoryDialog.value) CategoriesDialog(shouldShowCategoryDialog = shouldShowCategoryDialog,
-        categories = viewModel.addCashFlowData.categories,
-        onDismiss = { shouldShowCategoryDialog.value = false },
-        onCategorySelected = { category ->
-            viewModel.updateCategory(category.id)
-            viewModel.updateCategoryText("${category.emoji} ${category.name}")
-        })
-
-    if (shouldShowDatePickerDialog.value) CashFlowDatePickerDialog(shouldShowDialog = shouldShowDatePickerDialog,
-        onDateSelected = { date ->
-            if (date != null) viewModel.updateDate(date)
-        },
-        onDismiss = {
-            shouldShowDatePickerDialog.value = false
-        })
-
+    val categories by remember {
+        derivedStateOf { viewModel.addCashFlowData.categories }
+    }
     val expensesCategory by remember {
         derivedStateOf { viewModel.addCashFlowData.selectedCashflowTypeIndex == 1 }
     }
@@ -98,17 +83,80 @@ fun AddCashFlowScreen(
 
     val uiData = viewModel.addCashFlowData
 
+    AddCashFlowScreen(
+        modifier,
+        navigateBack = navigateBack,
+        shouldShowCategoryDialog = shouldShowCategoryDialog,
+        shouldShowDatePickerDialog = shouldShowDatePickerDialog,
+        categories = categories,
+        onCategorySelected = { category ->
+            viewModel.updateCategory(category.categoryId)
+            viewModel.updateCategoryText("${category.emoji} ${category.name}")
+        },
+        onUpdateDate = { date ->
+            viewModel.updateDate(date)
+        },
+        onUpdateSelectedCashFlowType = { index ->
+            viewModel.updateSelectedCashFlowType(index)
+        },
+        uiData = uiData,
+        expensesCategory = expensesCategory,
+        onUpdateAmount = { rawAmount ->
+            viewModel.updateAmount(rawAmount)
+        },
+        onUpdateNote = { note ->
+            viewModel.updateNote(note)
+        },
+        fieldsEmpty = fieldsEmpty,
+        onInsertCashFlow = {
+            viewModel.insertCashFlow()
+        }
+    )
+}
+
+@Composable
+fun AddCashFlowScreen(
+    modifier: Modifier = Modifier,
+    navigateBack: () -> Unit = {},
+    shouldShowCategoryDialog: MutableState<Boolean> = mutableStateOf(false),
+    shouldShowDatePickerDialog: MutableState<Boolean> = mutableStateOf(false),
+    categories: List<Category> = emptyList(),
+    onCategorySelected: (Category) -> Unit = {},
+    onUpdateDate: (Long) -> Unit = {},
+    onUpdateSelectedCashFlowType: (Int) -> Unit = {},
+    uiData: AddCashFlowData = AddCashFlowData(),
+    expensesCategory: Boolean = false,
+    onUpdateAmount: (String) -> Unit = {},
+    onUpdateNote: (String) -> Unit = {},
+    fieldsEmpty: Boolean = false,
+    onInsertCashFlow: () -> Unit = {}
+) {
+    if (shouldShowCategoryDialog.value) CategoriesDialog(shouldShowCategoryDialog = shouldShowCategoryDialog,
+        categories = categories,
+        onDismiss = { shouldShowCategoryDialog.value = false },
+        onCategorySelected = { category ->
+            onCategorySelected(category)
+        })
+
+    if (shouldShowDatePickerDialog.value) CashFlowDatePickerDialog(shouldShowDialog = shouldShowDatePickerDialog,
+        onDateSelected = { date ->
+            if (date != null) onUpdateDate(date)
+        },
+        onDismiss = {
+            shouldShowDatePickerDialog.value = false
+        })
+
     Scaffold(modifier, containerColor = backgroundLight, topBar = {
         AddCashFlowTopAppBar(navigateBack)
     }) { paddingValues ->
         Box(
             modifier = Modifier
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
                 Row {
@@ -117,7 +165,7 @@ fun AddCashFlowScreen(
                             modifier = Modifier.weight(1f),
                             type = value.type,
                             onClick = {
-                                viewModel.updateSelectedCashFlowType(index)
+                                onUpdateSelectedCashFlowType(index)
                             },
                             selected = (uiData.selectedCashflowTypeIndex == index)
                         )
@@ -138,22 +186,24 @@ fun AddCashFlowScreen(
                     )
                 }
                 if (!expensesCategory) Spacer(modifier = Modifier.height(12.dp))
-                OutlinedTextField(modifier = Modifier.fillMaxWidth(),
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = uiData.formattedAmount,
                     onValueChange = { formattedAmount ->
                         // Remove non-numeric characters from the input
                         val rawAmount = formattedAmount.replace("\\D".toRegex(), "")
-                        viewModel.updateAmount(rawAmount)
+                        onUpdateAmount(rawAmount)
                     },
                     label = {
                         Text(text = "Amount")
                     },
                     maxLines = 1,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    prefix = { Text(text = "Rp") })
+                    prefix = { Text(text = "Rp") },
+                )
                 Spacer(modifier = Modifier.height(12.dp))
                 ClickableTextField(modifier = Modifier.fillMaxWidth(),
-                    value = uiData.date.formatDateTo(format = DateUtils.formatDate2),
+                    value = uiData.date.formatDateTo(format = DateUtils.formatDate4),
                     onChange = { /* nothing */ },
                     placeholder = "Date",
                     readOnly = false,
@@ -163,7 +213,7 @@ fun AddCashFlowScreen(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiData.note,
-                    onValueChange = { note -> viewModel.updateNote(note) },
+                    onValueChange = { note -> onUpdateNote(note) },
                     label = {
                         Text(text = "Note")
                     },
@@ -172,7 +222,8 @@ fun AddCashFlowScreen(
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(modifier = Modifier.fillMaxWidth(), enabled = !fieldsEmpty, onClick = {
-                    viewModel.insertCashFlow()
+                    if (fieldsEmpty) return@Button
+                    onInsertCashFlow()
                     navigateBack()
                 }) {
                     Text(text = "Save")
@@ -232,7 +283,7 @@ fun CategoriesDialog(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(count = 4), modifier = Modifier.padding(innerPadding)
             ) {
-                items(categories.filter { it.id != 1 && it.id != 2 }) { category ->
+                items(categories.filter { it.categoryId != 1 && it.categoryId != 2 }) { category ->
                     CategoryDialogItem(item = category.name,
                         emoji = category.emoji,
                         onCategorySelected = {

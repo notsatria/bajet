@@ -15,22 +15,23 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.notsatria.bajet.data.entities.CashFlow
+import com.notsatria.bajet.data.entities.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.CashFlowSummary
 import com.notsatria.bajet.ui.theme.backgroundLight
 import com.notsatria.bajet.ui.theme.inversePrimaryLight
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import timber.log.Timber.Forest.i
+import java.util.Calendar
 
 @Composable
-fun HomeScreen(
+fun HomeRoute(
     modifier: Modifier = Modifier,
     navigateToAddCashFlowScreen: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
@@ -41,6 +42,35 @@ fun HomeScreen(
     val cashFlowSummary by viewModel.cashFlowSummary.collectAsStateWithLifecycle()
     val selectedMonth by viewModel.selectedMonth.collectAsStateWithLifecycle()
 
+    HomeScreen(
+        modifier,
+        navigateToAddCashFlowScreen,
+        cashFlowSummary,
+        cashFlowAndCategoryList,
+        selectedMonth,
+        onPreviousMonthClick = {
+            viewModel.changeMonth(-1)
+        },
+        onNextMonthClick = {
+            viewModel.changeMonth(1)
+        },
+        onDeleteCashFlow = {
+            viewModel.deleteCashFlow(it)
+        }
+    )
+}
+
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    navigateToAddCashFlowScreen: () -> Unit = {},
+    cashFlowSummary: CashFlowSummary? = null,
+    cashFlowAndCategoryList: List<CashFlowAndCategory> = emptyList(),
+    selectedMonth: Calendar,
+    onPreviousMonthClick: () -> Unit = {},
+    onNextMonthClick: () -> Unit = {},
+    onDeleteCashFlow: (CashFlow) -> Unit = {}
+) {
     Scaffold(
         modifier,
         containerColor = backgroundLight,
@@ -66,13 +96,13 @@ fun HomeScreen(
             ) {
                 if (cashFlowSummary != null)
                     CashFlowSummaryCard(
-                        cashFlowSummary = cashFlowSummary!!,
+                        cashFlowSummary = cashFlowSummary,
                         selectedMonth = selectedMonth,
                         onPreviousMonthClick = {
-                            viewModel.changeMonth(-1)
+                            onPreviousMonthClick()
                         },
                         onNextMonthClick = {
-                            viewModel.changeMonth(1)
+                            onNextMonthClick()
                         }
                     )
                 Spacer(modifier = Modifier.height(30.dp))
@@ -83,15 +113,23 @@ fun HomeScreen(
                     groupedCashflow.entries.forEachIndexed { _, entry ->
                         val date = entry.key
                         val cashFlowList = entry.value
-                        val total =
-                            cashFlowList.sumOf { it.cashFlow.amount }
+                        val totalIncome =
+                            cashFlowList.filter { it.category.categoryId == 1 }
+                                .sumOf { it.cashFlow.amount }
+                        val totalExpenses =
+                            cashFlowList.filter { it.category.categoryId != 1 }
+                                .sumOf { it.cashFlow.amount }
 
                         item {
                             DailyCashFlowCardItem(
                                 date = date,
-                                total = total,
+                                totalIncome = totalIncome,
+                                totalExpenses = totalExpenses,
                                 cashFlowList = cashFlowList,
-                                modifier = Modifier.padding(bottom = 12.dp)
+                                modifier = Modifier.padding(bottom = 12.dp),
+                                onDeleteCashFlow = { cashFlow ->
+                                    onDeleteCashFlow(cashFlow)
+                                }
                             )
                         }
                     }
@@ -106,10 +144,4 @@ fun HomeFloatingActionButton(onClick: () -> Unit) {
     FloatingActionButton(onClick = { onClick() }) {
         Icon(imageVector = Icons.Filled.Add, contentDescription = "Add cashflow")
     }
-}
-
-@Preview
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen()
 }

@@ -1,5 +1,6 @@
 package com.notsatria.bajet.repository
 
+import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.CashFlowSummary
 import com.notsatria.bajet.data.room.CashFlowDao
@@ -12,4 +13,6 @@ class CashFlowRepository(private val dao: CashFlowDao) {
 
     fun getCashFlowSummary(startDate: Long, endDate: Long): Flow<CashFlowSummary> =
         dao.getCashFlowSummary(startDate, endDate)
+
+    suspend fun deleteCashFlow(cashFlow: CashFlow) = dao.deleteCashFlow(cashFlow)
 }

@@ -1,79 +1,79 @@
 {
   "categories": [
     {
-      "id": 1,
+      "categoryId": 1,
       "name": "income",
       "emoji": "💰"
     },
     {
-      "id": 2,
+      "categoryId": 2,
       "name": "expenses",
       "emoji": "💸"
     },
     {
-      "id": 3,
+      "categoryId": 3,
       "name": "food",
       "emoji": "🍔"
     },
     {
-      "id": 4,
+      "categoryId": 4,
       "name": "transportation",
       "emoji": "🚗"
     },
     {
-      "id": 5,
+      "categoryId": 5,
       "name": "shopping",
       "emoji": "🛍️"
     },
     {
-      "id": 6,
+      "categoryId": 6,
       "name": "entertainment",
       "emoji": "🎬"
     },
     {
-      "id": 7,
+      "categoryId": 7,
       "name": "health",
       "emoji": "🏥"
     },
     {
-      "id": 8,
+      "categoryId": 8,
       "name": "utilities",
       "emoji": "💡"
     },
     {
-      "id": 9,
+      "categoryId": 9,
       "name": "education",
       "emoji": "🎓"
     },
     {
-      "id": 10,
+      "categoryId": 10,
       "name": "savings",
       "emoji": "🏦"
     },
     {
-      "id": 11,
+      "categoryId": 11,
       "name": "gifts",
       "emoji": "🎁"
     },
     {
-      "id": 12,
+      "categoryId": 12,
       "name": "travel",
       "emoji": "✈️"
     },
     {
-      "id": 13,
+      "categoryId": 13,
       "name": "pets",
       "emoji": "🐾"
     },
     {
-      "id": 14,
+      "categoryId": 14,
       "name": "subscriptions",
       "emoji": "📺"
     },
     {
-      "id": 15,
-      "name": "miscellaneous",
-      "emoji": "🔧"
+      "categoryId": 15,
+      "name": "other",
+      "emoji": "\uD83E\uDDF0"
     }
   ]
 }

@@ -8,6 +8,7 @@ object DateUtils {
     val formatDate1 = SimpleDateFormat("EEE, dd MMM yyyy", LOCALE_ID)
     val formatDate2 = SimpleDateFormat("dd MMM yyyy", LOCALE_ID)
     val formatDate3 = SimpleDateFormat("MMMM yyyy", LOCALE_ID)
+    val formatDate4 = SimpleDateFormat("dd MMM yyyy (EEE)", LOCALE_ID)
 
     fun Long.formatDateTo(format: SimpleDateFormat = formatDate1): String {
         val date = Date(this)
