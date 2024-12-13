@@ -45,13 +45,11 @@ import com.notsatria.bajet.ui.components.ActionIcon
 import com.notsatria.bajet.ui.components.SwipeableItemWithActions
 import com.notsatria.bajet.ui.theme.AppTypography
 import com.notsatria.bajet.ui.theme.errorLight
-import com.notsatria.bajet.ui.theme.onSecondaryLight
 import com.notsatria.bajet.ui.theme.outlineDark
 import com.notsatria.bajet.ui.theme.outlineLight
 import com.notsatria.bajet.ui.theme.tertiaryContainerDark
 import com.notsatria.bajet.ui.theme.tertiaryContainerLightMediumContrast
 import com.notsatria.bajet.utils.formatToRupiah
-import timber.log.Timber.Forest.i
 
 /**
  * This function will shown on [HomeScreen] as a list. It will show the grouped cash flow by day.
@@ -68,7 +66,8 @@ fun DailyCashFlowCardItem(
     totalExpenses: Double = 0.0,
     totalIncome: Double = 0.0,
     cashFlowList: List<CashFlowAndCategory>,
-    onDeleteCashFlow: (CashFlow) -> Unit = {}
+    onDeleteCashFlow: (CashFlow) -> Unit,
+    navigateToEditCashFlowScreen: (Int) -> Unit
 ) {
     var itemRowVisible by remember { mutableStateOf(true) }
 
@@ -102,7 +101,9 @@ fun DailyCashFlowCardItem(
             ) {
                 Column {
                     cashFlowList.forEachIndexed { index, cashFlowAndCategory ->
-                        var cashFlowAndCategoryDomain = cashFlowAndCategory.toDomain()
+                        var cashFlowAndCategoryDomain by remember {
+                            mutableStateOf(cashFlowAndCategory.toDomain())
+                        }
                         SwipeableItemWithActions(
                             isRevealed = cashFlowAndCategoryDomain.isOptionsRevealed,
                             actions = {
@@ -128,9 +129,14 @@ fun DailyCashFlowCardItem(
                             }) {
                             DailyCashFlowItemRow(
                                 cashFlow = cashFlowAndCategoryDomain,
-                                modifier = Modifier.background(
-                                    Color.White
-                                )
+                                modifier = Modifier
+                                    .background(
+                                        Color.White
+                                    )
+                                    .clickable {
+                                        navigateToEditCashFlowScreen(cashFlowAndCategoryDomain.cashFlow.cashFlowId)
+                                    },
+                                emoji = cashFlowAndCategoryDomain.category.emoji
                             )
                         }
                         // Add divider only if it's not the last item
@@ -162,8 +168,8 @@ fun DailyCashFlowHeader(
         ) {
             Text(
                 text = date,
-                style = AppTypography.labelLarge,
-                color = outlineLight,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.outline,
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
@@ -186,9 +192,14 @@ fun DailyCashFlowHeader(
  *
  * @param modifier
  * @param cashFlow
+ * @param emoji
  */
 @Composable
-fun DailyCashFlowItemRow(modifier: Modifier = Modifier, cashFlow: CashFlowAndCategoryDomain) {
+fun DailyCashFlowItemRow(
+    modifier: Modifier = Modifier,
+    cashFlow: CashFlowAndCategoryDomain,
+    emoji: String
+) {
     Row(
         modifier = modifier
             .padding(12.dp)
@@ -199,16 +210,16 @@ fun DailyCashFlowItemRow(modifier: Modifier = Modifier, cashFlow: CashFlowAndCat
             modifier = Modifier
                 .size(32.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(tertiaryContainerDark)
+                .background(MaterialTheme.colorScheme.tertiaryContainer)
         ) {
-            Text(text = "\uD83C\uDF72", modifier = Modifier.align(Alignment.Center))
+            Text(text = emoji, modifier = Modifier.align(Alignment.Center))
         }
         Spacer(modifier = Modifier.width(8.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = cashFlow.category.name, style = AppTypography.titleMedium)
+            Text(text = cashFlow.category.name, style = MaterialTheme.typography.titleMedium)
             if (cashFlow.cashFlow.note.isNotEmpty()) Text(
                 text = cashFlow.cashFlow.note,
-                color = outlineDark,
+                color = MaterialTheme.colorScheme.outlineVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 12.sp
@@ -216,7 +227,7 @@ fun DailyCashFlowItemRow(modifier: Modifier = Modifier, cashFlow: CashFlowAndCat
         }
         Text(
             text = cashFlow.cashFlow.amount.formatToRupiah(),
-            style = AppTypography.titleSmall,
+            style = MaterialTheme.typography.titleSmall,
             color = if (cashFlow.cashFlow.categoryId != 1) errorLight else tertiaryContainerLightMediumContrast
         )
     }

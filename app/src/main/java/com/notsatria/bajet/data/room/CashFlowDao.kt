@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.CashFlowSummary
@@ -42,4 +43,11 @@ interface CashFlowDao {
 
     @Delete
     suspend fun deleteCashFlow(cashFlow: CashFlow)
+
+    @Query("SELECT * FROM cashflow JOIN category ON cashflow.categoryId = category.categoryId WHERE cashFlowId = :cashFlowId")
+    suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowAndCategory
+
+    @Update
+    suspend fun updateCashFlow(cashFlow: CashFlow)
+
 }

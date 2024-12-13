@@ -13,18 +13,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.CashFlowSummary
-import com.notsatria.bajet.ui.theme.backgroundLight
-import com.notsatria.bajet.ui.theme.inversePrimaryLight
+import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import timber.log.Timber.Forest.i
@@ -34,6 +36,7 @@ import java.util.Calendar
 fun HomeRoute(
     modifier: Modifier = Modifier,
     navigateToAddCashFlowScreen: () -> Unit = {},
+    navigateToEditCashFlowScreen: (Int) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val cashFlowAndCategoryList by viewModel.cashFlowAndCategoryList.collectAsStateWithLifecycle(
@@ -44,10 +47,12 @@ fun HomeRoute(
 
     HomeScreen(
         modifier,
+        HomeUiState(
+            cashFlowSummary = cashFlowSummary,
+            cashFlowAndCategoryList = cashFlowAndCategoryList,
+            selectedMonth = selectedMonth
+        ),
         navigateToAddCashFlowScreen,
-        cashFlowSummary,
-        cashFlowAndCategoryList,
-        selectedMonth,
         onPreviousMonthClick = {
             viewModel.changeMonth(-1)
         },
@@ -56,6 +61,9 @@ fun HomeRoute(
         },
         onDeleteCashFlow = {
             viewModel.deleteCashFlow(it)
+        },
+        navigateToEditCashFlowScreen = {
+            navigateToEditCashFlowScreen(it)
         }
     )
 }
@@ -63,41 +71,43 @@ fun HomeRoute(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    homeUiState: HomeUiState,
     navigateToAddCashFlowScreen: () -> Unit = {},
-    cashFlowSummary: CashFlowSummary? = null,
-    cashFlowAndCategoryList: List<CashFlowAndCategory> = emptyList(),
-    selectedMonth: Calendar,
     onPreviousMonthClick: () -> Unit = {},
     onNextMonthClick: () -> Unit = {},
-    onDeleteCashFlow: (CashFlow) -> Unit = {}
+    onDeleteCashFlow: (CashFlow) -> Unit = {},
+    navigateToEditCashFlowScreen: (Int) -> Unit = {}
 ) {
+    val groupedCashflow = remember(homeUiState.cashFlowAndCategoryList) {
+        homeUiState.cashFlowAndCategoryList.sortedByDescending { it.cashFlow.date }
+            .groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) }
+    }
     Scaffold(
         modifier,
-        containerColor = backgroundLight,
+        containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
             HomeFloatingActionButton(navigateToAddCashFlowScreen)
         }
-    ) { paddingValues ->
+    ) { padding ->
         Box(
             modifier = Modifier
-                .padding(paddingValues)
                 .fillMaxSize()
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .background(inversePrimaryLight)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
             )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp)
             ) {
-                if (cashFlowSummary != null)
+                if (homeUiState.cashFlowSummary != null)
                     CashFlowSummaryCard(
-                        cashFlowSummary = cashFlowSummary,
-                        selectedMonth = selectedMonth,
+                        cashFlowSummary = homeUiState.cashFlowSummary,
+                        selectedMonth = homeUiState.selectedMonth,
                         onPreviousMonthClick = {
                             onPreviousMonthClick()
                         },
@@ -105,38 +115,42 @@ fun HomeScreen(
                             onNextMonthClick()
                         }
                     )
-                Spacer(modifier = Modifier.height(30.dp))
-                LazyColumn {
-                    val groupedCashflow =
-                        cashFlowAndCategoryList.groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) }
-
-                    groupedCashflow.entries.forEachIndexed { _, entry ->
-                        val date = entry.key
-                        val cashFlowList = entry.value
-                        val totalIncome =
-                            cashFlowList.filter { it.category.categoryId == 1 }
-                                .sumOf { it.cashFlow.amount }
-                        val totalExpenses =
-                            cashFlowList.filter { it.category.categoryId != 1 }
-                                .sumOf { it.cashFlow.amount }
-
-                        item {
-                            DailyCashFlowCardItem(
-                                date = date,
-                                totalIncome = totalIncome,
-                                totalExpenses = totalExpenses,
-                                cashFlowList = cashFlowList,
-                                modifier = Modifier.padding(bottom = 12.dp),
-                                onDeleteCashFlow = { cashFlow ->
-                                    onDeleteCashFlow(cashFlow)
-                                }
-                            )
-                        }
-                    }
-                }
+                GroupedCashFlowList(
+                    modifier = Modifier.padding(top = 16.dp),
+                    groupedCashflow = groupedCashflow,
+                    onDeleteCashFlow = onDeleteCashFlow,
+                    navigateToEditCashFlowScreen = navigateToEditCashFlowScreen
+                )
             }
         }
     }
+}
+
+@Composable
+fun GroupedCashFlowList(
+    modifier: Modifier = Modifier,
+    groupedCashflow: Map<String, List<CashFlowAndCategory>>,
+    onDeleteCashFlow: (CashFlow) -> Unit,
+    navigateToEditCashFlowScreen: (Int) -> Unit
+) {
+    LazyColumn(modifier) {
+        groupedCashflow.entries.map { entry ->
+            item {
+                DailyCashFlowCardItem(
+                    date = entry.key,
+                    totalIncome = entry.value.filter { it.category.categoryId == 1 }
+                        .sumOf { it.cashFlow.amount },
+                    totalExpenses = entry.value.filter { it.category.categoryId != 1 }
+                        .sumOf { it.cashFlow.amount },
+                    cashFlowList = entry.value,
+                    onDeleteCashFlow = onDeleteCashFlow,
+                    navigateToEditCashFlowScreen = navigateToEditCashFlowScreen
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -144,4 +158,43 @@ fun HomeFloatingActionButton(onClick: () -> Unit) {
     FloatingActionButton(onClick = { onClick() }) {
         Icon(imageVector = Icons.Filled.Add, contentDescription = "Add cashflow")
     }
+}
+
+data class HomeUiState(
+    val cashFlowSummary: CashFlowSummary? = null,
+    val cashFlowAndCategoryList: List<CashFlowAndCategory> = emptyList(),
+    val selectedMonth: Calendar = Calendar.getInstance()
+)
+
+@Preview
+@Composable
+fun HomeScreenPreview() {
+    HomeScreen(
+        homeUiState = HomeUiState(
+            cashFlowSummary = CashFlowSummary(
+                income = 20000.0,
+                expenses = -40000.0,
+                balance = -20000.0
+            ),
+            cashFlowAndCategoryList = listOf(
+                CashFlowAndCategory(
+                    cashFlow = CashFlow(
+                        cashFlowId = 1,
+                        type = "Income",
+                        amount = 10000.0,
+                        note = "Salary",
+                        date = Calendar.getInstance().timeInMillis,
+                        categoryId = 1
+                    ),
+                    category = Category(
+                        categoryId = 1,
+                        name = "Salary",
+                        emoji = "💰"
+                    )
+                )
+            ),
+            selectedMonth = Calendar.getInstance()
+        )
+
+    )
 }

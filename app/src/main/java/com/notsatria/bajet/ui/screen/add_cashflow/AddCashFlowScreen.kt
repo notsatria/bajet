@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -25,6 +26,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -34,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -42,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,10 +53,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.components.ClickableTextField
 import com.notsatria.bajet.ui.theme.backgroundLight
-import com.notsatria.bajet.ui.theme.surfaceContainerLight
 import com.notsatria.bajet.utils.CashFlowTypes
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
@@ -62,6 +66,7 @@ import java.util.Date
 fun AddCashFlowRoute(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
+    cashFlowId: Int? = null,
     viewModel: AddCashFlowViewModel = hiltViewModel()
 ) {
     val shouldShowCategoryDialog = rememberSaveable { mutableStateOf(false) }
@@ -72,23 +77,30 @@ fun AddCashFlowRoute(
     val expensesCategory by remember {
         derivedStateOf { viewModel.addCashFlowData.selectedCashflowTypeIndex == 1 }
     }
-
     val fieldsEmpty by remember {
         derivedStateOf {
-            viewModel.addCashFlowData.amount.isEmpty() ||
-                    viewModel.addCashFlowData.amount == "0" ||
-                    (expensesCategory && viewModel.addCashFlowData.categoryId == 0)
+            viewModel.validateFields(expensesCategory)
         }
     }
-
     val uiData = viewModel.addCashFlowData
+    val cashFlowIdExists = (cashFlowId != null && cashFlowId != -1)
+
+    LaunchedEffect(key1 = cashFlowId) {
+        if (cashFlowIdExists) viewModel.getCashFlowById(cashFlowId!!)
+    }
 
     AddCashFlowScreen(
         modifier,
+        uiState = AddCashFlowUiState(
+            shouldShowCategoryDialog = shouldShowCategoryDialog,
+            shouldShowDatePickerDialog = shouldShowDatePickerDialog,
+            categories = categories,
+            uiData = uiData,
+            expensesCategory = expensesCategory,
+            cashFlowIdExists = cashFlowIdExists,
+            fieldsEmpty = fieldsEmpty
+        ),
         navigateBack = navigateBack,
-        shouldShowCategoryDialog = shouldShowCategoryDialog,
-        shouldShowDatePickerDialog = shouldShowDatePickerDialog,
-        categories = categories,
         onCategorySelected = { category ->
             viewModel.updateCategory(category.categoryId)
             viewModel.updateCategoryText("${category.emoji} ${category.name}")
@@ -99,134 +111,141 @@ fun AddCashFlowRoute(
         onUpdateSelectedCashFlowType = { index ->
             viewModel.updateSelectedCashFlowType(index)
         },
-        uiData = uiData,
-        expensesCategory = expensesCategory,
         onUpdateAmount = { rawAmount ->
             viewModel.updateAmount(rawAmount)
         },
         onUpdateNote = { note ->
             viewModel.updateNote(note)
         },
-        fieldsEmpty = fieldsEmpty,
-        onInsertCashFlow = {
-            viewModel.insertCashFlow()
-        }
+        onAddCashFlowClicked = {
+            if (cashFlowIdExists) viewModel.updateCashFlow(cashFlowId!!)
+            else viewModel.insertCashFlow()
+            navigateBack()
+        },
     )
 }
 
 @Composable
 fun AddCashFlowScreen(
     modifier: Modifier = Modifier,
+    uiState: AddCashFlowUiState = AddCashFlowUiState(),
     navigateBack: () -> Unit = {},
-    shouldShowCategoryDialog: MutableState<Boolean> = mutableStateOf(false),
-    shouldShowDatePickerDialog: MutableState<Boolean> = mutableStateOf(false),
-    categories: List<Category> = emptyList(),
     onCategorySelected: (Category) -> Unit = {},
     onUpdateDate: (Long) -> Unit = {},
     onUpdateSelectedCashFlowType: (Int) -> Unit = {},
-    uiData: AddCashFlowData = AddCashFlowData(),
-    expensesCategory: Boolean = false,
     onUpdateAmount: (String) -> Unit = {},
     onUpdateNote: (String) -> Unit = {},
-    fieldsEmpty: Boolean = false,
-    onInsertCashFlow: () -> Unit = {}
+    onAddCashFlowClicked: () -> Unit = {},
 ) {
-    if (shouldShowCategoryDialog.value) CategoriesDialog(shouldShowCategoryDialog = shouldShowCategoryDialog,
-        categories = categories,
-        onDismiss = { shouldShowCategoryDialog.value = false },
-        onCategorySelected = { category ->
-            onCategorySelected(category)
-        })
+    if (uiState.shouldShowCategoryDialog.value)
+        CategoriesDialog(shouldShowCategoryDialog = uiState.shouldShowCategoryDialog,
+            categories = uiState.categories,
+            onDismiss = { uiState.shouldShowCategoryDialog.value = false },
+            onCategorySelected = { category ->
+                onCategorySelected(category)
+                uiState.shouldShowCategoryDialog.value = false
+            })
 
-    if (shouldShowDatePickerDialog.value) CashFlowDatePickerDialog(shouldShowDialog = shouldShowDatePickerDialog,
+    if (uiState.shouldShowDatePickerDialog.value) CashFlowDatePickerDialog(
+        shouldShowDialog = uiState.shouldShowDatePickerDialog,
         onDateSelected = { date ->
             if (date != null) onUpdateDate(date)
+            uiState.shouldShowDatePickerDialog.value = false
         },
         onDismiss = {
-            shouldShowDatePickerDialog.value = false
-        })
+            uiState.shouldShowDatePickerDialog.value = false
+        },
+        initialDate = if (uiState.cashFlowIdExists) uiState.uiData.date else Date().time,
+    )
 
-    Scaffold(modifier, containerColor = backgroundLight, topBar = {
+    val onEditAndIncomeAndExpensesCategory =
+        uiState.cashFlowIdExists && uiState.uiData.categoryId == 0 || uiState.uiData.categoryId == 1
+
+    Scaffold(modifier, containerColor = MaterialTheme.colorScheme.background, topBar = {
         AddCashFlowTopAppBar(navigateBack)
-    }) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .padding(paddingValues)
-        ) {
+    }) { padding ->
+        Box(Modifier.padding(padding)) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
                     .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+                    .imePadding()
             ) {
                 Row {
                     CashFlowTypes.entries.forEachIndexed { index, value ->
                         CashFlowTypeRadioButton(
-                            modifier = Modifier.weight(1f),
-                            type = value.type,
-                            onClick = {
+                            modifier = Modifier.weight(1f), type = value.type, onClick = {
                                 onUpdateSelectedCashFlowType(index)
-                            },
-                            selected = (uiData.selectedCashflowTypeIndex == index)
+                            }, selected = (uiState.uiData.selectedCashflowTypeIndex == index)
                         )
                     }
                 }
-                if (expensesCategory) Spacer(modifier = Modifier.height(12.dp))
-                AnimatedVisibility(visible = expensesCategory,
-                    modifier = Modifier.clickable { shouldShowCategoryDialog.value = true }) {
+                if (uiState.expensesCategory) Spacer(modifier = Modifier.height(12.dp))
+                AnimatedVisibility(visible = uiState.expensesCategory,
+                    modifier = Modifier.clickable {
+                        uiState.shouldShowCategoryDialog.value = true
+                    }) {
+                    // check if its edit cashflow and category is not income and expenses
                     ClickableTextField(
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = "Category",
-                        value = uiData.categoryText,
+                        placeholder = stringResource(R.string.category),
+                        value = if (onEditAndIncomeAndExpensesCategory) "" else uiState.uiData.categoryText,
                         onChange = { /* Do nothing */ },
                         readOnly = false,
                         onClick = {
-                            shouldShowCategoryDialog.value = true
+                            uiState.shouldShowCategoryDialog.value = true
                         },
                     )
                 }
-                if (!expensesCategory) Spacer(modifier = Modifier.height(12.dp))
+                if (!uiState.expensesCategory) Spacer(modifier = Modifier.height(12.dp))
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = uiData.formattedAmount,
+                    value = uiState.uiData.formattedAmount,
                     onValueChange = { formattedAmount ->
                         // Remove non-numeric characters from the input
                         val rawAmount = formattedAmount.replace("\\D".toRegex(), "")
                         onUpdateAmount(rawAmount)
                     },
                     label = {
-                        Text(text = "Amount")
+                        Text(text = stringResource(R.string.amount))
                     },
                     maxLines = 1,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    prefix = { Text(text = "Rp") },
+                    prefix = { Text(text = stringResource(R.string.rp)) },
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 ClickableTextField(modifier = Modifier.fillMaxWidth(),
-                    value = uiData.date.formatDateTo(format = DateUtils.formatDate4),
+                    value = uiState.uiData.date.formatDateTo(format = DateUtils.formatDate4),
                     onChange = { /* nothing */ },
-                    placeholder = "Date",
+                    placeholder = stringResource(R.string.date),
                     readOnly = false,
                     onClick = {
-                        shouldShowDatePickerDialog.value = true
+                        uiState.shouldShowDatePickerDialog.value = true
                     })
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = uiData.note,
+                    value = uiState.uiData.note,
                     onValueChange = { note -> onUpdateNote(note) },
                     label = {
-                        Text(text = "Note")
+                        Text(text = stringResource(R.string.note))
                     },
                     minLines = 1,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                Button(modifier = Modifier.fillMaxWidth(), enabled = !fieldsEmpty, onClick = {
-                    if (fieldsEmpty) return@Button
-                    onInsertCashFlow()
-                    navigateBack()
-                }) {
-                    Text(text = "Save")
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !uiState.fieldsEmpty,
+                    onClick = {
+                        if (uiState.fieldsEmpty) return@Button
+                        onAddCashFlowClicked()
+                    }) {
+                    Text(
+                        text = if (uiState.cashFlowIdExists) stringResource(R.string.update) else stringResource(
+                            R.string.save
+                        )
+                    )
                 }
             }
         }
@@ -236,9 +255,13 @@ fun AddCashFlowScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CashFlowDatePickerDialog(
-    shouldShowDialog: MutableState<Boolean>, onDateSelected: (Long?) -> Unit, onDismiss: () -> Unit
+    shouldShowDialog: MutableState<Boolean>,
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit,
+    initialDate: Long = 0
 ) {
-    val datePickerState = rememberDatePickerState(initialDisplayedMonthMillis = Date().time)
+    val datePickerState =
+        rememberDatePickerState(initialDisplayedMonthMillis = initialDate)
 
     if (shouldShowDialog.value) DatePickerDialog(onDismissRequest = { onDismiss() },
         confirmButton = {
@@ -246,12 +269,12 @@ fun CashFlowDatePickerDialog(
                 onDateSelected(datePickerState.selectedDateMillis)
                 onDismiss()
             }) {
-                Text(text = "OK")
+                Text(text = stringResource(R.string.ok))
             }
         },
         dismissButton = {
             TextButton(onClick = { onDismiss() }) {
-                Text(text = "Cancel")
+                Text(text = stringResource(R.string.cancel))
             }
         }) {
         DatePicker(state = datePickerState)
@@ -269,22 +292,27 @@ fun CategoriesDialog(
     if (shouldShowCategoryDialog.value) Dialog(onDismissRequest = {
         shouldShowCategoryDialog.value = false
     }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Scaffold(modifier = Modifier.fillMaxSize(), containerColor = backgroundLight, topBar = {
-            TopAppBar(title = {
-                Text(text = "Select Category")
-            }, navigationIcon = {
-                IconButton(onClick = { onDismiss() }) {
-                    Icon(
-                        Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Dismiss"
-                    )
-                }
-            })
-        }) { innerPadding ->
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                TopAppBar(title = {
+                    Text(text = stringResource(R.string.select_category))
+                }, navigationIcon = {
+                    IconButton(onClick = { onDismiss() }) {
+                        Icon(
+                            Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.dismiss)
+                        )
+                    }
+                })
+            }) { innerPadding ->
             LazyVerticalGrid(
                 columns = GridCells.Fixed(count = 4), modifier = Modifier.padding(innerPadding)
             ) {
                 items(categories.filter { it.categoryId != 1 && it.categoryId != 2 }) { category ->
-                    CategoryDialogItem(item = category.name,
+                    CategoryDialogItem(
+                        item = category.name,
                         emoji = category.emoji,
                         onCategorySelected = {
                             onCategorySelected(category)
@@ -325,15 +353,31 @@ fun CashFlowTypeRadioButton(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCashFlowTopAppBar(onNavigateBack: () -> Unit) {
-    TopAppBar(title = { Text(text = "Add Cashflow") }, navigationIcon = {
-        IconButton(onClick = { onNavigateBack() }) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back"
-            )
-        }
-    }, colors = TopAppBarDefaults.topAppBarColors(containerColor = surfaceContainerLight)
+    TopAppBar(
+        title = { Text(text = stringResource(R.string.add_cashflow)) },
+        navigationIcon = {
+            IconButton(onClick = { onNavigateBack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                    contentDescription = stringResource(
+                        R.string.back
+                    )
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
     )
 }
+
+data class AddCashFlowUiState(
+    val shouldShowCategoryDialog: MutableState<Boolean> = mutableStateOf(false),
+    val shouldShowDatePickerDialog: MutableState<Boolean> = mutableStateOf(false),
+    val categories: List<Category> = emptyList(),
+    val uiData: AddCashFlowData = AddCashFlowData(),
+    val expensesCategory: Boolean = false,
+    val cashFlowIdExists: Boolean = false,
+    val fieldsEmpty: Boolean = false
+)
 
 @Preview
 @Composable

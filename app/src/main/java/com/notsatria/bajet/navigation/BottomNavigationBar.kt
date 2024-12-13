@@ -11,7 +11,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import com.notsatria.bajet.R
 
 @Composable
 fun BottomNavigationBar(
@@ -21,10 +23,10 @@ fun BottomNavigationBar(
 ) {
     NavigationBar(modifier) {
         val navItems = listOf(
-            NavigationItem("Home", Icons.Default.Home, Screen.Home),
-            NavigationItem("Budget", Icons.Default.Money, Screen.Budget),
-            NavigationItem("Analytics", Icons.Default.Analytics, Screen.Analytics),
-            NavigationItem("Settings", Icons.Default.Settings, Screen.Settings),
+            NavigationItem(stringResource(R.string.home), Icons.Default.Home, Screen.Home),
+            NavigationItem(stringResource(R.string.budget), Icons.Default.Money, Screen.Budget),
+            NavigationItem(stringResource(R.string.analytics), Icons.Default.Analytics, Screen.Analytics),
+            NavigationItem(stringResource(R.string.settings), Icons.Default.Settings, Screen.Settings),
         )
 
         navItems.map { item ->

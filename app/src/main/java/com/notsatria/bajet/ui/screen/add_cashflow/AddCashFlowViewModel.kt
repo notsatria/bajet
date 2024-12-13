@@ -13,6 +13,7 @@ import com.notsatria.bajet.utils.formatToCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber.Forest.i
 import java.util.Date
 import javax.inject.Inject
 
@@ -56,7 +57,8 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
 
     fun insertCashFlow() {
         viewModelScope.launch(Dispatchers.IO) {
-            addCashFlowRepository.insertCashFlow(addCashFlowData.toCashFlow())
+            val cashFlow = addCashFlowData.toCashFlow()
+            addCashFlowRepository.insertCashFlow(cashFlow)
         }
 
     }
@@ -67,6 +69,35 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
                 addCashFlowData.copy(categories = addCashFlowRepository.getCategories())
         }
     }
+
+    fun getCashFlowById(cashFlowId: Int) {
+        viewModelScope.launch {
+            val data = addCashFlowRepository.getCashFlowAndCategoryById(cashFlowId)
+            val amount =
+                if (data.cashFlow.amount < 0) (data.cashFlow.amount * -1).toString() else data.cashFlow.amount.toString()
+
+            addCashFlowData = addCashFlowData.copy(
+                amount = amount,
+                formattedAmount = amount,
+                note = data.cashFlow.note,
+                date = data.cashFlow.date,
+                categoryId = data.cashFlow.categoryId,
+                categoryText = "${data.category.emoji} ${data.category.name}",
+                selectedCashflowTypeIndex = if (data.cashFlow.type == "Expenses") 1 else 0
+            )
+        }
+    }
+
+    fun updateCashFlow(cashFowId: Int) {
+        viewModelScope.launch {
+            val cashFlow = addCashFlowData.toCashFlow()
+            i("Update CashFlow: $cashFlow")
+            addCashFlowRepository.updateCashFlow(cashFlow.copy(cashFlowId = cashFowId))
+        }
+    }
+
+    fun validateFields(expensesCategory: Boolean) =
+        addCashFlowData.amount.isEmpty() || addCashFlowData.amount == "0" || (expensesCategory && addCashFlowData.categoryId == 0)
 }
 
 data class AddCashFlowData(

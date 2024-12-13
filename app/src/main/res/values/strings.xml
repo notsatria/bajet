@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">bajet</string>
+    <string name="update">Update</string>
+    <string name="save">Save</string>
+    <string name="note">Note</string>
+    <string name="date">Date</string>
+    <string name="amount">Amount</string>
+    <string name="category">Category</string>
+    <string name="rp">Rp</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="select_category">Select Category</string>
+    <string name="add_cashflow">Add Cashflow</string>
+    <string name="back">Back</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="expenses">Expenses</string>
+    <string name="income">Income</string>
+    <string name="balance">Balance</string>
+    <string name="home">Home</string>
+    <string name="budget">Budget</string>
+    <string name="analytics">Analytics</string>
+    <string name="settings">Settings</string>
 </resources>

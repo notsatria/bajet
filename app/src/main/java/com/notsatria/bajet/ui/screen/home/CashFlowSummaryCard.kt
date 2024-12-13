@@ -16,14 +16,17 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.CashFlowSummary
 import com.notsatria.bajet.ui.theme.AppTypography
 import com.notsatria.bajet.ui.theme.outlineLight
@@ -47,7 +50,7 @@ fun CashFlowSummaryCard(
 ) {
     ElevatedCard(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = surfaceContainerLight),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
         modifier = modifier
             .fillMaxWidth()
     ) {
@@ -65,7 +68,7 @@ fun CashFlowSummaryCard(
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = selectedMonth.formatDateTo(DateUtils.formatDate3),
-                    style = AppTypography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -84,17 +87,17 @@ fun CashFlowSummaryCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 CashflowColumnText(
-                    title = "Expenses",
+                    title = stringResource(R.string.expenses),
                     value = cashFlowSummary.expenses.formatToRupiah(),
                     modifier = Modifier.weight(1f)
                 )
                 CashflowColumnText(
-                    title = "Income",
+                    title = stringResource(R.string.income),
                     value = cashFlowSummary.income.formatToRupiah(),
                     modifier = Modifier.weight(1f)
                 )
                 CashflowColumnText(
-                    title = "Balance",
+                    title = stringResource(R.string.balance),
                     value = cashFlowSummary.balance.formatToRupiah(),
                     modifier = Modifier.weight(1f)
                 )
@@ -112,16 +115,29 @@ fun CashflowColumnText(modifier: Modifier = Modifier, title: String, value: Stri
         Text(
             title,
             textAlign = TextAlign.Center,
-            style = AppTypography.bodyMedium,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            color = outlineLight
+            color = MaterialTheme.colorScheme.outline
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             value,
             textAlign = TextAlign.Center,
-            style = AppTypography.bodyMedium,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold
         )
     }
+}
+
+@Preview
+@Composable
+fun CashFlowSummaryCardPreview() {
+    CashFlowSummaryCard(
+        cashFlowSummary = CashFlowSummary(
+            income = 20000.0,
+            expenses = -40000.0,
+            balance = -20000.0,
+        ),
+        selectedMonth = Calendar.getInstance()
+    )
 }

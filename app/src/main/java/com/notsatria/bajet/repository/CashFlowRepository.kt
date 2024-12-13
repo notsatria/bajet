@@ -15,4 +15,5 @@ class CashFlowRepository(private val dao: CashFlowDao) {
         dao.getCashFlowSummary(startDate, endDate)
 
     suspend fun deleteCashFlow(cashFlow: CashFlow) = dao.deleteCashFlow(cashFlow)
+
 }
