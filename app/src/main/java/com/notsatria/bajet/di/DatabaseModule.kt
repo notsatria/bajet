@@ -3,6 +3,7 @@ package com.notsatria.bajet.di
 import android.content.Context
 import com.notsatria.bajet.data.room.CashFlowDao
 import com.notsatria.bajet.data.room.CashFlowDatabase
+import com.notsatria.bajet.data.room.CategoryDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,5 +22,8 @@ class DatabaseModule {
     }
 
     @Provides
-    fun provideCashflowDao(db: CashFlowDatabase): CashFlowDao = db.dao()
+    fun provideCashflowDao(db: CashFlowDatabase): CashFlowDao = db.cashFlowDao()
+
+    @Provides
+    fun provideCategoryDao(db: CashFlowDatabase): CategoryDao = db.categoryDao()
 }

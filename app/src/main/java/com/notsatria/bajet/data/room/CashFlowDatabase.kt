@@ -17,7 +17,8 @@ import org.json.JSONException
 @Database(entities = [CashFlow::class, Category::class], version = 1)
 abstract class CashFlowDatabase : RoomDatabase() {
 
-    abstract fun dao(): CashFlowDao
+    abstract fun cashFlowDao(): CashFlowDao
+    abstract fun categoryDao(): CategoryDao
 
     companion object {
 
@@ -35,7 +36,7 @@ abstract class CashFlowDatabase : RoomDatabase() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
                             CoroutineScope(Dispatchers.IO).launch {
-                                prepopulateCategories(context, getInstance(context).dao())
+                                prepopulateCategories(context, getInstance(context).cashFlowDao())
                             }
                         }
                     })

@@ -24,10 +24,6 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
     var addCashFlowData by mutableStateOf(AddCashFlowData())
         private set
 
-    init {
-        getCategories()
-    }
-
     fun updateAmount(rawAmount: String) {
         addCashFlowData = addCashFlowData.copy(
             amount = rawAmount,
@@ -61,13 +57,6 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
             addCashFlowRepository.insertCashFlow(cashFlow)
         }
 
-    }
-
-    private fun getCategories() {
-        viewModelScope.launch {
-            addCashFlowData =
-                addCashFlowData.copy(categories = addCashFlowRepository.getCategories())
-        }
     }
 
     fun getCashFlowById(cashFlowId: Int) {
@@ -107,7 +96,6 @@ data class AddCashFlowData(
     val formattedAmount: String = "",
     val note: String = "",
     val date: Long = Date().time,
-    val categories: List<Category> = emptyList(),
     val categoryId: Int = 0,
     val categoryText: String = ""
 )

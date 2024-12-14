@@ -22,9 +22,6 @@ interface CashFlowDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCategory(category: Category)
 
-    @Query("SELECT * FROM category")
-    suspend fun getCategories(): List<Category>
-
     @Transaction
     @Query("SELECT * FROM cashflow JOIN category ON cashflow.categoryId = category.categoryId WHERE date BETWEEN :startDate AND :endDate")
     fun getCashFlowsAndCategoryListByMonth(startDate: Long, endDate: Long): Flow<List<CashFlowAndCategory>>

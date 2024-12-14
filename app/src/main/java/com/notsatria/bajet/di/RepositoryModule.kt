@@ -1,8 +1,10 @@
 package com.notsatria.bajet.di
 
 import com.notsatria.bajet.data.room.CashFlowDao
+import com.notsatria.bajet.data.room.CategoryDao
 import com.notsatria.bajet.repository.AddCashFlowRepository
 import com.notsatria.bajet.repository.CashFlowRepository
+import com.notsatria.bajet.repository.CategoryRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,5 +25,11 @@ class RepositoryModule {
     @Singleton
     fun provideCashFlowRepository(dao: CashFlowDao): CashFlowRepository {
         return CashFlowRepository(dao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCategoryRepository(dao: CategoryDao): CategoryRepository {
+        return CategoryRepository(dao)
     }
 }
