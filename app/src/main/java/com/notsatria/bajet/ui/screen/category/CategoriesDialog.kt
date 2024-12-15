@@ -22,6 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,6 +55,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Category
+import com.notsatria.bajet.ui.theme.BajetTheme
 
 @Composable
 fun CategoryManagementScreen(
@@ -88,7 +91,8 @@ fun CategoriesDialog(
     onCategorySelected: (Category) -> Unit,
     categories: List<Category> = emptyList(),
     shouldShowAddCategoryDialog: MutableState<Boolean> = mutableStateOf(false),
-    viewModel: CategoriesViewModel
+    viewModel: CategoriesViewModel,
+    context: Context = LocalContext.current
 ) {
     if (shouldShowCategoryDialog.value) Dialog(onDismissRequest = {
         shouldShowCategoryDialog.value = false
@@ -127,6 +131,11 @@ fun CategoriesDialog(
                         },
                         onDeleteCategory = {
                             viewModel.deleteCategory(categories[index])
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.category_deleted),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     )
                 }
@@ -143,7 +152,8 @@ fun CategoryDialogItem(
     onCategorySelected: () -> Unit,
     onDeleteCategory: () -> Unit
 ) {
-    val shouldShowDeleteCategoryDialog = rememberSaveable { mutableStateOf(false) }
+    val shouldShowCategoryActionDialog = remember { mutableStateOf(false) }
+    val shouldShowDeleteCategoryDialog = remember { mutableStateOf(false) }
 
     DeleteCategoryDialog(
         shouldShowDeleteCategoryDialog,
@@ -153,13 +163,22 @@ fun CategoryDialogItem(
         }
     )
 
+    CategoryActionDialog(
+        shouldShowCategoryActionDialog,
+        onEditCategory = {
+        },
+        onDeleteCategory = {
+            shouldShowDeleteCategoryDialog.value = true
+        }
+    )
+
     Column(
         modifier = Modifier
             .padding(bottom = 12.dp)
             .fillMaxSize()
             .combinedClickable(
                 onClick = { onCategorySelected() },
-                onLongClick = { shouldShowDeleteCategoryDialog.value = true }
+                onLongClick = { shouldShowCategoryActionDialog.value = true }
             ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -168,6 +187,49 @@ fun CategoryDialogItem(
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = item)
     }
+}
+
+@Composable
+fun CategoryActionDialog(
+    shouldShowCategoryActionDialog: MutableState<Boolean> = mutableStateOf(
+        false
+    ),
+    onEditCategory: () -> Unit = {},
+    onDeleteCategory: () -> Unit = {}
+) {
+    if (shouldShowCategoryActionDialog.value)
+        Dialog(onDismissRequest = {
+            shouldShowCategoryActionDialog.value = false
+        }) {
+            Card(
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                ) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            shouldShowCategoryActionDialog.value = false
+                            onEditCategory()
+                        }) {
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+                        Text(text = stringResource(R.string.edit_category))
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            shouldShowCategoryActionDialog.value = false
+                            onDeleteCategory()
+                        }) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                        Text(text = stringResource(R.string.delete_category))
+                    }
+                }
+            }
+        }
 }
 
 @Composable
@@ -330,4 +392,12 @@ fun AddCategoryDialogPreview() {
         onCancel = {},
         viewModel = hiltViewModel()
     )
+}
+
+@Preview
+@Composable
+fun CategoryActionDialogPreview() {
+    BajetTheme {
+        CategoryActionDialog()
+    }
 }
