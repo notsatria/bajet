@@ -11,4 +11,6 @@ class CategoryRepository(private val categoryDao: CategoryDao) {
 
     fun deleteCategory(category: Category) = categoryDao.deleteCategory(category)
 
+    fun updateCategory(category: Category) = categoryDao.updateCategory(category)
+
 }

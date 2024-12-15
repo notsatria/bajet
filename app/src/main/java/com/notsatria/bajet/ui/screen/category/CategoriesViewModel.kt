@@ -22,10 +22,13 @@ class CategoriesViewModel @Inject constructor(private val categoryRepository: Ca
     private var _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories = _categories.asStateFlow()
 
+    var selectedCategoryToEdit: Category? = null
+        private set
+
     var emoji by mutableStateOf("😊")
         private set
 
-    var categoryName by mutableStateOf("$emoji category")
+    var categoryName by mutableStateOf("$emoji Category")
         private set
 
     fun updateCategoryName(value: String) {
@@ -37,10 +40,37 @@ class CategoriesViewModel @Inject constructor(private val categoryRepository: Ca
         emoji = value.trim().split(" ").first()
     }
 
+    fun setSelectedCategoryToEdit(category: Category) {
+        i("setSelectedCategoryToEdit: $category")
+        selectedCategoryToEdit = category
+    }
+
     fun insertCategory() {
         viewModelScope.launch(Dispatchers.IO) {
-            val category = Category(name = categoryName.trim().split(" ").last(), emoji = emoji)
+            val splittedName = categoryName.trim().split(" ")
+            categoryName = if (splittedName.size > 2) {
+                splittedName.subList(1, splittedName.size).joinToString(" ")
+            } else {
+                splittedName.last()
+            }
+            val category = Category(name = categoryName, emoji = emoji)
             categoryRepository.insertCategory(category)
+        }
+    }
+
+    fun updateCategory() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val splittedName = categoryName.trim().split(" ")
+            categoryName = if (splittedName.size > 2) {
+                splittedName.subList(1, splittedName.size).joinToString(" ")
+            } else {
+                splittedName.last()
+            }
+            categoryRepository.updateCategory(
+                selectedCategoryToEdit!!.copy(
+                    name = categoryName, emoji = emoji
+                )
+            )
         }
     }
 
@@ -59,4 +89,5 @@ class CategoriesViewModel @Inject constructor(private val categoryRepository: Ca
             categoryRepository.deleteCategory(category)
         }
     }
+
 }

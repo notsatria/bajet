@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.notsatria.bajet.data.entities.Category
 import kotlinx.coroutines.flow.Flow
 
@@ -19,4 +20,8 @@ interface CategoryDao {
 
     @Delete
     fun deleteCategory(category: Category)
+
+    @Update
+    fun updateCategory(category: Category)
+
 }
