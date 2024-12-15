@@ -1,5 +1,6 @@
 package com.notsatria.bajet.ui.screen.home
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,20 +16,30 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.CashFlowSummary
 import com.notsatria.bajet.data.entities.Category
+import com.notsatria.bajet.ui.screen.add_cashflow.AddCashFlowViewModel
+import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber.Forest.i
 import java.util.Calendar
 
@@ -37,7 +48,10 @@ fun HomeRoute(
     modifier: Modifier = Modifier,
     navigateToAddCashFlowScreen: () -> Unit = {},
     navigateToEditCashFlowScreen: (Int) -> Unit = {},
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    scope: CoroutineScope = rememberCoroutineScope(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    context: Context = LocalContext.current
 ) {
     val cashFlowAndCategoryList by viewModel.cashFlowAndCategoryList.collectAsStateWithLifecycle(
         emptyList()
@@ -61,10 +75,20 @@ fun HomeRoute(
         },
         onDeleteCashFlow = {
             viewModel.deleteCashFlow(it)
+            scope.launch {
+                val result = snackbarHostState.showSnackbar(
+                    message = context.getString(R.string.cashflow_deleted),
+                    actionLabel = context.getString(R.string.undo)
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    viewModel.insertCashFlow()
+                }
+            }
         },
         navigateToEditCashFlowScreen = {
             navigateToEditCashFlowScreen(it)
-        }
+        },
+        snackbarHostState = snackbarHostState
     )
 }
 
@@ -76,7 +100,8 @@ fun HomeScreen(
     onPreviousMonthClick: () -> Unit = {},
     onNextMonthClick: () -> Unit = {},
     onDeleteCashFlow: (CashFlow) -> Unit = {},
-    navigateToEditCashFlowScreen: (Int) -> Unit = {}
+    navigateToEditCashFlowScreen: (Int) -> Unit = {},
+    snackbarHostState: SnackbarHostState,
 ) {
     val groupedCashflow = remember(homeUiState.cashFlowAndCategoryList) {
         homeUiState.cashFlowAndCategoryList.sortedByDescending { it.cashFlow.date }
@@ -85,9 +110,12 @@ fun HomeScreen(
     Scaffold(
         modifier,
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         floatingActionButton = {
             HomeFloatingActionButton(navigateToAddCashFlowScreen)
-        }
+        },
     ) { padding ->
         Box(
             modifier = Modifier
@@ -169,32 +197,34 @@ data class HomeUiState(
 @Preview
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(
-        homeUiState = HomeUiState(
-            cashFlowSummary = CashFlowSummary(
-                income = 20000.0,
-                expenses = -40000.0,
-                balance = -20000.0
-            ),
-            cashFlowAndCategoryList = listOf(
-                CashFlowAndCategory(
-                    cashFlow = CashFlow(
-                        cashFlowId = 1,
-                        type = "Income",
-                        amount = 10000.0,
-                        note = "Salary",
-                        date = Calendar.getInstance().timeInMillis,
-                        categoryId = 1
-                    ),
-                    category = Category(
-                        categoryId = 1,
-                        name = "Salary",
-                        emoji = "💰"
+    BajetTheme {
+        HomeScreen(
+            homeUiState = HomeUiState(
+                cashFlowSummary = CashFlowSummary(
+                    income = 20000.0,
+                    expenses = -40000.0,
+                    balance = -20000.0
+                ),
+                cashFlowAndCategoryList = listOf(
+                    CashFlowAndCategory(
+                        cashFlow = CashFlow(
+                            cashFlowId = 1,
+                            type = "Income",
+                            amount = 10000.0,
+                            note = "Salary",
+                            date = Calendar.getInstance().timeInMillis,
+                            categoryId = 1
+                        ),
+                        category = Category(
+                            categoryId = 1,
+                            name = "Salary",
+                            emoji = "💰"
+                        )
                     )
-                )
+                ),
+                selectedMonth = Calendar.getInstance()
             ),
-            selectedMonth = Calendar.getInstance()
+            snackbarHostState = SnackbarHostState()
         )
-
-    )
+    }
 }

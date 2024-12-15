@@ -7,6 +7,7 @@ import com.notsatria.bajet.data.entities.CashFlowAndCategory
 import com.notsatria.bajet.repository.CashFlowRepository
 import com.notsatria.bajet.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(private val repository: CashFlowRepository) : ViewModel() {
     private val _selectedMonth = MutableStateFlow(Calendar.getInstance())
     val selectedMonth get() = _selectedMonth.asStateFlow()
+
+   private var deletedCashflow: CashFlow? = null
 
     val cashFlowSummary = _selectedMonth.flatMapLatest { month ->
         val (startDate, endDate) = DateUtils.getStartAndEndDate(month)
@@ -49,9 +52,14 @@ class HomeViewModel @Inject constructor(private val repository: CashFlowReposito
 
     fun deleteCashFlow(cashFlow: CashFlow) {
         viewModelScope.launch {
-            i("Deleted cashflow ${cashFlow.cashFlowId}")
-            i("Deleted cashflow $cashFlow")
             repository.deleteCashFlow(cashFlow)
+            deletedCashflow = cashFlow
+        }
+    }
+
+    fun insertCashFlow() {
+        viewModelScope.launch(Dispatchers.IO) {
+            deletedCashflow?.let { repository.insertCashFlow(it) }
         }
     }
 }

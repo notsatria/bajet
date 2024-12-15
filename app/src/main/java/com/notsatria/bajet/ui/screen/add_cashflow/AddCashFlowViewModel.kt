@@ -56,7 +56,6 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
             val cashFlow = addCashFlowData.toCashFlow()
             addCashFlowRepository.insertCashFlow(cashFlow)
         }
-
     }
 
     fun getCashFlowById(cashFlowId: Int) {
