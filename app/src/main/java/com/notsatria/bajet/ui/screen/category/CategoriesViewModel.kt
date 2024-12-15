@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber.Forest.i
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,23 +22,24 @@ class CategoriesViewModel @Inject constructor(private val categoryRepository: Ca
     private var _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories = _categories.asStateFlow()
 
-    var categoryName by mutableStateOf("")
+    var emoji by mutableStateOf("😊")
         private set
 
-    var emoji by mutableStateOf("🦥")
+    var categoryName by mutableStateOf("$emoji category")
         private set
 
     fun updateCategoryName(value: String) {
+        i("updateCategoryName: $value")
         categoryName = value
     }
 
     fun updateEmoji(value: String) {
-        emoji = value
+        emoji = value.trim().split(" ").first()
     }
 
     fun insertCategory() {
         viewModelScope.launch(Dispatchers.IO) {
-            val category = Category(name = categoryName, emoji = emoji)
+            val category = Category(name = categoryName.trim().split(" ").last(), emoji = emoji)
             categoryRepository.insertCategory(category)
         }
     }

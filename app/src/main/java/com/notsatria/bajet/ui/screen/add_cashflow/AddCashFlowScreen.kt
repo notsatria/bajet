@@ -50,8 +50,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.components.ClickableTextField
-import com.notsatria.bajet.ui.screen.category.CategoriesDialog
 import com.notsatria.bajet.ui.screen.category.CategoriesViewModel
+import com.notsatria.bajet.ui.screen.category.CategoryManagementScreen
+import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.CashFlowTypes
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
@@ -123,6 +124,7 @@ fun AddCashFlowRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCashFlowScreen(
     modifier: Modifier = Modifier,
@@ -136,10 +138,9 @@ fun AddCashFlowScreen(
     onAddCashFlowClicked: () -> Unit = {},
 ) {
     if (uiState.shouldShowCategoryDialog.value)
-        CategoriesDialog(
-            shouldShowCategoryDialog = uiState.shouldShowCategoryDialog,
+        CategoryManagementScreen(
             categories = uiState.categories,
-            onDismiss = { uiState.shouldShowCategoryDialog.value = false },
+            shouldShowCategoryDialog = uiState.shouldShowCategoryDialog,
             onCategorySelected = { category ->
                 onCategorySelected(category)
                 uiState.shouldShowCategoryDialog.value = false
@@ -286,7 +287,7 @@ fun CashFlowTypeRadioButton(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
         RadioButton(selected = selected, onClick = { onClick() })
-        Text(text = type.replaceFirstChar { it.uppercase() })
+        Text(text = type)
     }
 }
 
@@ -322,5 +323,7 @@ data class AddCashFlowUiState(
 @Preview
 @Composable
 fun AddCashFlowScreenPreview() {
-    AddCashFlowScreen()
+    BajetTheme {
+        AddCashFlowScreen()
+    }
 }

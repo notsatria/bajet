@@ -10,6 +10,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven("https://packages.jetbrains.team/maven/p/firework/dev")
+        maven ("https://jitpack.io")
     }
 }
 dependencyResolutionManagement {
@@ -18,6 +19,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://packages.jetbrains.team/maven/p/firework/dev")
+        maven ("https://jitpack.io")
     }
 }
 

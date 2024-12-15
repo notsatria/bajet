@@ -1,5 +1,6 @@
 package com.notsatria.bajet.ui.screen.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -69,7 +70,7 @@ fun CashFlowSummaryCard(
                 Text(
                     text = selectedMonth.formatDateTo(DateUtils.formatDate3),
                     style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 IconButton(onClick = { onNextMonthClick() }) {

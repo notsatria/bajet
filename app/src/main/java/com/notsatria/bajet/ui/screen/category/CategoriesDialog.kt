@@ -1,5 +1,7 @@
 package com.notsatria.bajet.ui.screen.category
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -38,7 +40,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.EmojiSupportMatch
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,6 +54,32 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Category
 
+@Composable
+fun CategoryManagementScreen(
+    categories: List<Category>,
+    onCategorySelected: (Category) -> Unit,
+    shouldShowCategoryDialog: MutableState<Boolean>,
+    viewModel: CategoriesViewModel = hiltViewModel()
+) {
+    val shouldShowAddCategoryDialog = remember { mutableStateOf(false) }
+
+    CategoriesDialog(
+        shouldShowCategoryDialog = shouldShowCategoryDialog,
+        onDismiss = { shouldShowCategoryDialog.value = false },
+        categories = categories,
+        shouldShowAddCategoryDialog = shouldShowAddCategoryDialog,
+        onCategorySelected = onCategorySelected,
+        viewModel = viewModel
+    )
+
+    AddCategoryDialog(
+        shouldAddShowCategoryDialog = shouldShowAddCategoryDialog,
+        onCancel = { shouldShowAddCategoryDialog.value = false },
+        viewModel = viewModel
+    )
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriesDialog(
@@ -55,16 +87,9 @@ fun CategoriesDialog(
     onDismiss: () -> Unit,
     onCategorySelected: (Category) -> Unit,
     categories: List<Category> = emptyList(),
-    viewModel: CategoriesViewModel = hiltViewModel()
+    shouldShowAddCategoryDialog: MutableState<Boolean> = mutableStateOf(false),
+    viewModel: CategoriesViewModel
 ) {
-    val shouldShowAddCategoryDialog = rememberSaveable { mutableStateOf(false) }
-
-    AddCategoryDialog(
-        shouldShowAddCategoryDialog,
-        onCancel = {
-            shouldShowAddCategoryDialog.value = false
-        })
-
     if (shouldShowCategoryDialog.value) Dialog(onDismissRequest = {
         shouldShowCategoryDialog.value = false
     }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
@@ -103,7 +128,7 @@ fun CategoriesDialog(
                         onDeleteCategory = {
                             viewModel.deleteCategory(categories[index])
                         }
-                        )
+                    )
                 }
             }
         }
@@ -112,7 +137,12 @@ fun CategoriesDialog(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CategoryDialogItem(item: String, emoji: String, onCategorySelected: () -> Unit, onDeleteCategory: () -> Unit) {
+fun CategoryDialogItem(
+    item: String,
+    emoji: String,
+    onCategorySelected: () -> Unit,
+    onDeleteCategory: () -> Unit
+) {
     val shouldShowDeleteCategoryDialog = rememberSaveable { mutableStateOf(false) }
 
     DeleteCategoryDialog(
@@ -201,9 +231,10 @@ fun AddCategoryDialogItem(onAddCategory: () -> Unit) {
 fun AddCategoryDialog(
     shouldAddShowCategoryDialog: MutableState<Boolean> = mutableStateOf(false),
     onCancel: () -> Unit = {},
-    viewModel: CategoriesViewModel = hiltViewModel()
+    viewModel: CategoriesViewModel,
+    context: Context = LocalContext.current,
 ) {
-    if (shouldAddShowCategoryDialog.value)
+    if (shouldAddShowCategoryDialog.value) {
         Dialog(onDismissRequest = {
             shouldAddShowCategoryDialog.value = false
         }) {
@@ -227,13 +258,15 @@ fun AddCategoryDialog(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            modifier = Modifier.clickable { },
-                            text = "🤹", fontSize = 48.sp
+                            text = viewModel.emoji,
+                            fontSize = 48.sp,
+                            style = TextStyle(platformStyle = PlatformTextStyle(emojiSupportMatch = EmojiSupportMatch.None))
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         OutlinedTextField(
                             value = viewModel.categoryName,
                             onValueChange = { name ->
+                                viewModel.updateEmoji(name)
                                 viewModel.updateCategoryName(name)
                             },
                             placeholder = {
@@ -251,6 +284,16 @@ fun AddCategoryDialog(
                             Text(stringResource(R.string.cancel))
                         }
                         TextButton(onClick = {
+                            if (viewModel.categoryName.isEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(
+                                        R.string.field_cannot_be_empty,
+                                        "Category Name"
+                                    ), Toast.LENGTH_SHORT
+                                ).show()
+                                return@TextButton
+                            }
                             viewModel.insertCategory()
                             onCancel()
                         }) {
@@ -260,6 +303,7 @@ fun AddCategoryDialog(
                 }
             }
         }
+    }
 }
 
 @Preview(name = "CategoriesDialog")
@@ -268,7 +312,13 @@ fun CategoriesDialogPreview() {
     CategoriesDialog(
         shouldShowCategoryDialog = rememberSaveable { mutableStateOf(true) },
         onDismiss = {},
-        onCategorySelected = {}
+        onCategorySelected = {},
+        categories = listOf(
+            Category(categoryId = 3, name = "Food", emoji = "🍔"),
+            Category(categoryId = 4, name = "Transport", emoji = "🚌")
+        ),
+        shouldShowAddCategoryDialog = rememberSaveable { mutableStateOf(true) },
+        viewModel = hiltViewModel()
     )
 }
 
@@ -277,5 +327,7 @@ fun CategoriesDialogPreview() {
 fun AddCategoryDialogPreview() {
     AddCategoryDialog(
         shouldAddShowCategoryDialog = rememberSaveable { mutableStateOf(true) },
+        onCancel = {},
+        viewModel = hiltViewModel()
     )
 }

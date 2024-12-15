@@ -16,6 +16,7 @@ uiTextGoogleFonts = "1.7.5"
 navigationCompose = "2.8.4"
 timber = "5.0.1"
 firebaseCrashlyticsBuildtools = "3.0.2"
+foundationLayoutAndroid = "1.7.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +44,7 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
+androidx-foundation-layout-android = { group = "androidx.compose.foundation", name = "foundation-layout-android", version.ref = "foundationLayoutAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
