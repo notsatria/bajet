@@ -1,4 +1,4 @@
-package com.notsatria.bajet.data.room
+package com.notsatria.bajet.data.dao
 
 import androidx.room.Dao
 import androidx.room.Delete

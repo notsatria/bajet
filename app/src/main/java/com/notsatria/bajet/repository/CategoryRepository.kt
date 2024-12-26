@@ -1,7 +1,7 @@
 package com.notsatria.bajet.repository
 
 import com.notsatria.bajet.data.entities.Category
-import com.notsatria.bajet.data.room.CategoryDao
+import com.notsatria.bajet.data.dao.CategoryDao
 
 class CategoryRepository(private val categoryDao: CategoryDao) {
 
