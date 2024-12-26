@@ -1,6 +1,5 @@
 package com.notsatria.bajet.ui.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -12,9 +11,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.core.text.isDigitsOnly
 import com.notsatria.bajet.R
 import com.notsatria.bajet.utils.LOCALE_ID
 import java.text.NumberFormat
+import java.util.Currency
 
 @Composable
 fun CurrencyTextField(
@@ -32,24 +33,57 @@ fun CurrencyTextField(
         maxLines = 1,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         visualTransformation = RupiahVisualTransformation(),
-        prefix = { Text(text = stringResource(R.string.rp)) },
     )
 }
 
 class RupiahVisualTransformation : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val rawAmount = text.text.replace(",", "").replace(".", "")
-        val amount = if (rawAmount.isNotEmpty()) rawAmount.toLong() else 0L
-        val formatted = NumberFormat.getNumberInstance(LOCALE_ID).format(amount)
-        val numberOffsetTranslator = object : OffsetMapping {
-            override fun originalToTransformed(offset: Int): Int {
-                return formatted.length
-            }
+    private val numberFormatter = NumberFormat.getCurrencyInstance().apply {
+        currency = Currency.getInstance(LOCALE_ID)
+        maximumFractionDigits = 0
+    }
 
-            override fun transformedToOriginal(offset: Int): Int {
-                return rawAmount.length.coerceAtMost(offset)
+    override fun filter(text: AnnotatedString): TransformedText {
+        val originalText = text.text.trim()
+        if (originalText.isEmpty()) {
+            return TransformedText(text, OffsetMapping.Identity)
+        }
+        if (originalText.isDigitsOnly().not()) {
+            return TransformedText(text, OffsetMapping.Identity)
+        }
+
+        val formattedText = numberFormatter.format(originalText.toInt())
+        return TransformedText(AnnotatedString(formattedText), CurrencyOffsetMapping(originalText, formattedText))
+    }
+}
+
+class CurrencyOffsetMapping(originalText: String, formattedText: String) : OffsetMapping {
+    private val originalLength: Int = originalText.length
+    private val indices = findDigitIndices(originalText, formattedText)
+
+    private fun findDigitIndices(firstString: String, secondString: String): List<Int> {
+        val digitIndices = mutableListOf<Int>()
+        var currentIndex = 0
+        for (digit in firstString) {
+            val index = secondString.indexOf(digit, currentIndex)
+            if (index != -1) {
+                digitIndices.add(index)
+                currentIndex = index + 1
+            } else {
+                return emptyList()
             }
         }
-        return TransformedText(AnnotatedString(formatted), numberOffsetTranslator)
+        return digitIndices
+    }
+
+    override fun originalToTransformed(offset: Int): Int {
+        if (offset >= originalLength) {
+            return indices.last() + 1
+        }
+
+        return indices[offset]
+    }
+
+    override fun transformedToOriginal(offset: Int): Int {
+        return indices.indexOfFirst { it >= offset }.takeIf { it != -1 } ?: originalLength
     }
 }
