@@ -18,8 +18,7 @@ import com.notsatria.bajet.navigation.Screen
 import com.notsatria.bajet.ui.screen.add_cashflow.AddCashFlowRoute
 import com.notsatria.bajet.ui.screen.budget.add_budget.AddBudgetRoute
 import com.notsatria.bajet.ui.screen.budget.BudgetRoute
-import com.notsatria.bajet.ui.screen.budget.BudgetSettingRoute
-import com.notsatria.bajet.ui.screen.budget.BudgetSettingScreen
+import com.notsatria.bajet.ui.screen.budget.setting.BudgetSettingRoute
 import com.notsatria.bajet.ui.screen.home.HomeRoute
 
 @Composable

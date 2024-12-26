@@ -19,4 +19,6 @@ class BudgetRepository @Inject constructor(
             )
         }
     }
+
+    fun getAllBudget() = dao.getAllBudget()
 }

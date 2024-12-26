@@ -1,10 +1,11 @@
-package com.notsatria.bajet.ui.screen.budget
+package com.notsatria.bajet.ui.screen.budget.setting
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -18,24 +19,41 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
+import com.notsatria.bajet.data.entities.BudgetAndCategory
 import com.notsatria.bajet.ui.theme.BajetTheme
+import com.notsatria.bajet.utils.formatToRupiah
+import timber.log.Timber.Forest.d
 
 @Composable
 fun BudgetSettingRoute(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit = {},
-    navigateToAddBudgetScreen: () -> Unit = {}
+    navigateToAddBudgetScreen: () -> Unit = {},
+    viewModel: BudgetSettingViewModel = hiltViewModel()
 ) {
+    val budgetList by viewModel.budgetList.collectAsStateWithLifecycle()
+    LaunchedEffect(budgetList) {
+        viewModel.getAllBudget()
+        d("budgetList $budgetList")
+    }
+
     BudgetSettingScreen(
         modifier,
-        onNavigateBackClicked = navigateBack,
-        onAddClicked = navigateToAddBudgetScreen
+        event = BudgetSettingEvent(
+            onNavigateBackClicked = navigateBack,
+            onAddClicked = navigateToAddBudgetScreen,
+        ),
+        uiState = BudgetSettingUiState(budgetList)
     )
 }
 
@@ -43,13 +61,13 @@ fun BudgetSettingRoute(
 @Composable
 fun BudgetSettingScreen(
     modifier: Modifier = Modifier,
-    onNavigateBackClicked: () -> Unit = {},
-    onAddClicked: () -> Unit = {},
+    event: BudgetSettingEvent = BudgetSettingEvent(),
+    uiState: BudgetSettingUiState = BudgetSettingUiState()
 ) {
     Scaffold(modifier, topBar = {
         TopAppBar(title = { Text(text = "My Budget") },
             navigationIcon = {
-                IconButton(onClick = onNavigateBackClicked) {
+                IconButton(onClick = event.onNavigateBackClicked) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,
                         contentDescription = stringResource(
@@ -59,7 +77,7 @@ fun BudgetSettingScreen(
                 }
             },
             actions = {
-                IconButton(onClick = onAddClicked) {
+                IconButton(onClick = event.onAddClicked) {
                     Icon(
                         imageVector = Icons.Filled.Add,
                         contentDescription = stringResource(R.string.add_budget)
@@ -68,8 +86,12 @@ fun BudgetSettingScreen(
             })
     }) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(10) {
-                BudgetCategoryItem()
+            items(uiState.budgetList) { budgetAndCategory ->
+                BudgetCategoryItem(
+                    emoji = budgetAndCategory.category.emoji,
+                    categoryName = budgetAndCategory.category.name,
+                    amount = budgetAndCategory.budget.amount
+                )
                 HorizontalDivider()
             }
         }
@@ -77,13 +99,18 @@ fun BudgetSettingScreen(
 }
 
 @Composable
-fun BudgetCategoryItem(modifier: Modifier = Modifier) {
+fun BudgetCategoryItem(
+    modifier: Modifier = Modifier,
+    emoji: String = "😭",
+    categoryName: String = "Category name",
+    amount: Double = 0.0
+) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        Text(text = "😭", modifier = Modifier.padding(start = 12.dp))
+        Text(text = emoji, modifier = Modifier.padding(start = 12.dp))
         Spacer(modifier = Modifier.width(4.dp))
-        Text(text = "Category name")
+        Text(text = categoryName)
         Spacer(modifier = Modifier.weight(1f))
-        Text(text = "Rp40000")
+        Text(text = amount.formatToRupiah())
         Spacer(modifier = Modifier.width(8.dp))
         IconButton(onClick = { }) {
             Icon(
@@ -94,6 +121,15 @@ fun BudgetCategoryItem(modifier: Modifier = Modifier) {
         }
     }
 }
+
+data class BudgetSettingUiState(
+    val budgetList: List<BudgetAndCategory> = emptyList(),
+)
+
+data class BudgetSettingEvent(
+    val onNavigateBackClicked: () -> Unit = {},
+    val onAddClicked: () -> Unit = {}
+)
 
 @Preview
 @Composable
