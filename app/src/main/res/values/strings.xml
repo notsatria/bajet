@@ -31,4 +31,6 @@
     <string name="edit">Edit</string>
     <string name="cashflow_deleted">Cashflow deleted</string>
     <string name="undo">Undo</string>
+    <string name="my_budget">My Budget</string>
+    <string name="add_budget">Add Budget</string>
 </resources>

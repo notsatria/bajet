@@ -1,8 +1,11 @@
 package com.notsatria.bajet.di
 
-import com.notsatria.bajet.data.room.CashFlowDao
-import com.notsatria.bajet.data.room.CategoryDao
+import com.notsatria.bajet.data.dao.BudgetDao
+import com.notsatria.bajet.data.dao.BudgetMonthDao
+import com.notsatria.bajet.data.dao.CashFlowDao
+import com.notsatria.bajet.data.dao.CategoryDao
 import com.notsatria.bajet.repository.AddCashFlowRepository
+import com.notsatria.bajet.repository.BudgetRepository
 import com.notsatria.bajet.repository.CashFlowRepository
 import com.notsatria.bajet.repository.CategoryRepository
 import dagger.Module
@@ -32,4 +35,11 @@ class RepositoryModule {
     fun provideCategoryRepository(dao: CategoryDao): CategoryRepository {
         return CategoryRepository(dao)
     }
+
+    @Provides
+    @Singleton
+    fun provideBudgetRepository(dao: BudgetDao, budgetMonthDao: BudgetMonthDao): BudgetRepository {
+        return BudgetRepository(dao, budgetMonthDao)
+    }
+
 }

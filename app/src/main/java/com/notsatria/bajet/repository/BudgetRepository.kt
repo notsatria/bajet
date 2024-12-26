@@ -12,10 +12,10 @@ class BudgetRepository @Inject constructor(
 ) {
 
     suspend fun insert(budget: Budget) {
-        dao.insert(budget)
+        val budgetId: Long = dao.insert(budget)
         repeat(12) {
             budgetMonthDao.insert(
-                BudgetMonth(budgetId = budget.budgetId, month = it, amount = budget.amount)
+                BudgetMonth(budgetId = budgetId.toInt(), month = it + 1, amount = budget.amount)
             )
         }
     }
