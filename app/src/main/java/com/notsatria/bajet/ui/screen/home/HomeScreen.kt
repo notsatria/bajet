@@ -34,13 +34,11 @@ import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.CashFlowSummary
 import com.notsatria.bajet.data.entities.Category
-import com.notsatria.bajet.ui.screen.add_cashflow.AddCashFlowViewModel
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber.Forest.i
 import java.util.Calendar
 
 @Composable

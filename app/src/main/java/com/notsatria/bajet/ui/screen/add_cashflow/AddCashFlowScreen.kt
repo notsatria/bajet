@@ -50,6 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.components.ClickableTextField
+import com.notsatria.bajet.ui.components.CurrencyTextField
 import com.notsatria.bajet.ui.screen.category.CategoriesViewModel
 import com.notsatria.bajet.ui.screen.category.CategoryManagementScreen
 import com.notsatria.bajet.ui.theme.BajetTheme
@@ -101,7 +102,7 @@ fun AddCashFlowRoute(
         ),
         navigateBack = navigateBack,
         onCategorySelected = { category ->
-            viewModel.updateCategory(category.categoryId)
+            viewModel.updateCategoryId(category.categoryId)
             viewModel.updateCategoryText("${category.emoji} ${category.name}")
         },
         onUpdateDate = { date ->
@@ -124,7 +125,6 @@ fun AddCashFlowRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCashFlowScreen(
     modifier: Modifier = Modifier,
@@ -199,6 +199,11 @@ fun AddCashFlowScreen(
                     )
                 }
                 if (!uiState.expensesCategory) Spacer(modifier = Modifier.height(12.dp))
+                CurrencyTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    amount = uiState.uiData.formattedAmount,
+                    onValueChange = onUpdateAmount
+                )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.uiData.formattedAmount,

@@ -1,7 +1,7 @@
 package com.notsatria.bajet.repository
 
 import com.notsatria.bajet.data.entities.CashFlow
-import com.notsatria.bajet.data.room.CashFlowDao
+import com.notsatria.bajet.data.dao.CashFlowDao
 
 class AddCashFlowRepository(private val cashFlowDao: CashFlowDao) {
 

@@ -5,8 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.notsatria.bajet.data.entities.Category
-import com.notsatria.bajet.data.toCashFlow
+import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.repository.AddCashFlowRepository
 import com.notsatria.bajet.utils.CashFlowTypes
 import com.notsatria.bajet.utils.formatToCurrency
@@ -43,7 +42,7 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
         addCashFlowData = addCashFlowData.copy(selectedCashflowTypeIndex = index)
     }
 
-    fun updateCategory(id: Int) {
+    fun updateCategoryId(id: Int) {
         addCashFlowData = addCashFlowData.copy(categoryId = id)
     }
 
@@ -97,4 +96,16 @@ data class AddCashFlowData(
     val date: Long = Date().time,
     val categoryId: Int = 0,
     val categoryText: String = ""
-)
+) {
+    fun toCashFlow(): CashFlow {
+        val finalAmount = if (this.amount.isEmpty()) 0.0 else this.amount.toDouble()
+        return CashFlow(
+            type = if (selectedCashflowTypeIndex == 0) CashFlowTypes.INCOME.type else CashFlowTypes.EXPENSES.type,
+            amount = if (selectedCashflowTypeIndex == 0) finalAmount else -finalAmount,
+            note = this.note,
+            date = this.date,
+            /* If selected category is income, set category id to 1, otherwise set it to categoryId */
+            categoryId = if (selectedCashflowTypeIndex == 0) 1 else categoryId
+        )
+    }
+}
