@@ -1,6 +1,5 @@
 package com.notsatria.bajet.ui.screen.home
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,9 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.CashFlowSummary
-import com.notsatria.bajet.ui.theme.AppTypography
-import com.notsatria.bajet.ui.theme.outlineLight
-import com.notsatria.bajet.ui.theme.surfaceContainerLight
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import com.notsatria.bajet.utils.formatToRupiah

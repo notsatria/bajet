@@ -35,28 +35,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.CashFlowAndCategory
-import com.notsatria.bajet.data.toDomain
+import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.domain.entity.CashFlowAndCategoryDomain
 import com.notsatria.bajet.ui.components.ActionIcon
 import com.notsatria.bajet.ui.components.SwipeableItemWithActions
-import com.notsatria.bajet.ui.theme.AppTypography
+import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.ui.theme.errorLight
-import com.notsatria.bajet.ui.theme.outlineDark
-import com.notsatria.bajet.ui.theme.outlineLight
-import com.notsatria.bajet.ui.theme.tertiaryContainerDark
 import com.notsatria.bajet.ui.theme.tertiaryContainerLightMediumContrast
+import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import com.notsatria.bajet.utils.formatToRupiah
+import java.util.Calendar
 
 /**
  * This function will shown on [HomeScreen] as a list. It will show the grouped cash flow by day.
  *
  * @param modifier
  * @param date
- * @param total as a total amount of grouped CashFlow
  * @param cashFlowList
  */
 @Composable
@@ -229,6 +228,80 @@ fun DailyCashFlowItemRow(
             text = cashFlow.cashFlow.amount.formatToRupiah(),
             style = MaterialTheme.typography.titleSmall,
             color = if (cashFlow.cashFlow.categoryId != 1) errorLight else tertiaryContainerLightMediumContrast
+        )
+    }
+}
+
+
+@Preview
+@Composable
+fun DailyCashFlowCardItemPreview() {
+    BajetTheme {
+        DailyCashFlowCardItem(
+            date = Calendar.getInstance().formatDateTo(),
+            totalExpenses = 20000.0,
+            totalIncome = 30000.0,
+            cashFlowList = listOf(
+                CashFlowAndCategory(
+                    cashFlow = CashFlow(
+                        cashFlowId = 1,
+                        type = "Income",
+                        amount = 10000.0,
+                        note = "Salary",
+                        date = Calendar.getInstance().timeInMillis,
+                        categoryId = 1
+                    ),
+                    category = Category(
+                        categoryId = 1,
+                        name = "Salary",
+                        emoji = "💰"
+                    )
+                ),
+                CashFlowAndCategory(
+                    cashFlow = CashFlow(
+                        cashFlowId = 2,
+                        type = "Expenses",
+                        amount = -10000.0,
+                        note = "Food",
+                        date = Calendar.getInstance().timeInMillis,
+                        categoryId = 2
+                    ),
+                    category = Category(
+                        categoryId = 2,
+                        name = "Food",
+                        emoji = "🍔"
+                    )
+                )
+            ),
+            onDeleteCashFlow = {},
+            navigateToEditCashFlowScreen = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun DailyCashFlowItemRowPreview() {
+    BajetTheme {
+        DailyCashFlowItemRow(
+            modifier = Modifier,
+            cashFlow = CashFlowAndCategoryDomain(
+                cashFlow = CashFlow(
+                    cashFlowId = 1,
+                    type = "Income",
+                    amount = 10000.0,
+                    note = "Salary",
+                    date = Calendar.getInstance().timeInMillis,
+                    categoryId = 1
+                ),
+                category = Category(
+                    categoryId = 1,
+                    name = "Salary",
+                    emoji = "💰"
+                ),
+                isOptionsRevealed = false
+            ),
+            emoji = "💰"
         )
     }
 }

@@ -16,8 +16,11 @@ import androidx.navigation.navArgument
 import com.notsatria.bajet.navigation.BottomNavigationBar
 import com.notsatria.bajet.navigation.Screen
 import com.notsatria.bajet.ui.screen.add_cashflow.AddCashFlowRoute
+import com.notsatria.bajet.ui.screen.budget.add_budget.AddBudgetRoute
+import com.notsatria.bajet.ui.screen.budget.BudgetRoute
+import com.notsatria.bajet.ui.screen.budget.BudgetSettingRoute
+import com.notsatria.bajet.ui.screen.budget.BudgetSettingScreen
 import com.notsatria.bajet.ui.screen.home.HomeRoute
-import com.notsatria.bajet.ui.theme.backgroundLight
 
 @Composable
 fun BajetApp(
@@ -31,8 +34,8 @@ fun BajetApp(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            when {
-                currentRoute == Screen.Home.route -> BottomNavigationBar(
+            when (currentRoute) {
+                Screen.Home.route, Screen.Budget.route, Screen.Analytics.route, Screen.Settings.route -> BottomNavigationBar(
                     navController = navController,
                     currentRoute = currentRoute
                 )
@@ -41,10 +44,10 @@ fun BajetApp(
         NavHost(
             navController = navController,
             startDestination = Screen.Home.route,
-            modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
                 HomeRoute(
+                    modifier = Modifier.padding(innerPadding),
                     navigateToAddCashFlowScreen = {
                         navController.navigate(Screen.AddCashFlow.route)
                     },
@@ -66,6 +69,28 @@ fun BajetApp(
             composable(Screen.AddCashFlow.route) {
                 AddCashFlowRoute(
                     navigateBack = { navController.navigateUp() },
+                )
+            }
+            composable(Screen.Budget.route) {
+                BudgetRoute(
+                    navigateToBudgetSettingScreen = {
+                        navController.navigate(Screen.BudgetSetting.route)
+                    }
+                )
+            }
+            composable(Screen.BudgetSetting.route) {
+                BudgetSettingRoute(
+                    navigateBack = {
+                        navController.navigateUp()
+                    },
+                    navigateToAddBudgetScreen = {
+                        navController.navigate(Screen.AddBudget.route)
+                    }
+                )
+            }
+            composable(Screen.AddBudget.route) {
+                AddBudgetRoute(
+                    navigateBack = { navController.navigateUp() }
                 )
             }
         }

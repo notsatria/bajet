@@ -163,8 +163,12 @@ fun AddCashFlowScreen(
 
     Scaffold(modifier, containerColor = MaterialTheme.colorScheme.background, topBar = {
         AddCashFlowTopAppBar(navigateBack)
-    }) { padding ->
-        Box(Modifier.padding(padding)) {
+    }) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -201,23 +205,13 @@ fun AddCashFlowScreen(
                 if (!uiState.expensesCategory) Spacer(modifier = Modifier.height(12.dp))
                 CurrencyTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    amount = uiState.uiData.formattedAmount,
-                    onValueChange = onUpdateAmount
-                )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.uiData.formattedAmount,
-                    onValueChange = { formattedAmount ->
-                        // Remove non-numeric characters from the input
-                        val rawAmount = formattedAmount.replace("\\D".toRegex(), "")
-                        onUpdateAmount(rawAmount)
-                    },
-                    label = {
-                        Text(text = stringResource(R.string.amount))
-                    },
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    prefix = { Text(text = stringResource(R.string.rp)) },
+                    amount = uiState.uiData.amount,
+                    onValueChange = { newAmount ->
+                        val trimmed = newAmount.trimStart('0').trim { it.isDigit().not() }
+                        if (trimmed.isNotEmpty()) {
+                            onUpdateAmount(trimmed)
+                        }
+                    }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 ClickableTextField(modifier = Modifier.fillMaxWidth(),

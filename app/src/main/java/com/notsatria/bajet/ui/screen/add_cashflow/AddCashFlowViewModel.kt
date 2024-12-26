@@ -26,7 +26,6 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
     fun updateAmount(rawAmount: String) {
         addCashFlowData = addCashFlowData.copy(
             amount = rawAmount,
-            formattedAmount = rawAmount.formatToCurrency()
         )
     }
 
@@ -65,7 +64,6 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
 
             addCashFlowData = addCashFlowData.copy(
                 amount = amount,
-                formattedAmount = amount,
                 note = data.cashFlow.note,
                 date = data.cashFlow.date,
                 categoryId = data.cashFlow.categoryId,
@@ -91,7 +89,6 @@ data class AddCashFlowData(
     val addCashFlowType: CashFlowTypes = CashFlowTypes.INCOME,
     val selectedCashflowTypeIndex: Int = 0,
     val amount: String = "",
-    val formattedAmount: String = "",
     val note: String = "",
     val date: Long = Date().time,
     val categoryId: Int = 0,

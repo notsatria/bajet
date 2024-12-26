@@ -114,7 +114,7 @@ fun HomeScreen(
         floatingActionButton = {
             HomeFloatingActionButton(navigateToAddCashFlowScreen)
         },
-    ) { padding ->
+    ) { _ ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
