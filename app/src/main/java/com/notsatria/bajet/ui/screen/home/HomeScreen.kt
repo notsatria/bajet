@@ -16,6 +16,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -76,7 +77,8 @@ fun HomeRoute(
             scope.launch {
                 val result = snackbarHostState.showSnackbar(
                     message = context.getString(R.string.cashflow_deleted),
-                    actionLabel = context.getString(R.string.undo)
+                    actionLabel = context.getString(R.string.undo),
+                    duration = SnackbarDuration.Long
                 )
                 if (result == SnackbarResult.ActionPerformed) {
                     viewModel.insertCashFlow()

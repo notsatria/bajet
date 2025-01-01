@@ -100,9 +100,7 @@ fun DailyCashFlowCardItem(
             ) {
                 Column {
                     cashFlowList.forEachIndexed { index, cashFlowAndCategory ->
-                        var cashFlowAndCategoryDomain by remember {
-                            mutableStateOf(cashFlowAndCategory.toDomain())
-                        }
+                        var cashFlowAndCategoryDomain = cashFlowAndCategory.toDomain()
                         SwipeableItemWithActions(
                             isRevealed = cashFlowAndCategoryDomain.isOptionsRevealed,
                             actions = {
