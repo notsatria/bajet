@@ -29,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
+import com.notsatria.bajet.data.entities.Budget
 import com.notsatria.bajet.data.entities.BudgetAndCategory
+import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.formatToRupiah
 import timber.log.Timber.Forest.d
@@ -135,6 +137,33 @@ data class BudgetSettingEvent(
 @Composable
 fun BudgetSettingScreenPreview() {
     BajetTheme {
-        BudgetSettingScreen()
+        BudgetSettingScreen(
+            uiState = BudgetSettingUiState(
+                budgetList = listOf(
+                    BudgetAndCategory(
+                        budget = Budget(
+                            categoryId = 1,
+                            amount = 100000.0
+                        ),
+                        category = Category(
+                            categoryId = 1,
+                            name = "Food",
+                            emoji = "🍔"
+                        )
+                    ),
+                    BudgetAndCategory(
+                        budget = Budget(
+                            categoryId = 2,
+                            amount = 100000.0
+                        ),
+                        category = Category(
+                            categoryId = 1,
+                            name = "Food",
+                            emoji = "🍔"
+                        )
+                    )
+                )
+            )
+        )
     }
 }

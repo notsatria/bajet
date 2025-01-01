@@ -24,45 +24,74 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
+import com.notsatria.bajet.data.entities.BudgetItemByCategory
 import com.notsatria.bajet.ui.theme.BajetTheme
+import com.notsatria.bajet.utils.formatToRupiah
+import timber.log.Timber.Forest.i
 
 @Composable
-fun BudgetRoute(modifier: Modifier = Modifier, navigateToBudgetSettingScreen: () -> Unit = {}) {
-    BudgetScreen(modifier, onSettingsClicked = navigateToBudgetSettingScreen)
+fun BudgetRoute(
+    modifier: Modifier = Modifier,
+    navigateToBudgetSettingScreen: () -> Unit = {},
+    viewModel: BudgetViewModel = hiltViewModel()
+) {
+    val budgetList by viewModel.budgetList.collectAsStateWithLifecycle()
+    LaunchedEffect(budgetList) {
+        viewModel.getAllBudgetWithSpending()
+        i("budgetList: $budgetList")
+    }
+
+    BudgetScreen(
+        modifier,
+        event = BudgetScreenEvent(
+            onSettingsClicked = navigateToBudgetSettingScreen
+        ),
+        uiState = BudgetScreenUiState(
+            budgetList = budgetList.filter { it.budget != null }
+        )
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BudgetScreen(modifier: Modifier = Modifier, onSettingsClicked: () -> Unit = {}) {
+fun BudgetScreen(
+    modifier: Modifier = Modifier,
+    event: BudgetScreenEvent = BudgetScreenEvent(),
+    uiState: BudgetScreenUiState = BudgetScreenUiState()
+) {
     Scaffold(
+        modifier,
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.my_budget)) }, actions = {
-                TextButton(onClick = onSettingsClicked) {
-                    Icon(imageVector = Icons.Default.AccountBalanceWallet, null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.settings))
-                }
-            })
+            BudgetScreenTopBar(event.onSettingsClicked)
         },
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             LazyColumn {
-                items(5 + 1) { index ->
+                items(uiState.budgetList.size) { index ->
                     if (index == 0) {
                         MonthlyBudgetItem()
                         HorizontalDivider(
-                            thickness = 1.dp,
+                            thickness = 3.dp,
                             color = MaterialTheme.colorScheme.outlineVariant
                         )
                     }
-                    BudgetItem()
+                    val budgetItem = uiState.budgetList[index]
+                    BudgetItem(
+                        emoji = budgetItem.emoji,
+                        categoryName = budgetItem.categoryName,
+                        spending = budgetItem.spending,
+                        budget = budgetItem.budget!!
+                    )
                     HorizontalDivider(
                         thickness = 1.dp,
                         color = MaterialTheme.colorScheme.outlineVariant
@@ -74,7 +103,13 @@ fun BudgetScreen(modifier: Modifier = Modifier, onSettingsClicked: () -> Unit = 
 }
 
 @Composable
-fun BudgetItem(modifier: Modifier = Modifier) {
+fun BudgetItem(
+    modifier: Modifier = Modifier,
+    emoji: String,
+    categoryName: String,
+    spending: Double,
+    budget: Double
+) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
@@ -83,22 +118,22 @@ fun BudgetItem(modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.tertiaryContainer)
         ) {
-            Text(text = "🤹", modifier = Modifier.align(Alignment.Center))
+            Text(text = emoji, modifier = Modifier.align(Alignment.Center))
         }
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.padding(end = 16.dp, top = 8.dp, bottom = 8.dp)) {
-            Text("Category name", style = MaterialTheme.typography.titleMedium)
+            Text(categoryName, style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(4.dp))
             LinearProgressIndicator(progress = {
-                val progress = 0.5f
+                val progress = (spending / budget).toFloat()
                 progress
             }, modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(8.dp))
             Row {
-                Text("Rp1000", style = MaterialTheme.typography.labelLarge)
+                Text(spending.formatToRupiah(), style = MaterialTheme.typography.labelLarge)
                 Spacer(Modifier.weight(1f))
                 Text(
-                    "Rp1000",
+                    budget.formatToRupiah(),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge
                 )
@@ -143,11 +178,37 @@ fun MonthlyBudgetItem(modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BudgetScreenTopBar(onSettingsClicked: () -> Unit) {
+    TopAppBar(title = { Text(stringResource(R.string.my_budget)) }, actions = {
+        TextButton(onClick = onSettingsClicked) {
+            Icon(imageVector = Icons.Default.AccountBalanceWallet, null)
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.settings))
+        }
+    })
+}
+
+data class BudgetScreenEvent(
+    val onSettingsClicked: () -> Unit = {}
+)
+
+data class BudgetScreenUiState(
+    val budgetList: List<BudgetItemByCategory> = emptyList()
+)
+
 @Preview
 @Composable
 fun BudgetItemPreview(modifier: Modifier = Modifier) {
     BajetTheme {
-        BudgetItem(modifier.background(MaterialTheme.colorScheme.surfaceContainer))
+        BudgetItem(
+            modifier.background(MaterialTheme.colorScheme.surfaceContainer),
+            emoji = "🤹",
+            categoryName = "Food",
+            spending = 10000.0,
+            budget = 200000.0
+        )
     }
 }
 

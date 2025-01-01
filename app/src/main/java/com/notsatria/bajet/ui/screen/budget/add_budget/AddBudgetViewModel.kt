@@ -33,7 +33,7 @@ class AddBudgetViewModel @Inject constructor(private val budgetRepository: Budge
     }
 
     fun isFormsValid(): Boolean {
-        return addBudgetData.amount.isNotEmpty() && addBudgetData.categoryId != 0
+        return addBudgetData.amount.isNotEmpty() && addBudgetData.amount.toDouble() > 0 && addBudgetData.categoryId != 0
     }
 
     fun insertBudget() {

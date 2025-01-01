@@ -21,4 +21,7 @@ class BudgetRepository @Inject constructor(
     }
 
     fun getAllBudget() = dao.getAllBudget()
+
+    fun getAllBudgetsWithSpending(startDate: Long, endDate: Long) =
+        dao.getAllBudgetsWithSpending(startDate, endDate)
 }
