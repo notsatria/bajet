@@ -29,11 +29,19 @@ class HomeViewModel @Inject constructor(private val repository: CashFlowReposito
 
    private var deletedCashflow: CashFlow? = null
 
+    /**
+     * Flow to get the cash flow summary of the selected month
+     */
     val cashFlowSummary = _selectedMonth.flatMapLatest { month ->
         val (startDate, endDate) = DateUtils.getStartAndEndDate(month)
         repository.getCashFlowSummary(startDate, endDate)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
+    /**
+     * Function to change the selected month
+     *
+     * @param increment whether to increment or decrement the month
+     */
     fun changeMonth(increment: Int) {
         _selectedMonth.update { calendar ->
             i("selectedMonth: ${calendar.time}")
@@ -44,6 +52,9 @@ class HomeViewModel @Inject constructor(private val repository: CashFlowReposito
         }
     }
 
+    /**
+     * Flow to get the cash flow and category list of the selected month
+     */
     val cashFlowAndCategoryList: Flow<List<CashFlowAndCategory>> =
         _selectedMonth.flatMapLatest { month ->
             val (startDate, endDate) = DateUtils.getStartAndEndDate(month)

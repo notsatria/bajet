@@ -1,8 +1,8 @@
 package com.notsatria.bajet.repository
 
-import com.notsatria.bajet.data.entities.Budget
 import com.notsatria.bajet.data.dao.BudgetDao
 import com.notsatria.bajet.data.dao.BudgetMonthDao
+import com.notsatria.bajet.data.entities.Budget
 import com.notsatria.bajet.data.entities.BudgetMonth
 import javax.inject.Inject
 
@@ -22,6 +22,9 @@ class BudgetRepository @Inject constructor(
 
     fun getAllBudget() = dao.getAllBudget()
 
-    fun getAllBudgetsWithSpending(startDate: Long, endDate: Long) =
-        dao.getAllBudgetsWithSpending(startDate, endDate)
+    fun getAllBudgetsWithSpending(startDate: Long, endDate: Long, month: Int) =
+        dao.getAllBudgetsWithSpending(startDate, endDate, month)
+
+    fun getTotalBudgetByMonthWithSpending(startDate: Long, endDate: Long, month: Int) =
+        dao.getTotalBudgetByMonthWithSpending(startDate, endDate, month)
 }

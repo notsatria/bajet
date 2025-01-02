@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.CashFlowSummary
+import com.notsatria.bajet.ui.components.MonthSelection
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import com.notsatria.bajet.utils.formatToRupiah
@@ -55,27 +56,11 @@ fun CashFlowSummaryCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(12.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { onPreviousMonthClick() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                        contentDescription = null
-                    )
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = selectedMonth.formatDateTo(DateUtils.formatDate3),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                IconButton(onClick = { onNextMonthClick() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-                        contentDescription = null,
-                    )
-                }
-            }
+            MonthSelection(
+                selectedMonth = selectedMonth,
+                onPreviousMonthClick = onPreviousMonthClick,
+                onNextMonthClick = onNextMonthClick
+            )
             HorizontalDivider()
             Spacer(modifier = Modifier.height(20.dp))
             Row(
