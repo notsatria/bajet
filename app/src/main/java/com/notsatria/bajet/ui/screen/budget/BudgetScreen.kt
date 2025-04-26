@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
-import com.notsatria.bajet.data.entities.BudgetItemByCategory
-import com.notsatria.bajet.data.entities.TotalBudgetByMonthWithSpending
+import com.notsatria.bajet.data.entities.relation.BudgetItemByCategory
+import com.notsatria.bajet.data.entities.relation.TotalBudgetByMonthWithSpending
 import com.notsatria.bajet.ui.components.MonthSelection
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DateUtils.formatDate5

@@ -2,7 +2,7 @@ package com.notsatria.bajet.ui.screen.budget
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.notsatria.bajet.data.entities.TotalBudgetByMonthWithSpending
+import com.notsatria.bajet.data.entities.relation.TotalBudgetByMonthWithSpending
 import com.notsatria.bajet.repository.BudgetRepository
 import com.notsatria.bajet.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel

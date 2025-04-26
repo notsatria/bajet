@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notsatria.bajet.data.entities.CashFlow
-import com.notsatria.bajet.data.entities.CashFlowAndCategory
+import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.domain.entity.CashFlowAndCategoryDomain
 import com.notsatria.bajet.ui.components.ActionIcon

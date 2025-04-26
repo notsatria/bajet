@@ -5,9 +5,9 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import com.notsatria.bajet.data.entities.Budget
-import com.notsatria.bajet.data.entities.BudgetAndCategory
-import com.notsatria.bajet.data.entities.BudgetItemByCategory
-import com.notsatria.bajet.data.entities.TotalBudgetByMonthWithSpending
+import com.notsatria.bajet.data.entities.relation.BudgetAndCategory
+import com.notsatria.bajet.data.entities.relation.BudgetItemByCategory
+import com.notsatria.bajet.data.entities.relation.TotalBudgetByMonthWithSpending
 import kotlinx.coroutines.flow.Flow
 
 @Dao

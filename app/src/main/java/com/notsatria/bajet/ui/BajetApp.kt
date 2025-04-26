@@ -16,6 +16,7 @@ import androidx.navigation.navArgument
 import com.notsatria.bajet.navigation.BottomNavigationBar
 import com.notsatria.bajet.navigation.Screen
 import com.notsatria.bajet.ui.screen.add_cashflow.AddCashFlowRoute
+import com.notsatria.bajet.ui.screen.analytics.AnalyticsRoute
 import com.notsatria.bajet.ui.screen.budget.add_budget.AddBudgetRoute
 import com.notsatria.bajet.ui.screen.budget.BudgetRoute
 import com.notsatria.bajet.ui.screen.budget.setting.BudgetSettingRoute
@@ -91,6 +92,9 @@ fun BajetApp(
                 AddBudgetRoute(
                     navigateBack = { navController.navigateUp() }
                 )
+            }
+            composable(Screen.Analytics.route) {
+                AnalyticsRoute()
             }
         }
     }

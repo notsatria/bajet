@@ -8,8 +8,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.notsatria.bajet.data.entities.CashFlow
-import com.notsatria.bajet.data.entities.CashFlowAndCategory
-import com.notsatria.bajet.data.entities.CashFlowSummary
+import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
+import com.notsatria.bajet.data.entities.relation.CashFlowSummary
 import com.notsatria.bajet.data.entities.Category
 import kotlinx.coroutines.flow.Flow
 

@@ -3,7 +3,7 @@ package com.notsatria.bajet.ui.screen.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.CashFlow
-import com.notsatria.bajet.data.entities.CashFlowAndCategory
+import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
 import com.notsatria.bajet.repository.CashFlowRepository
 import com.notsatria.bajet.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel

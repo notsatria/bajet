@@ -1,7 +1,9 @@
-package com.notsatria.bajet.data.entities
+package com.notsatria.bajet.data.entities.relation
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.notsatria.bajet.data.entities.CashFlow
+import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.domain.entity.CashFlowAndCategoryDomain
 
 data class CashFlowAndCategory(

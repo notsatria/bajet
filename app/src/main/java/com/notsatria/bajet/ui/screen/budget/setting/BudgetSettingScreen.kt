@@ -30,7 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Budget
-import com.notsatria.bajet.data.entities.BudgetAndCategory
+import com.notsatria.bajet.data.entities.relation.BudgetAndCategory
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.formatToRupiah

@@ -1,4 +1,4 @@
-package com.notsatria.bajet.data.entities
+package com.notsatria.bajet.data.entities.relation
 
 data class TotalBudgetByMonthWithSpending(
     val totalBudget: Double,

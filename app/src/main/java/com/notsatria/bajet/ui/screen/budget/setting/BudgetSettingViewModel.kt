@@ -2,7 +2,7 @@ package com.notsatria.bajet.ui.screen.budget.setting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.notsatria.bajet.data.entities.BudgetAndCategory
+import com.notsatria.bajet.data.entities.relation.BudgetAndCategory
 import com.notsatria.bajet.repository.BudgetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
