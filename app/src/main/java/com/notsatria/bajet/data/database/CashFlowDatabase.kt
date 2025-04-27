@@ -1,6 +1,7 @@
 package com.notsatria.bajet.data.database
 
 import android.content.Context
+import androidx.compose.ui.graphics.toArgb
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -64,7 +65,8 @@ abstract class CashFlowDatabase : RoomDatabase() {
                             Category(
                                 categoryId = item.getInt("categoryId"),
                                 name = item.getString("name"),
-                                emoji = item.getString("emoji")
+                                emoji = item.getString("emoji"),
+                                color = Helper.randomColor().toArgb()
                             )
                         )
                     }

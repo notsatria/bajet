@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,13 +42,15 @@ import androidx.compose.ui.unit.sp
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.Category
-import com.notsatria.bajet.domain.entity.CashFlowAndCategoryDomain
+import com.notsatria.bajet.ui.domain.CashFlowAndCategoryDomain
 import com.notsatria.bajet.ui.components.ActionIcon
 import com.notsatria.bajet.ui.components.SwipeableItemWithActions
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.ui.theme.errorLight
 import com.notsatria.bajet.ui.theme.tertiaryContainerLightMediumContrast
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
+import com.notsatria.bajet.utils.DummyData
+import com.notsatria.bajet.utils.Helper
 import com.notsatria.bajet.utils.formatToRupiah
 import java.util.Calendar
 
@@ -128,12 +131,13 @@ fun DailyCashFlowCardItem(
                                 cashFlow = cashFlowAndCategoryDomain,
                                 modifier = Modifier
                                     .background(
-                                        Color.White
+                                        MaterialTheme.colorScheme.surfaceContainer
                                     )
                                     .clickable {
                                         navigateToEditCashFlowScreen(cashFlowAndCategoryDomain.cashFlow.cashFlowId)
                                     },
-                                emoji = cashFlowAndCategoryDomain.category.emoji
+                                emoji = cashFlowAndCategoryDomain.category.emoji,
+                                categoryColor = cashFlowAndCategoryDomain.category.color
                             )
                         }
                         // Add divider only if it's not the last item
@@ -155,9 +159,11 @@ fun DailyCashFlowHeader(
     date: String,
     onClick: () -> Unit = {},
 ) {
-    Column(modifier.clickable {
-        onClick()
-    }) {
+    Column(modifier
+        .clickable {
+            onClick()
+        }
+        .background(color = MaterialTheme.colorScheme.surfaceContainerHigh)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -166,7 +172,7 @@ fun DailyCashFlowHeader(
             Text(
                 text = date,
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.outline,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
@@ -195,7 +201,8 @@ fun DailyCashFlowHeader(
 fun DailyCashFlowItemRow(
     modifier: Modifier = Modifier,
     cashFlow: CashFlowAndCategoryDomain,
-    emoji: String
+    emoji: String,
+    categoryColor: Int
 ) {
     Row(
         modifier = modifier
@@ -207,13 +214,17 @@ fun DailyCashFlowItemRow(
             modifier = Modifier
                 .size(32.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(MaterialTheme.colorScheme.tertiaryContainer)
+                .background(Color(categoryColor))
         ) {
             Text(text = emoji, modifier = Modifier.align(Alignment.Center))
         }
         Spacer(modifier = Modifier.width(8.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = cashFlow.category.name, style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = cashFlow.category.name,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
             if (cashFlow.cashFlow.note.isNotEmpty()) Text(
                 text = cashFlow.cashFlow.note,
                 color = MaterialTheme.colorScheme.outlineVariant,
@@ -249,11 +260,7 @@ fun DailyCashFlowCardItemPreview() {
                         date = Calendar.getInstance().timeInMillis,
                         categoryId = 1
                     ),
-                    category = Category(
-                        categoryId = 1,
-                        name = "Salary",
-                        emoji = "💰"
-                    )
+                    category = DummyData.categories[0]
                 ),
                 CashFlowAndCategory(
                     cashFlow = CashFlow(
@@ -264,11 +271,7 @@ fun DailyCashFlowCardItemPreview() {
                         date = Calendar.getInstance().timeInMillis,
                         categoryId = 2
                     ),
-                    category = Category(
-                        categoryId = 2,
-                        name = "Food",
-                        emoji = "🍔"
-                    )
+                    category = DummyData.categories[2]
                 )
             ),
             onDeleteCashFlow = {},
@@ -292,14 +295,11 @@ fun DailyCashFlowItemRowPreview() {
                     date = Calendar.getInstance().timeInMillis,
                     categoryId = 1
                 ),
-                category = Category(
-                    categoryId = 1,
-                    name = "Salary",
-                    emoji = "💰"
-                ),
+                category = DummyData.categories[0],
                 isOptionsRevealed = false
             ),
-            emoji = "💰"
+            emoji = "💰",
+            categoryColor = Helper.randomColor(alpha = 130).toArgb()
         )
     }
 }

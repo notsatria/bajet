@@ -11,6 +11,8 @@ import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.relation.CashFlowSummary
 import com.notsatria.bajet.data.entities.Category
+import com.notsatria.bajet.data.entities.relation.AnalyticsRaw
+import com.notsatria.bajet.data.entities.relation.AnalyticsTotalRaw
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -24,7 +26,10 @@ interface CashFlowDao {
 
     @Transaction
     @Query("SELECT * FROM cashflow JOIN category ON cashflow.categoryId = category.categoryId WHERE date BETWEEN :startDate AND :endDate")
-    fun getCashFlowsAndCategoryListByMonth(startDate: Long, endDate: Long): Flow<List<CashFlowAndCategory>>
+    fun getCashFlowsAndCategoryListByMonth(
+        startDate: Long,
+        endDate: Long
+    ): Flow<List<CashFlowAndCategory>>
 
     @Query(
         """
@@ -41,10 +46,63 @@ interface CashFlowDao {
     @Delete
     suspend fun deleteCashFlow(cashFlow: CashFlow)
 
+    @Transaction
     @Query("SELECT * FROM cashflow JOIN category ON cashflow.categoryId = category.categoryId WHERE cashFlowId = :cashFlowId")
     suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowAndCategory
 
     @Update
     suspend fun updateCashFlow(cashFlow: CashFlow)
 
+    @Transaction
+    @Query(
+        """
+           WITH total_sum AS (
+            SELECT SUM(amount) AS total
+            FROM cashflow
+            WHERE date BETWEEN :startDate AND :endDate
+              AND type = :type
+        )
+        
+        SELECT 
+            cf.cashflowId,
+            cf.categoryId,
+            cf.type,
+            c.name AS categoryName,
+            c.emoji,
+            c.color,
+            SUM(cf.amount) AS amount,
+            t.total AS total,
+            (SUM(cf.amount) * 1.0 / t.total) AS percentage
+        FROM cashflow AS cf
+        JOIN category AS c ON cf.categoryId = c.categoryId
+        CROSS JOIN total_sum t
+        WHERE cf.date BETWEEN :startDate AND :endDate
+          AND cf.type = :type
+        GROUP BY c.name, c.emoji, c.color
+        """
+    )
+    fun getAnalytics(
+        startDate: Long,
+        endDate: Long,
+        type: String
+    ): Flow<List<AnalyticsRaw>>
+
+    @Transaction
+    @Query("""
+         WITH types(type) AS (
+            SELECT 'Income'
+            UNION ALL
+            SELECT 'Expenses'
+        )
+        SELECT 
+            types.type,
+            IFNULL(SUM(cf.amount), 0) AS total
+        FROM types
+        LEFT JOIN cashflow AS cf ON cf.type = types.type
+            AND cf.date BETWEEN :startDate AND :endDate
+        GROUP BY types.type
+        ORDER BY types.type DESC
+
+    """)
+    fun getTotalAnalyticsTotalAmount(startDate: Long, endDate: Long): Flow<List<AnalyticsTotalRaw>>
 }

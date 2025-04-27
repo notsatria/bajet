@@ -33,4 +33,7 @@
     <string name="undo">Undo</string>
     <string name="my_budget">My Budget</string>
     <string name="add_budget">Add Budget</string>
+    <string name="no_cashflow_found">No cashflow found</string>
+    <string name="edit_cashflow">Edit Cashflow</string>
+    <string name="no_analytics_found">No Analytics Found</string>
 </resources>

@@ -56,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.theme.BajetTheme
+import com.notsatria.bajet.utils.DummyData
 
 @Composable
 fun CategoryManagementScreen(
@@ -405,10 +406,7 @@ fun CategoriesDialogPreview() {
         shouldShowCategoryDialog = rememberSaveable { mutableStateOf(true) },
         onDismiss = {},
         onCategorySelected = {},
-        categories = listOf(
-            Category(categoryId = 3, name = "Food", emoji = "🍔"),
-            Category(categoryId = 4, name = "Transport", emoji = "🚌")
-        ),
+        categories = DummyData.categories,
         shouldShowAddCategoryDialog = rememberSaveable { mutableStateOf(true) },
         viewModel = hiltViewModel(),
         onEditCategoryMode = remember { mutableStateOf(false) }

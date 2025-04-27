@@ -33,6 +33,7 @@ import com.notsatria.bajet.data.entities.Budget
 import com.notsatria.bajet.data.entities.relation.BudgetAndCategory
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.theme.BajetTheme
+import com.notsatria.bajet.utils.DummyData
 import com.notsatria.bajet.utils.formatToRupiah
 import timber.log.Timber.Forest.d
 
@@ -145,22 +146,14 @@ fun BudgetSettingScreenPreview() {
                             categoryId = 1,
                             amount = 100000.0
                         ),
-                        category = Category(
-                            categoryId = 1,
-                            name = "Food",
-                            emoji = "🍔"
-                        )
+                        category = DummyData.categories[0]
                     ),
                     BudgetAndCategory(
                         budget = Budget(
                             categoryId = 2,
                             amount = 100000.0
                         ),
-                        category = Category(
-                            categoryId = 1,
-                            name = "Food",
-                            emoji = "🍔"
-                        )
+                        category = DummyData.categories[1]
                     )
                 )
             )

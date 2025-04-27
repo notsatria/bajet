@@ -5,6 +5,7 @@ import com.notsatria.bajet.data.dao.BudgetMonthDao
 import com.notsatria.bajet.data.dao.CashFlowDao
 import com.notsatria.bajet.data.dao.CategoryDao
 import com.notsatria.bajet.repository.AddCashFlowRepository
+import com.notsatria.bajet.repository.AnalyticsRepository
 import com.notsatria.bajet.repository.BudgetRepository
 import com.notsatria.bajet.repository.CashFlowRepository
 import com.notsatria.bajet.repository.CategoryRepository
@@ -42,4 +43,9 @@ class RepositoryModule {
         return BudgetRepository(dao, budgetMonthDao)
     }
 
+    @Provides
+    @Singleton
+    fun provideAnalyticsRepository(cashFlowDao: CashFlowDao): AnalyticsRepository {
+        return AnalyticsRepository(cashFlowDao)
+    }
 }

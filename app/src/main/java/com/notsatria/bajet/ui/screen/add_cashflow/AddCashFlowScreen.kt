@@ -57,6 +57,7 @@ import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.CashFlowTypes
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
+import java.util.Calendar
 import java.util.Date
 
 @Composable
@@ -155,14 +156,14 @@ fun AddCashFlowScreen(
         onDismiss = {
             uiState.shouldShowDatePickerDialog.value = false
         },
-        initialDate = if (uiState.cashFlowIdExists) uiState.uiData.date else Date().time,
+        initialDate = if (uiState.cashFlowIdExists) uiState.uiData.date else Calendar.getInstance().timeInMillis,
     )
 
     val onEditAndIncomeAndExpensesCategory =
         uiState.cashFlowIdExists && uiState.uiData.categoryId == 0 || uiState.uiData.categoryId == 1
 
     Scaffold(modifier, containerColor = MaterialTheme.colorScheme.background, topBar = {
-        AddCashFlowTopAppBar(navigateBack)
+        AddCashFlowTopAppBar(navigateBack, title = if (uiState.cashFlowIdExists) stringResource(R.string.edit_cashflow) else stringResource(R.string.add_cashflow))
     }) { innerPadding ->
         Box(
             modifier = Modifier
@@ -292,9 +293,9 @@ fun CashFlowTypeRadioButton(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddCashFlowTopAppBar(onNavigateBack: () -> Unit) {
+fun AddCashFlowTopAppBar(onNavigateBack: () -> Unit, title: String) {
     TopAppBar(
-        title = { Text(text = stringResource(R.string.add_cashflow)) },
+        title = { Text(text = title) },
         navigationIcon = {
             IconButton(onClick = { onNavigateBack() }) {
                 Icon(
