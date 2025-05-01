@@ -1,11 +1,13 @@
 package com.notsatria.bajet.di
 
 import android.content.Context
+import com.notsatria.bajet.data.dao.AccountDao
+import com.notsatria.bajet.data.dao.AccountGroupDao
 import com.notsatria.bajet.data.dao.BudgetDao
 import com.notsatria.bajet.data.dao.BudgetMonthDao
 import com.notsatria.bajet.data.dao.CashFlowDao
-import com.notsatria.bajet.data.database.CashFlowDatabase
 import com.notsatria.bajet.data.dao.CategoryDao
+import com.notsatria.bajet.data.database.CashFlowDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,4 +36,10 @@ class DatabaseModule {
 
     @Provides
     fun provideBudgetMonthDao(db: CashFlowDatabase): BudgetMonthDao = db.budgetMonthDao()
+
+    @Provides
+    fun provideAccountDao(db: CashFlowDatabase): AccountDao = db.accountDao()
+
+    @Provides
+    fun provideAccountGroupDao(db: CashFlowDatabase): AccountGroupDao = db.accountGroupDao()
 }

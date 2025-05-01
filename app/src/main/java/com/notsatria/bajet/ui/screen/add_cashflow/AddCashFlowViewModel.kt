@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.repository.AddCashFlowRepository
 import com.notsatria.bajet.utils.CashFlowTypes
-import com.notsatria.bajet.utils.formatToCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,6 +58,7 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
     fun getCashFlowById(cashFlowId: Int) {
         viewModelScope.launch {
             val data = addCashFlowRepository.getCashFlowAndCategoryById(cashFlowId)
+            // if amount is less than 0, times with -1 to create minus
             val amount =
                 if (data.cashFlow.amount < 0) (data.cashFlow.amount * -1).toString() else data.cashFlow.amount.toString()
 

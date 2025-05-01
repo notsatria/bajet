@@ -6,14 +6,10 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,13 +19,14 @@ fun ClickableTextField(
     modifier: Modifier = Modifier,
     placeholder: String,
     value: String,
-    onChange: (String) -> Unit,
+    onChange: (String) -> Unit = {},
     readOnly: Boolean,
     supportingText: String = "Empty Field",
     supportingTextCondition: () -> Boolean = { false },
     minLines: Int = 1,
     onClick: () -> Unit = {},
     keyboardType: KeyboardType = KeyboardType.Text,
+    isError: Boolean = false
 ) {
     val interactionSource = remember {
         object : MutableInteractionSource {
@@ -66,6 +63,7 @@ fun ClickableTextField(
                 color = MaterialTheme.colorScheme.error
             )
         },
+        isError = isError,
         label = { Text(text = placeholder) },
         minLines = minLines,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),

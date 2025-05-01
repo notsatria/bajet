@@ -1,0 +1,32 @@
+{
+  "account_groups": [
+    {
+      "id": 1,
+      "name": "Cash"
+    },
+    {
+      "id": 2,
+      "name": "Accounts"
+    },
+    {
+      "id": 3,
+      "name": "Savings"
+    },
+    {
+      "id": 4,
+      "name": "Investments"
+    },
+    {
+      "id": 5,
+      "name": "Credit Cards"
+    },
+    {
+      "id": 6,
+      "name": "Loans"
+    },
+    {
+      "id": 7,
+      "name": "Other"
+    }
+  ]
+}

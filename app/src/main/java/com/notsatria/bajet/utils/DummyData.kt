@@ -1,6 +1,7 @@
 package com.notsatria.bajet.utils
 
 import androidx.compose.ui.graphics.toArgb
+import com.notsatria.bajet.data.entities.AccountGroup
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
@@ -113,6 +114,25 @@ object DummyData {
             category = categories[2],
             percentage = 0.8,
             total = 30000.0
+        ),
+    )
+
+    val accountGroups = listOf<AccountGroup>(
+        AccountGroup(
+            id = 1,
+            name = "Cash",
+        ),
+        AccountGroup(
+            id = 2,
+            name = "Bank",
+        ),
+        AccountGroup(
+            id = 3,
+            name = "Credit Card",
+        ),
+        AccountGroup(
+            id = 4,
+            name = "Other",
         ),
     )
 }

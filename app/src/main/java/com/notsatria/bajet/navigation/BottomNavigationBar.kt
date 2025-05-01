@@ -1,6 +1,7 @@
 package com.notsatria.bajet.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Money
@@ -25,8 +26,21 @@ fun BottomNavigationBar(
         val navItems = listOf(
             NavigationItem(stringResource(R.string.home), Icons.Default.Home, Screen.Home),
             NavigationItem(stringResource(R.string.budget), Icons.Default.Money, Screen.Budget),
-            NavigationItem(stringResource(R.string.analytics), Icons.Default.Analytics, Screen.Analytics),
-            NavigationItem(stringResource(R.string.settings), Icons.Default.Settings, Screen.Settings),
+            NavigationItem(
+                stringResource(R.string.analytics),
+                Icons.Default.Analytics,
+                Screen.Analytics
+            ),
+            NavigationItem(
+                stringResource(R.string.account),
+                Icons.Default.AccountBalanceWallet,
+                Screen.Account
+            ),
+            NavigationItem(
+                stringResource(R.string.settings),
+                Icons.Default.Settings,
+                Screen.Settings
+            ),
         )
 
         navItems.map { item ->

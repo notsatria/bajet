@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -23,7 +22,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -42,13 +40,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Category
+import com.notsatria.bajet.ui.components.BajetOutlinedTextField
 import com.notsatria.bajet.ui.components.ClickableTextField
 import com.notsatria.bajet.ui.components.CurrencyTextField
 import com.notsatria.bajet.ui.screen.category.CategoriesViewModel
@@ -58,7 +56,6 @@ import com.notsatria.bajet.utils.CashFlowTypes
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import java.util.Calendar
-import java.util.Date
 
 @Composable
 fun AddCashFlowRoute(
@@ -163,7 +160,12 @@ fun AddCashFlowScreen(
         uiState.cashFlowIdExists && uiState.uiData.categoryId == 0 || uiState.uiData.categoryId == 1
 
     Scaffold(modifier, containerColor = MaterialTheme.colorScheme.background, topBar = {
-        AddCashFlowTopAppBar(navigateBack, title = if (uiState.cashFlowIdExists) stringResource(R.string.edit_cashflow) else stringResource(R.string.add_cashflow))
+        AddCashFlowTopAppBar(
+            navigateBack,
+            title = if (uiState.cashFlowIdExists) stringResource(R.string.edit_cashflow) else stringResource(
+                R.string.add_cashflow
+            )
+        )
     }) { innerPadding ->
         Box(
             modifier = Modifier
@@ -187,7 +189,8 @@ fun AddCashFlowScreen(
                     }
                 }
                 if (uiState.expensesCategory) Spacer(modifier = Modifier.height(12.dp))
-                AnimatedVisibility(visible = uiState.expensesCategory,
+                AnimatedVisibility(
+                    visible = uiState.expensesCategory,
                     modifier = Modifier.clickable {
                         uiState.shouldShowCategoryDialog.value = true
                     }) {
@@ -196,7 +199,6 @@ fun AddCashFlowScreen(
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = stringResource(R.string.category),
                         value = if (onEditAndIncomeAndExpensesCategory) "" else uiState.uiData.categoryText,
-                        onChange = { /* Do nothing */ },
                         readOnly = false,
                         onClick = {
                             uiState.shouldShowCategoryDialog.value = true
@@ -215,23 +217,20 @@ fun AddCashFlowScreen(
                     }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                ClickableTextField(modifier = Modifier.fillMaxWidth(),
+                ClickableTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = uiState.uiData.date.formatDateTo(format = DateUtils.formatDate4),
-                    onChange = { /* nothing */ },
                     placeholder = stringResource(R.string.date),
                     readOnly = false,
                     onClick = {
                         uiState.shouldShowDatePickerDialog.value = true
                     })
-                OutlinedTextField(
+                BajetOutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.uiData.note,
                     onValueChange = { note -> onUpdateNote(note) },
-                    label = {
-                        Text(text = stringResource(R.string.note))
-                    },
-                    minLines = 1,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    label = stringResource(R.string.note),
+                    minLines = 1
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(
@@ -263,7 +262,8 @@ fun CashFlowDatePickerDialog(
     val datePickerState =
         rememberDatePickerState(initialDisplayedMonthMillis = initialDate)
 
-    if (shouldShowDialog.value) DatePickerDialog(onDismissRequest = { onDismiss() },
+    if (shouldShowDialog.value) DatePickerDialog(
+        onDismissRequest = { onDismiss() },
         confirmButton = {
             TextButton(onClick = {
                 onDateSelected(datePickerState.selectedDateMillis)

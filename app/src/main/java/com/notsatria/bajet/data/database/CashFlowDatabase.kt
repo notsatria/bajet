@@ -7,10 +7,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.notsatria.bajet.R
+import com.notsatria.bajet.data.dao.AccountDao
+import com.notsatria.bajet.data.dao.AccountGroupDao
 import com.notsatria.bajet.data.dao.BudgetDao
 import com.notsatria.bajet.data.dao.BudgetMonthDao
 import com.notsatria.bajet.data.dao.CashFlowDao
 import com.notsatria.bajet.data.dao.CategoryDao
+import com.notsatria.bajet.data.entities.Account
+import com.notsatria.bajet.data.entities.AccountGroup
 import com.notsatria.bajet.data.entities.Budget
 import com.notsatria.bajet.data.entities.BudgetMonth
 import com.notsatria.bajet.data.entities.CashFlow
@@ -20,15 +24,20 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONException
+import timber.log.Timber
 
-@Database(entities = [CashFlow::class, Category::class, Budget::class, BudgetMonth::class], version = 1)
+@Database(
+    entities = [CashFlow::class, Category::class, Budget::class, BudgetMonth::class, Account::class, AccountGroup::class],
+    version = 1
+)
 abstract class CashFlowDatabase : RoomDatabase() {
 
     abstract fun cashFlowDao(): CashFlowDao
     abstract fun categoryDao(): CategoryDao
     abstract fun budgetDao(): BudgetDao
-
     abstract fun budgetMonthDao(): BudgetMonthDao
+    abstract fun accountDao(): AccountDao
+    abstract fun accountGroupDao(): AccountGroupDao
 
     companion object {
 
@@ -47,6 +56,11 @@ abstract class CashFlowDatabase : RoomDatabase() {
                             super.onCreate(db)
                             CoroutineScope(Dispatchers.IO).launch {
                                 prepopulateCategories(context, getInstance(context).cashFlowDao())
+                                prepopulateAccountGroup(
+                                    context,
+                                    getInstance(context).accountGroupDao()
+                                )
+                                prepopulateDefaultAccount(getInstance(context).accountDao())
                             }
                         }
                     })
@@ -55,7 +69,7 @@ abstract class CashFlowDatabase : RoomDatabase() {
             }
         }
 
-        fun prepopulateCategories(context: Context, dao: CashFlowDao) {
+        private fun prepopulateCategories(context: Context, dao: CashFlowDao) {
             val jsonArray = Helper.loadJsonArray(context, R.raw.category, "categories")
             try {
                 if (jsonArray != null) {
@@ -72,6 +86,34 @@ abstract class CashFlowDatabase : RoomDatabase() {
                     }
                 }
             } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
+
+        private fun prepopulateAccountGroup(context: Context, dao: AccountGroupDao) {
+            val jsonArray = Helper.loadJsonArray(context, R.raw.account_group, "account_groups")
+            try {
+                if (jsonArray != null) {
+                    for (i in 0 until jsonArray.length()) {
+                        val item = jsonArray.getJSONObject(i)
+                        dao.insert(
+                            AccountGroup(
+                                id = item.getInt("id"),
+                                name = item.getString("name")
+                            )
+                        )
+                    }
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
+                Timber.e("Error on populateGroupAccounts ${e.message}")
+            }
+        }
+
+        private fun prepopulateDefaultAccount(dao: AccountDao) {
+            try {
+                dao.insert(Account(id = 1, name = "Cash", amount = 0.0, groupId = 1))
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }

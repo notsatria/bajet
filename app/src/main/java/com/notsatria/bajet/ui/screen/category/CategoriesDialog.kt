@@ -30,7 +30,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -55,6 +54,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Category
+import com.notsatria.bajet.ui.components.BajetOutlinedTextField
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DummyData
 
@@ -63,6 +63,7 @@ fun CategoryManagementScreen(
     categories: List<Category>,
     onCategorySelected: (Category) -> Unit,
     shouldShowCategoryDialog: MutableState<Boolean>,
+    context: Context = LocalContext.current,
     viewModel: CategoriesViewModel = hiltViewModel()
 ) {
     val shouldShowAddCategoryDialog = remember { mutableStateOf(false) }
@@ -74,8 +75,20 @@ fun CategoryManagementScreen(
         categories = categories,
         shouldShowAddCategoryDialog = shouldShowAddCategoryDialog,
         onCategorySelected = onCategorySelected,
-        viewModel = viewModel,
-        onEditCategoryMode = onEditCategoryMode
+        onEditCategoryMode = onEditCategoryMode,
+        onDeleteCategory = { category ->
+            viewModel.deleteCategory(category)
+            Toast.makeText(
+                context,
+                context.getString(R.string.category_deleted),
+                Toast.LENGTH_SHORT
+            ).show()
+        },
+        onEditCategory = { category ->
+            viewModel.setSelectedCategoryToEdit(category)
+            viewModel.updateEmoji(category.emoji)
+            viewModel.updateCategoryName("${category.emoji} ${category.name}")
+        }
     )
 
     AddCategoryDialog(
@@ -84,8 +97,28 @@ fun CategoryManagementScreen(
             shouldShowAddCategoryDialog.value = false
             onEditCategoryMode.value = false
         },
-        viewModel = viewModel,
-        onEditCategoryMode = onEditCategoryMode
+        onEditCategoryMode = onEditCategoryMode,
+        emoji = viewModel.emoji,
+        onCategoryNameChange = { name ->
+            viewModel.updateEmoji(name)
+            viewModel.updateCategoryName(name)
+        },
+        categoryName = viewModel.categoryName,
+        onSaveOrEditClicked = {
+            if (viewModel.categoryName.isEmpty()) {
+                Toast.makeText(
+                    context,
+                    context.getString(
+                        R.string.field_cannot_be_empty,
+                        "Category Name"
+                    ), Toast.LENGTH_SHORT
+                ).show()
+                return@AddCategoryDialog
+            }
+            if (onEditCategoryMode.value) viewModel.updateCategory()
+            else viewModel.insertCategory()
+            onEditCategoryMode.value = false
+        }
     )
 }
 
@@ -95,12 +128,12 @@ fun CategoryManagementScreen(
 fun CategoriesDialog(
     shouldShowCategoryDialog: MutableState<Boolean>,
     onDismiss: () -> Unit,
-    onCategorySelected: (Category) -> Unit,
+    onCategorySelected: (category: Category) -> Unit,
     categories: List<Category> = emptyList(),
     shouldShowAddCategoryDialog: MutableState<Boolean> = mutableStateOf(false),
-    viewModel: CategoriesViewModel,
-    context: Context = LocalContext.current,
-    onEditCategoryMode: MutableState<Boolean>
+    onEditCategoryMode: MutableState<Boolean>,
+    onDeleteCategory: (category: Category) -> Unit = {},
+    onEditCategory: (category: Category) -> Unit = {}
 ) {
     if (shouldShowCategoryDialog.value) Dialog(onDismissRequest = {
         shouldShowCategoryDialog.value = false
@@ -137,20 +170,11 @@ fun CategoriesDialog(
                             onCategorySelected(categories[index])
                             onDismiss()
                         },
-                        onDeleteCategory = {
-                            viewModel.deleteCategory(categories[index])
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.category_deleted),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
+                        onDeleteCategory = { onDeleteCategory(categories[index]) },
                         onEditCategory = {
                             onEditCategoryMode.value = true
                             shouldShowAddCategoryDialog.value = true
-                            viewModel.setSelectedCategoryToEdit(categories[index])
-                            viewModel.updateCategoryName("${categories[index].emoji} ${categories[index].name}")
-                            viewModel.updateEmoji(categories[index].emoji)
+                           onEditCategory(categories[index])
                         }
                     )
                 }
@@ -225,25 +249,27 @@ fun CategoryActionDialog(
                     modifier = Modifier
                         .padding(16.dp)
                 ) {
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable {
-                            shouldShowCategoryActionDialog.value = false
-                            onEditCategory()
-                        }) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable {
+                                shouldShowCategoryActionDialog.value = false
+                                onEditCategory()
+                            }) {
                         Icon(imageVector = Icons.Default.Edit, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text(text = stringResource(R.string.edit_category))
                     }
                     Spacer(Modifier.height(8.dp))
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable {
-                            shouldShowCategoryActionDialog.value = false
-                            onDeleteCategory()
-                        }) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable {
+                                shouldShowCategoryActionDialog.value = false
+                                onDeleteCategory()
+                            }) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text(text = stringResource(R.string.delete_category))
@@ -314,9 +340,11 @@ fun AddCategoryDialogItem(onAddCategory: () -> Unit) {
 fun AddCategoryDialog(
     shouldAddShowCategoryDialog: MutableState<Boolean> = mutableStateOf(false),
     onCancel: () -> Unit = {},
-    viewModel: CategoriesViewModel,
-    context: Context = LocalContext.current,
-    onEditCategoryMode: MutableState<Boolean>
+    onEditCategoryMode: MutableState<Boolean>,
+    emoji: String = "",
+    categoryName: String = "",
+    onCategoryNameChange: (String) -> Unit = {},
+    onSaveOrEditClicked: (onSave: () -> Unit) -> Unit = {},
 ) {
     if (shouldAddShowCategoryDialog.value) {
         Dialog(onDismissRequest = {
@@ -345,20 +373,15 @@ fun AddCategoryDialog(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = viewModel.emoji,
+                            text = emoji,
                             fontSize = 48.sp,
                             style = TextStyle(platformStyle = PlatformTextStyle(emojiSupportMatch = EmojiSupportMatch.None))
                         )
                         Spacer(modifier = Modifier.width(12.dp))
-                        OutlinedTextField(
-                            value = viewModel.categoryName,
-                            onValueChange = { name ->
-                                viewModel.updateEmoji(name)
-                                viewModel.updateCategoryName(name)
-                            },
-                            placeholder = {
-                                Text(stringResource(R.string.category_name))
-                            },
+                        BajetOutlinedTextField(
+                            value = categoryName,
+                            onValueChange = onCategoryNameChange,
+                            placeholder = stringResource(R.string.category_name),
                             maxLines = 1,
                         )
                     }
@@ -371,19 +394,7 @@ fun AddCategoryDialog(
                             Text(stringResource(R.string.cancel))
                         }
                         TextButton(onClick = {
-                            if (viewModel.categoryName.isEmpty()) {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(
-                                        R.string.field_cannot_be_empty,
-                                        "Category Name"
-                                    ), Toast.LENGTH_SHORT
-                                ).show()
-                                return@TextButton
-                            }
-                            if (onEditCategoryMode.value) viewModel.updateCategory()
-                            else viewModel.insertCategory()
-                            onEditCategoryMode.value = false
+                            onSaveOrEditClicked
                             onCancel()
                         }) {
                             Text(
@@ -402,32 +413,34 @@ fun AddCategoryDialog(
 @Preview(name = "CategoriesDialog")
 @Composable
 fun CategoriesDialogPreview() {
-    CategoriesDialog(
-        shouldShowCategoryDialog = rememberSaveable { mutableStateOf(true) },
-        onDismiss = {},
-        onCategorySelected = {},
-        categories = DummyData.categories,
-        shouldShowAddCategoryDialog = rememberSaveable { mutableStateOf(true) },
-        viewModel = hiltViewModel(),
-        onEditCategoryMode = remember { mutableStateOf(false) }
-    )
+    BajetTheme {
+        CategoriesDialog(
+            shouldShowCategoryDialog = rememberSaveable { mutableStateOf(true) },
+            onDismiss = {},
+            onCategorySelected = {},
+            categories = DummyData.categories,
+            shouldShowAddCategoryDialog = rememberSaveable { mutableStateOf(true) },
+            onEditCategoryMode = remember { mutableStateOf(false) }
+        )
+    }
 }
 
 @Preview("AddCategoryDialog")
 @Composable
 fun AddCategoryDialogPreview() {
-    AddCategoryDialog(
-        shouldAddShowCategoryDialog = rememberSaveable { mutableStateOf(true) },
-        onCancel = {},
-        viewModel = hiltViewModel(),
-        onEditCategoryMode = remember { mutableStateOf(false) }
-    )
+    BajetTheme {
+        AddCategoryDialog(
+            shouldAddShowCategoryDialog = rememberSaveable { mutableStateOf(true) },
+            onCancel = {},
+            onEditCategoryMode = remember { mutableStateOf(false) }
+        )
+    }
 }
 
 @Preview
 @Composable
 fun CategoryActionDialogPreview() {
     BajetTheme {
-        CategoryActionDialog()
+        CategoryActionDialog(shouldShowCategoryActionDialog = remember { mutableStateOf(true) })
     }
 }

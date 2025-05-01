@@ -11,4 +11,6 @@ sealed class Screen(val route: String) {
     data object EditCashFlow : Screen("home/edit_cash_flow/{cashFlowId}") {
         fun createRoute(cashFlowId: Int) = "home/edit_cash_flow/$cashFlowId"
     }
+    data object Account : Screen("account")
+    data object AddAccount : Screen("account/add_account")
 }

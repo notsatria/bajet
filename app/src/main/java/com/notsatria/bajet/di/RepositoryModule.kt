@@ -1,9 +1,12 @@
 package com.notsatria.bajet.di
 
+import com.notsatria.bajet.data.dao.AccountDao
+import com.notsatria.bajet.data.dao.AccountGroupDao
 import com.notsatria.bajet.data.dao.BudgetDao
 import com.notsatria.bajet.data.dao.BudgetMonthDao
 import com.notsatria.bajet.data.dao.CashFlowDao
 import com.notsatria.bajet.data.dao.CategoryDao
+import com.notsatria.bajet.repository.AccountRepository
 import com.notsatria.bajet.repository.AddCashFlowRepository
 import com.notsatria.bajet.repository.AnalyticsRepository
 import com.notsatria.bajet.repository.BudgetRepository
@@ -48,4 +51,14 @@ class RepositoryModule {
     fun provideAnalyticsRepository(cashFlowDao: CashFlowDao): AnalyticsRepository {
         return AnalyticsRepository(cashFlowDao)
     }
+
+    @Provides
+    @Singleton
+    fun provideAccountRepository(
+        accountDao: AccountDao,
+        accountGroupDao: AccountGroupDao
+    ): AccountRepository {
+        return AccountRepository(accountDao, accountGroupDao)
+    }
+
 }

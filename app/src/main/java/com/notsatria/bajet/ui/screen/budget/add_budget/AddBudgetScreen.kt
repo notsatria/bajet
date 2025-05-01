@@ -110,7 +110,6 @@ fun AddBudgetScreen(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = stringResource(R.string.category),
                     value = uiState.categoryText,
-                    onChange = { /* Do nothing */ },
                     readOnly = false,
                     onClick = {
                         uiState.shouldShowCategoryDialog.value = true
