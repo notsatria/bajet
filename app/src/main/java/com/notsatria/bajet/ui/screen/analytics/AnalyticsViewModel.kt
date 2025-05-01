@@ -2,7 +2,6 @@ package com.notsatria.bajet.ui.screen.analytics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
 import com.notsatria.bajet.repository.AnalyticsRepository
 import com.notsatria.bajet.ui.domain.Analytics
 import com.notsatria.bajet.utils.CashFlowTypes
@@ -31,7 +30,7 @@ class AnalyticsViewModel @Inject constructor(private val repository: AnalyticsRe
     private val _analytics = MutableStateFlow<List<Analytics>>(emptyList())
     val analytics get() = _analytics.asStateFlow()
 
-    val titles = MutableStateFlow(listOf("Income", "Expenses"))
+    val titles = MutableStateFlow(listOf("Income Rp0", "Expenses Rp0"))
 
     fun changeMonth(increment: Int) {
         _selectedMonth.value = Calendar.getInstance().apply {
@@ -64,8 +63,8 @@ class AnalyticsViewModel @Inject constructor(private val repository: AnalyticsRe
                 repository.getTotalAnalyticsTotalAmount(startDate, endDate)
             }.collect {
                 titles.value = listOf(
-                    "Income ${(it.filter { it2 -> it2.type == CashFlowTypes.INCOME.type }[0].total.takeIf { it > 0.0 } ?: 0.0).formatToRupiah()}",
-                    "Expenses ${(it.filter { it2 -> it2.type == CashFlowTypes.EXPENSES.type }[0].total.takeIf { it > 0.0 } ?: 0.0).formatToRupiah()}"
+                    "Income ${it.filter { it2 -> it2.type == CashFlowTypes.INCOME.type }[0].total.formatToRupiah()}",
+                    "Expenses ${it.filter { it2 -> it2.type == CashFlowTypes.EXPENSES.type }[0].total.formatToRupiah()}"
                 )
             }
         }
