@@ -21,6 +21,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,9 +55,7 @@ fun HomeRoute(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     context: Context = LocalContext.current
 ) {
-    val cashFlowAndCategoryList by viewModel.cashFlowAndCategoryList.collectAsStateWithLifecycle(
-        emptyList()
-    )
+    val cashFlowAndCategoryList by viewModel.groupedCashflowAndCategory.collectAsState()
     val cashFlowSummary by viewModel.cashFlowSummary.collectAsStateWithLifecycle()
     val selectedMonth by viewModel.selectedMonth.collectAsStateWithLifecycle()
 
@@ -64,7 +63,7 @@ fun HomeRoute(
         modifier,
         HomeUiState(
             cashFlowSummary = cashFlowSummary,
-            cashFlowAndCategoryList = cashFlowAndCategoryList,
+            groupedCashflowAndCategory = cashFlowAndCategoryList,
             selectedMonth = selectedMonth
         ),
         navigateToAddCashFlowScreen,
@@ -105,10 +104,6 @@ fun HomeScreen(
     navigateToEditCashFlowScreen: (Int) -> Unit = {},
     snackbarHostState: SnackbarHostState,
 ) {
-    val groupedCashflow = remember(homeUiState.cashFlowAndCategoryList) {
-        homeUiState.cashFlowAndCategoryList.sortedByDescending { it.cashFlow.date }
-            .groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) }
-    }
     Scaffold(
         modifier,
         containerColor = MaterialTheme.colorScheme.background,
@@ -145,7 +140,7 @@ fun HomeScreen(
                             onNextMonthClick()
                         }
                     )
-                if (groupedCashflow.isEmpty()) {
+                if (homeUiState.groupedCashflowAndCategory.isEmpty()) {
                     EmptyView(
                         Modifier.fillMaxSize(), drawable = R.drawable.ic_no_budget_found_24,
                         stringResource(R.string.no_cashflow_found)
@@ -153,7 +148,7 @@ fun HomeScreen(
                 }
                 GroupedCashFlowList(
                     modifier = Modifier.padding(top = 16.dp),
-                    groupedCashflow = groupedCashflow,
+                    groupedCashflow = homeUiState.groupedCashflowAndCategory,
                     onDeleteCashFlow = onDeleteCashFlow,
                     navigateToEditCashFlowScreen = navigateToEditCashFlowScreen
                 )
@@ -198,7 +193,7 @@ fun HomeFloatingActionButton(onClick: () -> Unit) {
 
 data class HomeUiState(
     val cashFlowSummary: CashFlowSummary? = null,
-    val cashFlowAndCategoryList: List<CashFlowAndCategory> = emptyList(),
+    val groupedCashflowAndCategory: Map<String, List<CashFlowAndCategory>> = emptyMap(),
     val selectedMonth: Calendar = Calendar.getInstance()
 )
 
@@ -213,7 +208,8 @@ fun HomeScreenPreview() {
                     expenses = -40000.0,
                     balance = -20000.0
                 ),
-                cashFlowAndCategoryList = DummyData.cashFlowAndCategories,
+                groupedCashflowAndCategory = DummyData.cashFlowAndCategories.sortedByDescending { it.cashFlow.date }
+                    .groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) },
                 selectedMonth = Calendar.getInstance()
             ),
             snackbarHostState = SnackbarHostState()
@@ -232,7 +228,7 @@ fun HomeScreenEmptyListPreview() {
                     expenses = -40000.0,
                     balance = -20000.0
                 ),
-                cashFlowAndCategoryList = listOf(
+                groupedCashflowAndCategory = mapOf(
                 ),
                 selectedMonth = Calendar.getInstance()
             ),

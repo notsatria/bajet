@@ -41,10 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
-import com.notsatria.bajet.data.entities.Category
-import com.notsatria.bajet.ui.domain.CashFlowAndCategoryDomain
 import com.notsatria.bajet.ui.components.ActionIcon
 import com.notsatria.bajet.ui.components.SwipeableItemWithActions
+import com.notsatria.bajet.ui.domain.CashFlowAndCategoryDomain
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.ui.theme.errorLight
 import com.notsatria.bajet.ui.theme.tertiaryContainerLightMediumContrast
@@ -159,11 +158,12 @@ fun DailyCashFlowHeader(
     date: String,
     onClick: () -> Unit = {},
 ) {
-    Column(modifier
-        .clickable {
-            onClick()
-        }
-        .background(color = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+    Column(
+        modifier
+            .clickable {
+                onClick()
+            }
+            .background(color = MaterialTheme.colorScheme.surfaceContainerHigh)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -258,7 +258,8 @@ fun DailyCashFlowCardItemPreview() {
                         amount = 10000.0,
                         note = "Salary",
                         date = Calendar.getInstance().timeInMillis,
-                        categoryId = 1
+                        categoryId = 1,
+                        accountId = 1
                     ),
                     category = DummyData.categories[0]
                 ),
@@ -269,7 +270,8 @@ fun DailyCashFlowCardItemPreview() {
                         amount = -10000.0,
                         note = "Food",
                         date = Calendar.getInstance().timeInMillis,
-                        categoryId = 2
+                        categoryId = 2,
+                        accountId = 1
                     ),
                     category = DummyData.categories[2]
                 )
@@ -293,7 +295,8 @@ fun DailyCashFlowItemRowPreview() {
                     amount = 10000.0,
                     note = "Salary",
                     date = Calendar.getInstance().timeInMillis,
-                    categoryId = 1
+                    categoryId = 1,
+                    accountId = 1
                 ),
                 category = DummyData.categories[0],
                 isOptionsRevealed = false

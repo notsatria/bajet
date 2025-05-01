@@ -11,11 +11,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +36,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,12 +44,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
+import com.notsatria.bajet.data.entities.Account
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.components.BajetOutlinedTextField
 import com.notsatria.bajet.ui.components.ClickableTextField
@@ -67,6 +74,7 @@ fun AddCashFlowRoute(
 ) {
     val shouldShowCategoryDialog = rememberSaveable { mutableStateOf(false) }
     val shouldShowDatePickerDialog = rememberSaveable { mutableStateOf(false) }
+    val showAccountDialog = rememberSaveable { mutableStateOf(false) }
     val expensesCategory by remember {
         derivedStateOf { viewModel.addCashFlowData.selectedCashflowTypeIndex == 1 }
     }
@@ -77,7 +85,8 @@ fun AddCashFlowRoute(
     }
     val uiData = viewModel.addCashFlowData
     val cashFlowIdExists = (cashFlowId != null && cashFlowId != -1)
-    val categories by categoryViewModel.categories.collectAsStateWithLifecycle()
+    val categories by categoryViewModel.categories.collectAsState()
+    val accounts by viewModel.accounts.collectAsState()
 
     LaunchedEffect(key1 = cashFlowId) {
         if (cashFlowIdExists) viewModel.getCashFlowById(cashFlowId!!)
@@ -92,11 +101,13 @@ fun AddCashFlowRoute(
         uiState = AddCashFlowUiState(
             shouldShowCategoryDialog = shouldShowCategoryDialog,
             shouldShowDatePickerDialog = shouldShowDatePickerDialog,
+            showAccountDialog = showAccountDialog,
             uiData = uiData,
             expensesCategory = expensesCategory,
             cashFlowIdExists = cashFlowIdExists,
             fieldsEmpty = fieldsEmpty,
-            categories = categories
+            categories = categories,
+            accounts = accounts,
         ),
         navigateBack = navigateBack,
         onCategorySelected = { category ->
@@ -120,6 +131,9 @@ fun AddCashFlowRoute(
             else viewModel.insertCashFlow()
             navigateBack()
         },
+        onAccountSelected = { account ->
+            viewModel.updateAccountId(account)
+        }
     )
 }
 
@@ -134,6 +148,7 @@ fun AddCashFlowScreen(
     onUpdateAmount: (String) -> Unit = {},
     onUpdateNote: (String) -> Unit = {},
     onAddCashFlowClicked: () -> Unit = {},
+    onAccountSelected: (Account) -> Unit = {}
 ) {
     if (uiState.shouldShowCategoryDialog.value)
         CategoryManagementScreen(
@@ -154,6 +169,15 @@ fun AddCashFlowScreen(
             uiState.shouldShowDatePickerDialog.value = false
         },
         initialDate = if (uiState.cashFlowIdExists) uiState.uiData.date else Calendar.getInstance().timeInMillis,
+    )
+
+    if (uiState.showAccountDialog.value) AccountListDialog(
+        accounts = uiState.accounts,
+        onItemClicked = { account ->
+            onAccountSelected(account)
+            uiState.showAccountDialog.value = false
+        },
+        showDialog = uiState.showAccountDialog
     )
 
     val onEditAndIncomeAndExpensesCategory =
@@ -225,6 +249,15 @@ fun AddCashFlowScreen(
                     onClick = {
                         uiState.shouldShowDatePickerDialog.value = true
                     })
+                ClickableTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = uiState.uiData.selectedAccount.name,
+                    placeholder = stringResource(R.string.account),
+                    readOnly = false,
+                    onClick = {
+                        uiState.showAccountDialog.value = true
+                    }
+                )
                 BajetOutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.uiData.note,
@@ -282,6 +315,41 @@ fun CashFlowDatePickerDialog(
 }
 
 @Composable
+fun AccountListDialog(
+    accounts: List<Account>,
+    onItemClicked: (Account) -> Unit,
+    showDialog: MutableState<Boolean>
+) {
+    Dialog(onDismissRequest = {
+        showDialog.value = false
+    }) {
+        Card(modifier = Modifier.clip(RoundedCornerShape(16.dp))) {
+            Column(modifier = Modifier.padding(vertical = 16.dp)) {
+                Text(
+                    stringResource(R.string.choose_account),
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                )
+                LazyColumn {
+                    items(accounts) {
+                        Text(
+                            text = it.name, modifier = Modifier
+                                .clickable {
+                                    onItemClicked(it)
+                                    showDialog.value = false
+                                }
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun CashFlowTypeRadioButton(
     modifier: Modifier = Modifier, type: String, onClick: () -> Unit = {}, selected: Boolean = false
 ) {
@@ -313,11 +381,13 @@ fun AddCashFlowTopAppBar(onNavigateBack: () -> Unit, title: String) {
 data class AddCashFlowUiState(
     val shouldShowCategoryDialog: MutableState<Boolean> = mutableStateOf(false),
     val shouldShowDatePickerDialog: MutableState<Boolean> = mutableStateOf(false),
+    val showAccountDialog: MutableState<Boolean> = mutableStateOf(false),
     val categories: List<Category> = emptyList(),
     val uiData: AddCashFlowData = AddCashFlowData(),
     val expensesCategory: Boolean = false,
     val cashFlowIdExists: Boolean = false,
-    val fieldsEmpty: Boolean = false
+    val fieldsEmpty: Boolean = false,
+    val accounts: List<Account> = emptyList()
 )
 
 @Preview

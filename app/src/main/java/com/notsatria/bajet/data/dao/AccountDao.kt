@@ -19,7 +19,7 @@ interface AccountDao {
         SELECT 
         account.id as accountId,
         account.name as accountName,
-        account.amount as amount,
+        account.balance as amount,
         account_group.name as groupName,
         account_group.id as accountGroupId
         FROM account
@@ -27,5 +27,11 @@ interface AccountDao {
         ON account.groupId = account_group.id
         """
     )
-    fun getAllAccount(): Flow<List<AccountsRaw>>
+    fun getAllAccountsAndGroup(): Flow<List<AccountsRaw>>
+
+    @Query("SELECT * FROM account")
+    fun getAllAccounts(): Flow<List<Account>>
+
+    @Query("UPDATE account SET balance = balance + :amount WHERE id = :accountId")
+    fun updateAmount(accountId: Int, amount: Double)
 }

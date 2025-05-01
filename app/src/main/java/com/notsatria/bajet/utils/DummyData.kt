@@ -16,7 +16,8 @@ object DummyData {
             amount = 10000.0,
             note = "Jual buku",
             categoryId = 1,
-            date = 1732774404029
+            date = 1732774404029,
+            accountId = 1
         ),
         CashFlow(
             cashFlowId = 1,
@@ -24,7 +25,8 @@ object DummyData {
             amount = 20000.0,
             note = "Jual buku",
             categoryId = 3,
-            date = 1732640400000
+            date = 1732640400000,
+            accountId = 1
         ),
         CashFlow(
             cashFlowId = 3,
@@ -32,7 +34,8 @@ object DummyData {
             amount = 30000.0,
             note = "Jual buku",
             categoryId = 3,
-            date = 1732774404029
+            date = 1732774404029,
+            accountId = 1
         ),
         CashFlow(
             cashFlowId = 4,
@@ -40,7 +43,8 @@ object DummyData {
             amount = 30000.0,
             note = "Makan",
             categoryId = 4,
-            date = 1732774404029
+            date = 1732774404029,
+            accountId = 1
         ),
     )
 
@@ -68,7 +72,8 @@ object DummyData {
                 amount = 10000.0,
                 note = "Salary",
                 date = Calendar.getInstance().timeInMillis,
-                categoryId = 1
+                categoryId = 1,
+                accountId = 1
             ),
             category = categories[0]
         ),
@@ -79,7 +84,8 @@ object DummyData {
                 amount = 20000.0,
                 note = "Food",
                 date = Calendar.getInstance().timeInMillis,
-                categoryId = 3
+                categoryId = 3,
+                accountId = 1
             ),
             category = categories[1]
         ),
@@ -90,7 +96,8 @@ object DummyData {
                 amount = 40000.0,
                 note = "Something",
                 date = Calendar.getInstance().timeInMillis,
-                categoryId = 4
+                categoryId = 4,
+                accountId = 1
             ),
             category = categories[2]
         )

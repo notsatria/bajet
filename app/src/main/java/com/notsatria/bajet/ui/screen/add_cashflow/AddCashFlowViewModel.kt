@@ -5,19 +5,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.notsatria.bajet.data.entities.Account
 import com.notsatria.bajet.data.entities.CashFlow
+import com.notsatria.bajet.repository.AccountRepository
 import com.notsatria.bajet.repository.AddCashFlowRepository
 import com.notsatria.bajet.utils.CashFlowTypes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber.Forest.i
 import java.util.Date
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository: AddCashFlowRepository) :
-    ViewModel() {
+class AddCashFlowViewModel @Inject constructor(
+    private val addCashFlowRepository: AddCashFlowRepository,
+    private val accountRepository: AccountRepository
+) : ViewModel() {
 
     var addCashFlowData by mutableStateOf(AddCashFlowData())
         private set
@@ -48,15 +56,23 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
         addCashFlowData = addCashFlowData.copy(categoryText = value)
     }
 
+    fun updateAccountId(account: Account) {
+        addCashFlowData = addCashFlowData.copy(selectedAccount = account)
+    }
+
     fun insertCashFlow() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             val cashFlow = addCashFlowData.toCashFlow()
             addCashFlowRepository.insertCashFlow(cashFlow)
+            accountRepository.updateAmount(cashFlow.accountId, cashFlow.amount)
         }
     }
 
+    val accounts = accountRepository.getAllAccounts()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
     fun getCashFlowById(cashFlowId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             val data = addCashFlowRepository.getCashFlowAndCategoryById(cashFlowId)
             // if amount is less than 0, times with -1 to create minus
             val amount =
@@ -74,15 +90,16 @@ class AddCashFlowViewModel @Inject constructor(private val addCashFlowRepository
     }
 
     fun updateCashFlow(cashFowId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
             val cashFlow = addCashFlowData.toCashFlow()
             i("Update CashFlow: $cashFlow")
             addCashFlowRepository.updateCashFlow(cashFlow.copy(cashFlowId = cashFowId))
+            accountRepository.updateAmount(cashFlow.accountId, cashFlow.amount)
         }
     }
 
     fun validateFields(expensesCategory: Boolean) =
-        addCashFlowData.amount.isEmpty() || addCashFlowData.amount == "0" || (expensesCategory && addCashFlowData.categoryId == 0)
+        addCashFlowData.amount.isEmpty() || addCashFlowData.amount == "0" || (expensesCategory && addCashFlowData.categoryId == 0 || addCashFlowData.selectedAccount.id == 0)
 }
 
 data class AddCashFlowData(
@@ -92,7 +109,8 @@ data class AddCashFlowData(
     val note: String = "",
     val date: Long = Date().time,
     val categoryId: Int = 0,
-    val categoryText: String = ""
+    val categoryText: String = "",
+    val selectedAccount: Account = Account(id = 1, groupId = 1, name = "Cash", balance = 0.0),
 ) {
     fun toCashFlow(): CashFlow {
         val finalAmount = if (this.amount.isEmpty()) 0.0 else this.amount.toDouble()
@@ -100,9 +118,9 @@ data class AddCashFlowData(
             type = if (selectedCashflowTypeIndex == 0) CashFlowTypes.INCOME.type else CashFlowTypes.EXPENSES.type,
             amount = if (selectedCashflowTypeIndex == 0) finalAmount else -finalAmount,
             note = this.note,
-            date = this.date,
-            /* If selected category is income, set category id to 1, otherwise set it to categoryId */
-            categoryId = if (selectedCashflowTypeIndex == 0) 1 else categoryId
+            date = this.date,/* If selected category is income, set category id to 1, otherwise set it to categoryId */
+            categoryId = if (selectedCashflowTypeIndex == 0) 1 else categoryId,
+            accountId = selectedAccount.id
         )
     }
 }

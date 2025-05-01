@@ -16,7 +16,7 @@ class AccountViewModel @Inject constructor(private val accountRepository: Accoun
     ViewModel() {
 
     val groupedAccounts: StateFlow<Map<String, List<AccountsRaw>>> =
-        accountRepository.getAllAccount()
+        accountRepository.getAllAccountsAndGroup()
             .map { list -> list.groupBy { it.groupName } }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 

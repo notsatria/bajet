@@ -32,7 +32,7 @@ fun BottomNavigationBar(
                 Screen.Analytics
             ),
             NavigationItem(
-                stringResource(R.string.account),
+                stringResource(R.string.accounts),
                 Icons.Default.AccountBalanceWallet,
                 Screen.Account
             ),

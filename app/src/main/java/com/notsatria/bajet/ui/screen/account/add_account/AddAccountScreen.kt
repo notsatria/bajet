@@ -80,7 +80,7 @@ fun AddAccountRoute(
                 ).show()
                 return@AddAccountScreen
             }
-            if (viewModel.amount.value.isEmpty() || viewModel.amount.value.toDouble() == 0.0) {
+            if (viewModel.amount.value.isEmpty()) {
                 Toast.makeText(
                     context,
                     context.getString(R.string.format_field_is_empty, "Amount"),

@@ -6,14 +6,16 @@ import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
 import com.notsatria.bajet.repository.CashFlowRepository
 import com.notsatria.bajet.utils.DateUtils
+import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,7 +29,7 @@ class HomeViewModel @Inject constructor(private val repository: CashFlowReposito
     private val _selectedMonth = MutableStateFlow(Calendar.getInstance())
     val selectedMonth get() = _selectedMonth.asStateFlow()
 
-   private var deletedCashflow: CashFlow? = null
+    private var deletedCashflow: CashFlow? = null
 
     /**
      * Flow to get the cash flow summary of the selected month
@@ -55,11 +57,14 @@ class HomeViewModel @Inject constructor(private val repository: CashFlowReposito
     /**
      * Flow to get the cash flow and category list of the selected month
      */
-    val cashFlowAndCategoryList: Flow<List<CashFlowAndCategory>> =
+    val groupedCashflowAndCategory: StateFlow<Map<String, List<CashFlowAndCategory>>> =
         _selectedMonth.flatMapLatest { month ->
             val (startDate, endDate) = DateUtils.getStartAndEndDate(month)
             repository.getCashFlowAndCategoryListByMonth(startDate, endDate)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+        }.map { list ->
+            list.sortedByDescending { it.cashFlow.date }
+                .groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
     fun deleteCashFlow(cashFlow: CashFlow) {
         viewModelScope.launch {

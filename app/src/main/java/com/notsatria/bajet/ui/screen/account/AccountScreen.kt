@@ -62,7 +62,7 @@ fun AccountScreen(
     Scaffold(modifier, topBar = {
         TopAppBar(
             title = {
-                Text(stringResource(R.string.account))
+                Text(stringResource(R.string.accounts))
             },
         )
     }, floatingActionButton = {

@@ -23,7 +23,8 @@ data class AnalyticsRaw(
                 type = this.type,
                 amount = this.amount,
                 note = "",
-                date = 0
+                date = 0,
+                accountId = 0
             ),
             category = Category(
                 categoryId = this.categoryId,

@@ -11,7 +11,12 @@ class AccountRepository(
 
     fun getAllAccountGroup() = accountGroupDao.getAll()
 
-    suspend fun insertAccount(account: Account) = accountDao.insert(account)
+    fun insertAccount(account: Account) = accountDao.insert(account)
 
-    fun getAllAccount() = accountDao.getAllAccount()
+    fun getAllAccountsAndGroup() = accountDao.getAllAccountsAndGroup()
+
+    fun getAllAccounts() = accountDao.getAllAccounts()
+
+    fun updateAmount(accountId: Int, amount: Double) = accountDao.updateAmount(accountId, amount)
+
 }

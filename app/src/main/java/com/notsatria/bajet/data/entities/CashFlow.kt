@@ -22,5 +22,8 @@ data class CashFlow(
     val categoryId: Int,
 
     @ColumnInfo("date")
-    val date: Long
+    val date: Long,
+
+    @ColumnInfo("accountId")
+    val accountId: Int
 )

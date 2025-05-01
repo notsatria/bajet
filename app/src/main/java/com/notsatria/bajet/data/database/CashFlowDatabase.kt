@@ -112,7 +112,7 @@ abstract class CashFlowDatabase : RoomDatabase() {
 
         private fun prepopulateDefaultAccount(dao: AccountDao) {
             try {
-                dao.insert(Account(id = 1, name = "Cash", amount = 0.0, groupId = 1))
+                dao.insert(Account(id = 1, name = "Cash", balance = 0.0, groupId = 1))
             } catch (e: Exception) {
                 e.printStackTrace()
             }
