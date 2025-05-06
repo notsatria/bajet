@@ -35,16 +35,19 @@ fun PieChart(
     Canvas(modifier = modifier.size(200.dp)) {
         data.forEach {
             val sweepAngle = ((it.cashFlow.amount / totalAmount) * 360f).toFloat()
-            val measuredText = textMeasurer.measure(
-                "${(it.percentage * 100).roundToInt()}%",
-                style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium)
-            )
+
             drawPieChartSlice(
                 color = Color(it.category.color),
                 startAngle = startAngle,
                 sweepAngle = sweepAngle,
             )
-            drawPercentageText(measuredText, startAngle, sweepAngle)
+            if (sweepAngle >= 20f) {
+                val measuredText = textMeasurer.measure(
+                    "${(it.percentage * 100).roundToInt()}%",
+                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                )
+                drawPercentageText(measuredText, startAngle, sweepAngle)
+            }
 
             startAngle += sweepAngle
         }

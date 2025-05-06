@@ -250,32 +250,7 @@ fun DailyCashFlowCardItemPreview() {
             date = Calendar.getInstance().formatDateTo(),
             totalExpenses = 20000.0,
             totalIncome = 30000.0,
-            cashFlowList = listOf(
-                CashFlowAndCategory(
-                    cashFlow = CashFlow(
-                        cashFlowId = 1,
-                        type = "Income",
-                        amount = 10000.0,
-                        note = "Salary",
-                        date = Calendar.getInstance().timeInMillis,
-                        categoryId = 1,
-                        accountId = 1
-                    ),
-                    category = DummyData.categories[0]
-                ),
-                CashFlowAndCategory(
-                    cashFlow = CashFlow(
-                        cashFlowId = 2,
-                        type = "Expenses",
-                        amount = -10000.0,
-                        note = "Food",
-                        date = Calendar.getInstance().timeInMillis,
-                        categoryId = 2,
-                        accountId = 1
-                    ),
-                    category = DummyData.categories[2]
-                )
-            ),
+            cashFlowList = DummyData.cashflowWithCategories,
             onDeleteCashFlow = {},
             navigateToEditCashFlowScreen = {}
         )
@@ -288,19 +263,7 @@ fun DailyCashFlowItemRowPreview() {
     BajetTheme {
         DailyCashFlowItemRow(
             modifier = Modifier,
-            cashFlow = CashFlowAndCategoryDomain(
-                cashFlow = CashFlow(
-                    cashFlowId = 1,
-                    type = "Income",
-                    amount = 10000.0,
-                    note = "Salary",
-                    date = Calendar.getInstance().timeInMillis,
-                    categoryId = 1,
-                    accountId = 1
-                ),
-                category = DummyData.categories[0],
-                isOptionsRevealed = false
-            ),
+            cashFlow = DummyData.cashflowWithCategories[0].toDomain(),
             emoji = "💰",
             categoryColor = Helper.randomColor(alpha = 130).toArgb()
         )

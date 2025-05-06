@@ -12,15 +12,14 @@ import com.notsatria.bajet.repository.AddCashFlowRepository
 import com.notsatria.bajet.utils.CashFlowTypes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber.Forest.i
 import java.util.Date
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class AddCashFlowViewModel @Inject constructor(
     private val addCashFlowRepository: AddCashFlowRepository,
@@ -61,19 +60,26 @@ class AddCashFlowViewModel @Inject constructor(
     }
 
     fun insertCashFlow() {
-        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+        viewModelScope.launch {
             val cashFlow = addCashFlowData.toCashFlow()
-            addCashFlowRepository.insertCashFlow(cashFlow)
-            accountRepository.updateAmount(cashFlow.accountId, cashFlow.amount)
+            withContext(Dispatchers.IO) {
+                addCashFlowRepository.insertCashFlow(cashFlow)
+                accountRepository.updateAmount(cashFlow.accountId, cashFlow.amount)
+            }
         }
     }
 
     val accounts = accountRepository.getAllAccounts()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
+    /**
+     * Get cashflow by id (return cashflow, category and account)
+     */
     fun getCashFlowById(cashFlowId: Int) {
-        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
-            val data = addCashFlowRepository.getCashFlowAndCategoryById(cashFlowId)
+        viewModelScope.launch {
+            val data = withContext(Dispatchers.IO) {
+                addCashFlowRepository.getCashFlowAndCategoryById(cashFlowId)
+            }
             // if amount is less than 0, times with -1 to create minus
             val amount =
                 if (data.cashFlow.amount < 0) (data.cashFlow.amount * -1).toString() else data.cashFlow.amount.toString()
@@ -84,17 +90,20 @@ class AddCashFlowViewModel @Inject constructor(
                 date = data.cashFlow.date,
                 categoryId = data.cashFlow.categoryId,
                 categoryText = "${data.category.emoji} ${data.category.name}",
-                selectedCashflowTypeIndex = if (data.cashFlow.type == "Expenses") 1 else 0
+                selectedCashflowTypeIndex = if (data.cashFlow.type == CashFlowTypes.EXPENSES.type) 1 else 0,
+                selectedAccount = data.account
             )
         }
     }
 
     fun updateCashFlow(cashFowId: Int) {
-        viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
+        viewModelScope.launch {
             val cashFlow = addCashFlowData.toCashFlow()
             i("Update CashFlow: $cashFlow")
-            addCashFlowRepository.updateCashFlow(cashFlow.copy(cashFlowId = cashFowId))
-            accountRepository.updateAmount(cashFlow.accountId, cashFlow.amount)
+            withContext(Dispatchers.IO) {
+                addCashFlowRepository.updateCashFlow(cashFlow.copy(cashFlowId = cashFowId))
+                accountRepository.updateAmount(cashFlow.accountId, cashFlow.amount)
+            }
         }
     }
 

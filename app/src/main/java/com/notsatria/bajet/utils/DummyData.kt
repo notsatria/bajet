@@ -1,10 +1,12 @@
 package com.notsatria.bajet.utils
 
 import androidx.compose.ui.graphics.toArgb
+import com.notsatria.bajet.data.entities.Account
 import com.notsatria.bajet.data.entities.AccountGroup
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
+import com.notsatria.bajet.data.entities.relation.CashFlowWithCategoryAndAccount
 import com.notsatria.bajet.ui.domain.Analytics
 import java.util.Calendar
 
@@ -64,7 +66,7 @@ object DummyData {
         )
     )
 
-    val cashFlowAndCategories = listOf(
+    val cashflowWithCategories = listOf(
         CashFlowAndCategory(
             cashFlow = CashFlow(
                 cashFlowId = 1,
@@ -75,7 +77,7 @@ object DummyData {
                 categoryId = 1,
                 accountId = 1
             ),
-            category = categories[0]
+            category = categories[0],
         ),
         CashFlowAndCategory(
             cashFlow = CashFlow(
@@ -100,6 +102,63 @@ object DummyData {
                 accountId = 1
             ),
             category = categories[2]
+        )
+    )
+
+    val cashFlowWithCategoriesAndAccount = listOf(
+        CashFlowWithCategoryAndAccount(
+            cashFlow = CashFlow(
+                cashFlowId = 1,
+                type = CashFlowTypes.INCOME.type,
+                amount = 10000.0,
+                note = "Salary",
+                date = Calendar.getInstance().timeInMillis,
+                categoryId = 1,
+                accountId = 1
+            ),
+            category = categories[0],
+            account = Account(
+                id = 1,
+                name = "Cash",
+                groupId = 1,
+                balance = 10000.0
+            )
+        ),
+        CashFlowWithCategoryAndAccount(
+            cashFlow = CashFlow(
+                cashFlowId = 2,
+                type = CashFlowTypes.EXPENSES.type,
+                amount = 20000.0,
+                note = "Food",
+                date = Calendar.getInstance().timeInMillis,
+                categoryId = 3,
+                accountId = 1
+            ),
+            category = categories[1],
+            account = Account(
+                id = 1,
+                name = "Cash",
+                groupId = 1,
+                balance = 10000.0
+            )
+        ),
+        CashFlowWithCategoryAndAccount(
+            cashFlow = CashFlow(
+                cashFlowId = 3,
+                type = CashFlowTypes.EXPENSES.type,
+                amount = 40000.0,
+                note = "Something",
+                date = Calendar.getInstance().timeInMillis,
+                categoryId = 4,
+                accountId = 1
+            ),
+            category = categories[2],
+            account = Account(
+                id = 1,
+                name = "Cash",
+                groupId = 1,
+                balance = 10000.0
+            )
         )
     )
 

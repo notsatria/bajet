@@ -81,7 +81,8 @@ fun AnalyticsRoute(viewModel: AnalyticsViewModel = hiltViewModel()) {
             viewModel.changeType(if (index == 0) CashFlowTypes.INCOME else CashFlowTypes.EXPENSES)
         }),
         state = AnalyticsScreenUiState(
-            selectedMonth = selectedMonth, analytics = analytics,
+            selectedMonth = selectedMonth,
+            analytics = analytics,
             pagerState = pagerState,
             coroutineScope = coroutineScope,
             titles = titles

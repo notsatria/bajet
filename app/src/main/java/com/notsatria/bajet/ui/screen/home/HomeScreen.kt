@@ -208,7 +208,7 @@ fun HomeScreenPreview() {
                     expenses = -40000.0,
                     balance = -20000.0
                 ),
-                groupedCashflowAndCategory = DummyData.cashFlowAndCategories.sortedByDescending { it.cashFlow.date }
+                groupedCashflowAndCategory = DummyData.cashflowWithCategories.sortedByDescending { it.cashFlow.date }
                     .groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) },
                 selectedMonth = Calendar.getInstance()
             ),

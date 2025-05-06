@@ -43,6 +43,9 @@ class AnalyticsViewModel @Inject constructor(private val repository: AnalyticsRe
         _selectedType.value = type.type
     }
 
+    /**
+     * Observe analytics based on selectedMonth and selectedType
+     */
     fun observeAnalytics() {
         viewModelScope.launch {
             combine(_selectedMonth, _selectedType) { month, type ->
@@ -51,7 +54,7 @@ class AnalyticsViewModel @Inject constructor(private val repository: AnalyticsRe
                 val (startDate, endDate) = DateUtils.getStartAndEndDate(month)
                 repository.getAnalytics(startDate, endDate, type)
             }.collect {
-                _analytics.value = it.map { it.toAnalytics() }
+                _analytics.value = it.sortedByDescending { it.percentage }.map { it.toAnalytics() }
             }
         }
     }

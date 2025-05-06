@@ -8,11 +8,12 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.notsatria.bajet.data.entities.CashFlow
-import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
-import com.notsatria.bajet.data.entities.relation.CashFlowSummary
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.data.entities.relation.AnalyticsRaw
 import com.notsatria.bajet.data.entities.relation.AnalyticsTotalRaw
+import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
+import com.notsatria.bajet.data.entities.relation.CashFlowSummary
+import com.notsatria.bajet.data.entities.relation.CashFlowWithCategoryAndAccount
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -47,8 +48,31 @@ interface CashFlowDao {
     suspend fun deleteCashFlow(cashFlow: CashFlow)
 
     @Transaction
-    @Query("SELECT * FROM cashflow JOIN category ON cashflow.categoryId = category.categoryId WHERE cashFlowId = :cashFlowId")
-    suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowAndCategory
+    @Query(
+        """
+        SELECT 
+            cashFlowId,
+            type,
+            amount,
+            note,
+            cashflow.categoryId,
+            date,
+            accountId,
+            category.name as categoryName,
+            emoji,
+            color,
+            groupId,
+            account.name as accountName,
+            balance
+        FROM cashflow 
+        JOIN category 
+        ON cashflow.categoryId = category.categoryId
+        JOIN account 
+        ON cashflow.accountId = account.id
+        WHERE cashFlowId = :cashFlowId
+        """
+    )
+    suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowWithCategoryAndAccount
 
     @Update
     suspend fun updateCashFlow(cashFlow: CashFlow)
@@ -88,7 +112,8 @@ interface CashFlowDao {
     ): Flow<List<AnalyticsRaw>>
 
     @Transaction
-    @Query("""
+    @Query(
+        """
          WITH types(type) AS (
             SELECT 'Income'
             UNION ALL
@@ -103,6 +128,7 @@ interface CashFlowDao {
         GROUP BY types.type
         ORDER BY types.type DESC
 
-    """)
+    """
+    )
     fun getTotalAnalyticsTotalAmount(startDate: Long, endDate: Long): Flow<List<AnalyticsTotalRaw>>
 }
