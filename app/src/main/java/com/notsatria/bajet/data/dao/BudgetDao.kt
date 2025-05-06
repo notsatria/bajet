@@ -25,6 +25,7 @@ interface BudgetDao {
         SELECT 
             c.emoji AS emoji,
             c.name AS categoryName,
+            c.color AS categoryColor,
             COALESCE(ABS(SUM(cf.amount)), 0.0) AS spending,
             b.amount AS budget
         FROM 
@@ -41,7 +42,11 @@ interface BudgetDao {
             c.categoryId, b.amount
     """
     )
-    fun getAllBudgetsWithSpending(startDate: Long, endDate: Long, month: Int): Flow<List<BudgetItemByCategory>>
+    fun getAllBudgetsWithSpending(
+        startDate: Long,
+        endDate: Long,
+        month: Int
+    ): Flow<List<BudgetItemByCategory>>
 
     @Transaction
     @Query(
@@ -60,5 +65,9 @@ interface BudgetDao {
         AND bm.month = :month
     """
     )
-    fun getTotalBudgetByMonthWithSpending(startDate: Long, endDate: Long, month: Int): Flow<TotalBudgetByMonthWithSpending>
+    fun getTotalBudgetByMonthWithSpending(
+        startDate: Long,
+        endDate: Long,
+        month: Int
+    ): Flow<TotalBudgetByMonthWithSpending>
 }
