@@ -44,4 +44,36 @@
     <string name="format_field_is_empty">%1$s field is empty</string>
     <string name="total">Total</string>
     <string name="choose_account">Choose account</string>
+    <string name="configuration">Configuration</string>
+    <string name="passcode">Passcode</string>
+    <string name="backup">Backup</string>
+    <string name="about">About</string>
+    <string name="feedback">Feedback</string>
+    <string name="theme">Theme</string>
+    <string name="language_settings">Language settings</string>
+    <string name="currency_settings">Currency settings</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="system">System</string>
+    <string name="selected">Selected</string>
+
+    <string-array name="settings_title">
+        <item>@string/configuration</item>
+        <item>@string/passcode</item>
+        <item>@string/backup</item>
+        <item>@string/about</item>
+        <item>@string/feedback</item>
+    </string-array>
+
+    <string-array name="configuration_items">
+        <item>@string/theme</item>
+        <item>@string/currency_settings</item>
+        <item>@string/language_settings</item>
+    </string-array>
+
+    <string-array name="theme_list">
+        <item>@string/light</item>
+        <item>@string/dark</item>
+        <item>@string/system</item>
+    </string-array>
 </resources>

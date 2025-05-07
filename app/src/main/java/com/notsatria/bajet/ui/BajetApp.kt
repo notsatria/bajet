@@ -23,6 +23,8 @@ import com.notsatria.bajet.ui.screen.budget.BudgetRoute
 import com.notsatria.bajet.ui.screen.budget.add_budget.AddBudgetRoute
 import com.notsatria.bajet.ui.screen.budget.setting.BudgetSettingRoute
 import com.notsatria.bajet.ui.screen.home.HomeRoute
+import com.notsatria.bajet.ui.screen.settings.SettingRoute
+import com.notsatria.bajet.ui.screen.settings.configuration.ConfigurationRoute
 
 @Composable
 fun BajetApp(
@@ -92,6 +94,14 @@ fun BajetApp(
             }
             composable(Screen.AddAccount.route) {
                 AddAccountRoute(navigateBack = { navController.navigateUp() })
+            }
+            composable(Screen.Settings.route) {
+                SettingRoute(navigateToConfigurationScreen = {
+                    navController.navigate(Screen.Configuration.route)
+                })
+            }
+            composable(Screen.Configuration.route) {
+                ConfigurationRoute(navigateBack = { navController.navigateUp() })
             }
         }
     }
