@@ -133,7 +133,7 @@ fun DailyCashFlowCardItem(
                                         MaterialTheme.colorScheme.surfaceContainer
                                     )
                                     .clickable {
-                                        navigateToEditCashFlowScreen(cashFlowAndCategoryDomain.cashFlow.cashFlowId)
+                                        navigateToEditCashFlowScreen(cashFlowAndCategoryDomain.cashFlow.id)
                                     },
                                 emoji = cashFlowAndCategoryDomain.category.emoji,
                                 categoryColor = cashFlowAndCategoryDomain.category.color

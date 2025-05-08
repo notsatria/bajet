@@ -26,7 +26,7 @@ interface CashFlowDao {
     fun insertCategory(category: Category)
 
     @Transaction
-    @Query("SELECT * FROM cashflow JOIN category ON cashflow.categoryId = category.categoryId WHERE date BETWEEN :startDate AND :endDate")
+    @Query("SELECT * FROM cashflow JOIN category ON cashflow.categoryId = category.id WHERE date BETWEEN :startDate AND :endDate")
     fun getCashFlowsAndCategoryListByMonth(
         startDate: Long,
         endDate: Long
@@ -51,7 +51,7 @@ interface CashFlowDao {
     @Query(
         """
         SELECT 
-            cashFlowId,
+            id,
             type,
             amount,
             note,
@@ -66,10 +66,10 @@ interface CashFlowDao {
             balance
         FROM cashflow 
         JOIN category 
-        ON cashflow.categoryId = category.categoryId
+        ON cashflow.categoryId = category.id
         JOIN account 
         ON cashflow.accountId = account.id
-        WHERE cashFlowId = :cashFlowId
+        WHERE id = :cashFlowId
         """
     )
     suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowWithCategoryAndAccount
@@ -98,7 +98,7 @@ interface CashFlowDao {
             t.total AS total,
             (SUM(cf.amount) * 1.0 / t.total) AS percentage
         FROM cashflow AS cf
-        JOIN category AS c ON cf.categoryId = c.categoryId
+        JOIN category AS c ON cf.categoryId = c.id
         CROSS JOIN total_sum t
         WHERE cf.date BETWEEN :startDate AND :endDate
           AND cf.type = :type

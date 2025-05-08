@@ -13,7 +13,7 @@ import java.util.Calendar
 object DummyData {
     val cashFlowList = listOf(
         CashFlow(
-            cashFlowId = 0,
+            id = 0,
             type = CashFlowTypes.INCOME.type,
             amount = 10000.0,
             note = "Jual buku",
@@ -22,7 +22,7 @@ object DummyData {
             accountId = 1
         ),
         CashFlow(
-            cashFlowId = 1,
+            id = 1,
             type = CashFlowTypes.EXPENSES.type,
             amount = 20000.0,
             note = "Jual buku",
@@ -31,7 +31,7 @@ object DummyData {
             accountId = 1
         ),
         CashFlow(
-            cashFlowId = 3,
+            id = 3,
             type = CashFlowTypes.EXPENSES.type,
             amount = 30000.0,
             note = "Jual buku",
@@ -40,7 +40,7 @@ object DummyData {
             accountId = 1
         ),
         CashFlow(
-            cashFlowId = 4,
+            id = 4,
             type = CashFlowTypes.EXPENSES.type,
             amount = 30000.0,
             note = "Makan",
@@ -52,14 +52,14 @@ object DummyData {
 
     val categories = listOf(
         Category(
-            categoryId = 1,
+            id = 1,
             name = "Salary",
             emoji = "💰",
             color = Helper.randomColor(alpha = 160).toArgb()
         ),
-        Category(categoryId = 3, name = "Food", emoji = "🍔", color = Helper.randomColor().toArgb()),
+        Category(id = 3, name = "Food", emoji = "🍔", color = Helper.randomColor().toArgb()),
         Category(
-            categoryId = 4,
+            id = 4,
             name = "Transport",
             emoji = "🚌",
             color = Helper.randomColor(alpha = 160).toArgb()
@@ -69,7 +69,7 @@ object DummyData {
     val cashflowWithCategories = listOf(
         CashFlowAndCategory(
             cashFlow = CashFlow(
-                cashFlowId = 1,
+                id = 1,
                 type = CashFlowTypes.INCOME.type,
                 amount = 10000.0,
                 note = "Salary",
@@ -81,7 +81,7 @@ object DummyData {
         ),
         CashFlowAndCategory(
             cashFlow = CashFlow(
-                cashFlowId = 2,
+                id = 2,
                 type = CashFlowTypes.EXPENSES.type,
                 amount = 20000.0,
                 note = "Food",
@@ -93,7 +93,7 @@ object DummyData {
         ),
         CashFlowAndCategory(
             cashFlow = CashFlow(
-                cashFlowId = 3,
+                id = 3,
                 type = CashFlowTypes.EXPENSES.type,
                 amount = 40000.0,
                 note = "Something",
@@ -108,7 +108,7 @@ object DummyData {
     val cashFlowWithCategoriesAndAccount = listOf(
         CashFlowWithCategoryAndAccount(
             cashFlow = CashFlow(
-                cashFlowId = 1,
+                id = 1,
                 type = CashFlowTypes.INCOME.type,
                 amount = 10000.0,
                 note = "Salary",
@@ -126,7 +126,7 @@ object DummyData {
         ),
         CashFlowWithCategoryAndAccount(
             cashFlow = CashFlow(
-                cashFlowId = 2,
+                id = 2,
                 type = CashFlowTypes.EXPENSES.type,
                 amount = 20000.0,
                 note = "Food",
@@ -144,7 +144,7 @@ object DummyData {
         ),
         CashFlowWithCategoryAndAccount(
             cashFlow = CashFlow(
-                cashFlowId = 3,
+                id = 3,
                 type = CashFlowTypes.EXPENSES.type,
                 amount = 40000.0,
                 note = "Something",

@@ -77,7 +77,7 @@ abstract class CashFlowDatabase : RoomDatabase() {
                         val item = jsonArray.getJSONObject(i)
                         dao.insertCategory(
                             Category(
-                                categoryId = item.getInt("categoryId"),
+                                id = item.getInt("id"),
                                 name = item.getString("name"),
                                 emoji = item.getString("emoji"),
                                 color = Helper.randomColor().toArgb()

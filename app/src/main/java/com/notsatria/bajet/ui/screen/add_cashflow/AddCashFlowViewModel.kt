@@ -101,7 +101,7 @@ class AddCashFlowViewModel @Inject constructor(
             val cashFlow = addCashFlowData.toCashFlow()
             i("Update CashFlow: $cashFlow")
             withContext(Dispatchers.IO) {
-                addCashFlowRepository.updateCashFlow(cashFlow.copy(cashFlowId = cashFowId))
+                addCashFlowRepository.updateCashFlow(cashFlow.copy(id = cashFowId))
                 accountRepository.updateAmount(cashFlow.accountId, cashFlow.amount)
             }
         }

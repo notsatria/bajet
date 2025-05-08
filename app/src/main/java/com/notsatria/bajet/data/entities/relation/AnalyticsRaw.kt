@@ -18,7 +18,7 @@ data class AnalyticsRaw(
     fun toAnalytics(): Analytics {
         return Analytics(
             cashFlow = CashFlow(
-                cashFlowId = this.cashFlowId,
+                id = this.cashFlowId,
                 categoryId = this.categoryId,
                 type = this.type,
                 amount = this.amount,
@@ -27,7 +27,7 @@ data class AnalyticsRaw(
                 accountId = 0
             ),
             category = Category(
-                categoryId = this.categoryId,
+                id = this.categoryId,
                 name = this.categoryName,
                 emoji = this.emoji,
                 color = this.color

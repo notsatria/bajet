@@ -75,7 +75,7 @@ fun AddBudgetRoute(
         },
         onCategorySelected = { category ->
             shouldShowCategoryDialog.value = false
-            viewModel.updateCategoryId(category.categoryId)
+            viewModel.updateCategoryId(category.id)
             viewModel.updateCategoryText("${category.emoji} ${category.name}")
         },
         onAddBudgetClicked = {

@@ -16,7 +16,7 @@ interface BudgetDao {
     suspend fun insert(budget: Budget): Long
 
     @Transaction
-    @Query("SELECT * FROM budget JOIN category ON budget.categoryId = category.categoryId")
+    @Query("SELECT * FROM budget JOIN category ON budget.categoryId = category.id")
     fun getAllBudget(): Flow<List<BudgetAndCategory>>
 
     @Transaction
@@ -31,15 +31,15 @@ interface BudgetDao {
         FROM 
             category c
         LEFT JOIN 
-            budget b ON c.categoryId = b.categoryId
+            budget b ON c.id = b.categoryId
         LEFT JOIN 
-            cashflow cf ON c.categoryId = cf.categoryId AND cf.type = 'Expenses'
+            cashflow cf ON c.id = cf.categoryId AND cf.type = 'Expenses'
         LEFT JOIN 
             budget_month bm ON bm.budgetId = b.budgetId
         WHERE 
             cf.date BETWEEN :startDate AND :endDate AND bm.month = :month
         GROUP BY 
-            c.categoryId, b.amount
+            c.id, b.amount
     """
     )
     fun getAllBudgetsWithSpending(

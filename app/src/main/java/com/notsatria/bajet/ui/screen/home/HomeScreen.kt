@@ -169,9 +169,9 @@ fun GroupedCashFlowList(
             item {
                 DailyCashFlowCardItem(
                     date = entry.key,
-                    totalIncome = entry.value.filter { it.category.categoryId == 1 }
+                    totalIncome = entry.value.filter { it.category.id == 1 }
                         .sumOf { it.cashFlow.amount },
-                    totalExpenses = entry.value.filter { it.category.categoryId != 1 }
+                    totalExpenses = entry.value.filter { it.category.id != 1 }
                         .sumOf { it.cashFlow.amount },
                     cashFlowList = entry.value,
                     onDeleteCashFlow = onDeleteCashFlow,

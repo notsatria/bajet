@@ -79,7 +79,7 @@ class CategoriesViewModel @Inject constructor(private val categoryRepository: Ca
         viewModelScope.launch(Dispatchers.IO) {
             categoryRepository.getCategories().collect {
                 _categories.value =
-                    it.filter { category -> category.categoryId != 1 && category.categoryId != 2 }
+                    it.filter { category -> category.id != 1 && category.id != 2 }
             }
         }
     }

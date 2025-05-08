@@ -111,7 +111,7 @@ fun AddCashFlowRoute(
         ),
         navigateBack = navigateBack,
         onCategorySelected = { category ->
-            viewModel.updateCategoryId(category.categoryId)
+            viewModel.updateCategoryId(category.id)
             viewModel.updateCategoryText("${category.emoji} ${category.name}")
         },
         onUpdateDate = { date ->
