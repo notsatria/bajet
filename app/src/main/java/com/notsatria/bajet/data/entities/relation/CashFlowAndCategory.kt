@@ -35,7 +35,7 @@ data class CashFlowWithCategoryAndAccount(
     val category: Category,
 
     @Relation(
-        parentColumn = "categoryId",
+        parentColumn = "accountId",
         entityColumn = "id"
     )
     val account: Account

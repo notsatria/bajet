@@ -5,8 +5,8 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import com.notsatria.bajet.data.entities.Budget
-import com.notsatria.bajet.data.entities.relation.BudgetAndCategory
 import com.notsatria.bajet.data.entities.relation.BudgetItemByCategory
+import com.notsatria.bajet.data.entities.relation.BudgetWithCategoryAndBudgetEntry
 import com.notsatria.bajet.data.entities.relation.TotalBudgetByMonthWithSpending
 import com.notsatria.bajet.utils.CashFlowType
 import kotlinx.coroutines.flow.Flow
@@ -17,8 +17,20 @@ interface BudgetDao {
     suspend fun insert(budget: Budget): Long
 
     @Transaction
-    @Query("SELECT * FROM budget JOIN category ON budget.categoryId = category.id")
-    fun getAllBudget(): Flow<List<BudgetAndCategory>>
+    @Query(
+        """
+        SELECT 
+            c.name AS categoryName,
+            c.emoji AS categoryEmoji,
+            be.amount AS budgetAmount
+        FROM budget b
+        JOIN category c ON b.categoryId = c.id
+        JOIN budget_entry be ON b.id = be.budgetId
+        
+        WHERE be.month = :month AND be.year = :year
+    """
+    )
+    fun getAllBudget(month: Int, year: Int): Flow<List<BudgetWithCategoryAndBudgetEntry>>
 
     @Transaction
     @Query(
@@ -71,6 +83,6 @@ interface BudgetDao {
         cfType: String = CashFlowType.EXPENSES
     ): Flow<TotalBudgetByMonthWithSpending>
 
-    @Query("SELECT amount FROM budget_entry WHERE month = :month AND year = :year")
+    @Query("SELECT SUM(amount) FROM budget_entry WHERE month = :month AND year = :year")
     fun getBudgetAmountByMonth(month: Int, year: Int): Flow<Double>
 }

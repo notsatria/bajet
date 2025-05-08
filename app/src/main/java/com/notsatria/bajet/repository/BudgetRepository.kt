@@ -8,6 +8,7 @@ import com.notsatria.bajet.data.dao.CashFlowDao
 import com.notsatria.bajet.data.entities.Budget
 import com.notsatria.bajet.data.entities.BudgetEntry
 import com.notsatria.bajet.data.entities.relation.BudgetItemByCategory
+import com.notsatria.bajet.data.entities.relation.BudgetWithCategoryAndBudgetEntry
 import com.notsatria.bajet.data.entities.relation.TotalBudgetByMonthWithSpending
 import com.notsatria.bajet.utils.DateUtils
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +39,10 @@ class BudgetRepository @Inject constructor(
         }
     }
 
-    fun getAllBudget() = dao.getAllBudget()
+    fun getAllBudget(): Flow<List<BudgetWithCategoryAndBudgetEntry>> {
+        val calendar = java.util.Calendar.getInstance()
+        return dao.getAllBudget(calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR))
+    }
 
     fun getAllBudgetWithSpending(month: Int, year: Int): Flow<List<BudgetItemByCategory>> =
         flow {
@@ -49,7 +53,6 @@ class BudgetRepository @Inject constructor(
             val (startDate, endDate) = DateUtils.getStartAndEndDate(calendar)
             emitAll(dao.getAllBudgetWithSpending(month, year, startDate, endDate))
         }
-
 
     @Transaction
     fun getTotalBudgetByMonthWithSpending(

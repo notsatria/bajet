@@ -3,6 +3,7 @@ package com.notsatria.bajet.utils
 import androidx.compose.ui.graphics.toArgb
 import com.notsatria.bajet.data.entities.Account
 import com.notsatria.bajet.data.entities.AccountGroup
+import com.notsatria.bajet.data.entities.BudgetEntry
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
@@ -200,5 +201,44 @@ object DummyData {
             id = 4,
             name = "Other",
         ),
+    )
+
+    val budgetEntries = listOf<BudgetEntry>(
+        BudgetEntry(
+            budgetId = 1,
+            month = 1,
+            year = 2023,
+            amount = 10000.0
+        ),
+        BudgetEntry(
+            budgetId = 2,
+            month = 2,
+            year = 2023,
+            amount = 20000.0
+        ),
+        BudgetEntry(
+            budgetId = 3,
+            month = 3,
+            year = 2023,
+            amount = 30000.0
+        ),
+        BudgetEntry(
+            budgetId = 4,
+            month = 4,
+            year = 2023,
+            amount = 40000.0
+        ),
+        BudgetEntry(
+            budgetId = 5,
+            month = 5,
+            year = 2023,
+            amount = 50000.0
+        ),
+        BudgetEntry(
+            budgetId = 6,
+            month = 6,
+            year = 2023,
+            amount = 60000.0
+        )
     )
 }

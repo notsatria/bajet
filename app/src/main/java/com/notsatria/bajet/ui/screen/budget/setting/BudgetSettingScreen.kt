@@ -19,7 +19,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,12 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
-import com.notsatria.bajet.data.entities.Budget
-import com.notsatria.bajet.data.entities.relation.BudgetAndCategory
+import com.notsatria.bajet.data.entities.relation.BudgetWithCategoryAndBudgetEntry
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DummyData
 import com.notsatria.bajet.utils.formatToRupiah
-import timber.log.Timber.Forest.d
 
 @Composable
 fun BudgetSettingRoute(
@@ -44,10 +41,6 @@ fun BudgetSettingRoute(
     viewModel: BudgetSettingViewModel = hiltViewModel()
 ) {
     val budgetList by viewModel.budgetList.collectAsStateWithLifecycle()
-    LaunchedEffect(budgetList) {
-        viewModel.getAllBudget()
-        d("budgetList $budgetList")
-    }
 
     BudgetSettingScreen(
         modifier,
@@ -55,7 +48,7 @@ fun BudgetSettingRoute(
             onNavigateBackClicked = navigateBack,
             onAddClicked = navigateToAddBudgetScreen,
         ),
-        uiState = BudgetSettingUiState(budgetList)
+        state = BudgetSettingUiState(budgetList)
     )
 }
 
@@ -64,7 +57,7 @@ fun BudgetSettingRoute(
 fun BudgetSettingScreen(
     modifier: Modifier = Modifier,
     event: BudgetSettingEvent = BudgetSettingEvent(),
-    uiState: BudgetSettingUiState = BudgetSettingUiState()
+    state: BudgetSettingUiState = BudgetSettingUiState()
 ) {
     Scaffold(modifier, topBar = {
         TopAppBar(title = { Text(text = "My Budget") },
@@ -88,11 +81,11 @@ fun BudgetSettingScreen(
             })
     }) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(uiState.budgetList) { budgetAndCategory ->
+            items(state.budgetList) { budgetAndCategory ->
                 BudgetCategoryItem(
-                    emoji = budgetAndCategory.category.emoji,
-                    categoryName = budgetAndCategory.category.name,
-                    amount = 100.0
+                    emoji = budgetAndCategory.categoryEmoji,
+                    categoryName = budgetAndCategory.categoryName,
+                    amount = budgetAndCategory.budgetAmount
                 )
                 HorizontalDivider()
             }
@@ -125,7 +118,7 @@ fun BudgetCategoryItem(
 }
 
 data class BudgetSettingUiState(
-    val budgetList: List<BudgetAndCategory> = emptyList(),
+    val budgetList: List<BudgetWithCategoryAndBudgetEntry> = emptyList(),
 )
 
 data class BudgetSettingEvent(
@@ -138,19 +131,17 @@ data class BudgetSettingEvent(
 fun BudgetSettingScreenPreview() {
     BajetTheme {
         BudgetSettingScreen(
-            uiState = BudgetSettingUiState(
+            state = BudgetSettingUiState(
                 budgetList = listOf(
-                    BudgetAndCategory(
-                        budget = Budget(
-                            categoryId = 1,
-                        ),
-                        category = DummyData.categories[0]
+                    BudgetWithCategoryAndBudgetEntry(
+                        categoryName = DummyData.categories[0].name,
+                        categoryEmoji = DummyData.categories[0].emoji,
+                        budgetAmount = DummyData.budgetEntries[0].amount
                     ),
-                    BudgetAndCategory(
-                        budget = Budget(
-                            categoryId = 2,
-                        ),
-                        category = DummyData.categories[1]
+                    BudgetWithCategoryAndBudgetEntry(
+                        categoryName = DummyData.categories[1].name,
+                        categoryEmoji = DummyData.categories[1].emoji,
+                        budgetAmount = DummyData.budgetEntries[0].amount
                     )
                 )
             )
