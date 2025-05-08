@@ -9,7 +9,7 @@ import com.notsatria.bajet.data.entities.Account
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.repository.AccountRepository
 import com.notsatria.bajet.repository.AddCashFlowRepository
-import com.notsatria.bajet.utils.CashFlowTypes
+import com.notsatria.bajet.utils.CashFlowType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -90,7 +90,7 @@ class AddCashFlowViewModel @Inject constructor(
                 date = data.cashFlow.date,
                 categoryId = data.cashFlow.categoryId,
                 categoryText = "${data.category.emoji} ${data.category.name}",
-                selectedCashflowTypeIndex = if (data.cashFlow.type == CashFlowTypes.EXPENSES.type) 1 else 0,
+                selectedCashflowTypeIndex = if (data.cashFlow.type == CashFlowType.EXPENSES) 1 else 0,
                 selectedAccount = data.account
             )
         }
@@ -112,7 +112,7 @@ class AddCashFlowViewModel @Inject constructor(
 }
 
 data class AddCashFlowData(
-    val addCashFlowType: CashFlowTypes = CashFlowTypes.INCOME,
+    val addCashFlowType: String = CashFlowType.INCOME,
     val selectedCashflowTypeIndex: Int = 0,
     val amount: String = "",
     val note: String = "",
@@ -124,7 +124,7 @@ data class AddCashFlowData(
     fun toCashFlow(): CashFlow {
         val finalAmount = if (this.amount.isEmpty()) 0.0 else this.amount.toDouble()
         return CashFlow(
-            type = if (selectedCashflowTypeIndex == 0) CashFlowTypes.INCOME.type else CashFlowTypes.EXPENSES.type,
+            type = if (selectedCashflowTypeIndex == 0) CashFlowType.INCOME else CashFlowType.EXPENSES,
             amount = if (selectedCashflowTypeIndex == 0) finalAmount else -finalAmount,
             note = this.note,
             date = this.date,/* If selected category is income, set category id to 1, otherwise set it to categoryId */

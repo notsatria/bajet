@@ -9,7 +9,7 @@ data class BudgetAndCategory(
     @Embedded val budget: Budget,
     @Relation(
         parentColumn = "categoryId",
-        entityColumn = "categoryId"
+        entityColumn = "id"
     )
     val category: Category
 )

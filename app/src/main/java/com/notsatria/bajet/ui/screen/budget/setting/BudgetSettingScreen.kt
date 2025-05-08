@@ -31,7 +31,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Budget
 import com.notsatria.bajet.data.entities.relation.BudgetAndCategory
-import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DummyData
 import com.notsatria.bajet.utils.formatToRupiah
@@ -93,7 +92,7 @@ fun BudgetSettingScreen(
                 BudgetCategoryItem(
                     emoji = budgetAndCategory.category.emoji,
                     categoryName = budgetAndCategory.category.name,
-                    amount = budgetAndCategory.budget.amount
+                    amount = 100.0
                 )
                 HorizontalDivider()
             }
@@ -144,14 +143,12 @@ fun BudgetSettingScreenPreview() {
                     BudgetAndCategory(
                         budget = Budget(
                             categoryId = 1,
-                            amount = 100000.0
                         ),
                         category = DummyData.categories[0]
                     ),
                     BudgetAndCategory(
                         budget = Budget(
                             categoryId = 2,
-                            amount = 100000.0
                         ),
                         category = DummyData.categories[1]
                     )

@@ -14,6 +14,7 @@ import com.notsatria.bajet.data.entities.relation.AnalyticsTotalRaw
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.relation.CashFlowSummary
 import com.notsatria.bajet.data.entities.relation.CashFlowWithCategoryAndAccount
+import com.notsatria.bajet.utils.CashFlowType
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -35,14 +36,19 @@ interface CashFlowDao {
     @Query(
         """
         SELECT 
-            SUM(CASE WHEN type = 'Expenses' THEN amount ELSE 0 END) AS expenses,
-            SUM(CASE WHEN type = 'Income' THEN amount ELSE 0 END) AS income,
+            SUM(CASE WHEN type = :expenses THEN amount ELSE 0 END) AS expenses,
+            SUM(CASE WHEN type = :income THEN amount ELSE 0 END) AS income,
             SUM(amount) AS balance
         FROM cashflow
         WHERE date BETWEEN :startDate AND :endDate
         """
     )
-    fun getCashFlowSummary(startDate: Long, endDate: Long): Flow<CashFlowSummary>
+    fun getCashFlowSummary(
+        startDate: Long,
+        endDate: Long,
+        expenses: String = CashFlowType.EXPENSES,
+        income: String = CashFlowType.INCOME
+    ): Flow<CashFlowSummary>
 
     @Delete
     suspend fun deleteCashFlow(cashFlow: CashFlow)
@@ -51,7 +57,7 @@ interface CashFlowDao {
     @Query(
         """
         SELECT 
-            id,
+            cashflow.id,
             type,
             amount,
             note,
@@ -69,7 +75,7 @@ interface CashFlowDao {
         ON cashflow.categoryId = category.id
         JOIN account 
         ON cashflow.accountId = account.id
-        WHERE id = :cashFlowId
+        WHERE cashflow.id = :cashFlowId
         """
     )
     suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowWithCategoryAndAccount
@@ -88,7 +94,7 @@ interface CashFlowDao {
         )
         
         SELECT 
-            cf.cashflowId,
+            cf.id AS cashFlowId,
             cf.categoryId,
             cf.type,
             c.name AS categoryName,
@@ -115,9 +121,9 @@ interface CashFlowDao {
     @Query(
         """
          WITH types(type) AS (
-            SELECT 'Income'
+            SELECT :income
             UNION ALL
-            SELECT 'Expenses'
+            SELECT :expenses
         )
         SELECT 
             types.type,
@@ -130,5 +136,23 @@ interface CashFlowDao {
 
     """
     )
-    fun getTotalAnalyticsTotalAmount(startDate: Long, endDate: Long): Flow<List<AnalyticsTotalRaw>>
+    fun getTotalAnalyticsTotalAmount(
+        startDate: Long,
+        endDate: Long,
+        expenses: String = CashFlowType.EXPENSES,
+        income: String = CashFlowType.INCOME
+    ): Flow<List<AnalyticsTotalRaw>>
+
+    @Query(
+        """
+        SELECT COALESCE(ABS(SUM(cf.amount)), 0.0)
+        FROM cashflow cf
+        WHERE cf.type = :expenses AND cf.date BETWEEN :startDate AND :endDate
+    """
+    )
+    fun getTotalSpending(
+        startDate: Long,
+        endDate: Long,
+        expenses: String = CashFlowType.EXPENSES
+    ): Flow<Double>
 }

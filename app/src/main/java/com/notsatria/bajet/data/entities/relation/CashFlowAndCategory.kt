@@ -11,8 +11,8 @@ import com.notsatria.bajet.ui.domain.CashFlowWithCategoryAndAccountDomain
 data class CashFlowAndCategory(
     @Embedded val cashFlow: CashFlow,
     @Relation(
-        parentColumn = "categoryId",
-        entityColumn = "categoryId"
+        parentColumn = "id",
+        entityColumn = "id"
     )
     val category: Category
 ) {
@@ -30,12 +30,12 @@ data class CashFlowWithCategoryAndAccount(
 
     @Relation(
         parentColumn = "categoryId",
-        entityColumn = "categoryId"
+        entityColumn = "id"
     )
     val category: Category,
 
     @Relation(
-        parentColumn = "accountId",
+        parentColumn = "categoryId",
         entityColumn = "id"
     )
     val account: Account

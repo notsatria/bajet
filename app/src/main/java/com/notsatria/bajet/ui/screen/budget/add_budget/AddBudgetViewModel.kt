@@ -9,11 +9,13 @@ import com.notsatria.bajet.data.entities.Budget
 import com.notsatria.bajet.repository.BudgetRepository
 import com.notsatria.bajet.utils.formatToCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AddBudgetViewModel @Inject constructor(private val budgetRepository: BudgetRepository) : ViewModel() {
+class AddBudgetViewModel @Inject constructor(private val budgetRepository: BudgetRepository) :
+    ViewModel() {
     var addBudgetData by mutableStateOf(AddBudgetData())
         private set
 
@@ -37,8 +39,11 @@ class AddBudgetViewModel @Inject constructor(private val budgetRepository: Budge
     }
 
     fun insertBudget() {
-        viewModelScope.launch {
-            budgetRepository.insert(addBudgetData.toBudget())
+        viewModelScope.launch(Dispatchers.IO) {
+            budgetRepository.insertBudget(
+                budget = addBudgetData.toBudget(),
+                amount = addBudgetData.amount.toDouble()
+            )
         }
     }
 }
@@ -50,7 +55,6 @@ data class AddBudgetData(
     val categoryText: String = ""
 ) {
     fun toBudget() = Budget(
-        amount = amount.toDouble(),
         categoryId = categoryId
     )
 }

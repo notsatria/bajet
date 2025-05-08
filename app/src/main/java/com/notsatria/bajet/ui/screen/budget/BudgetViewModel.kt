@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.relation.TotalBudgetByMonthWithSpending
 import com.notsatria.bajet.repository.BudgetRepository
-import com.notsatria.bajet.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,20 +24,16 @@ class BudgetViewModel @Inject constructor(private val budgetRepository: BudgetRe
     val selectedMonth = _selectedMonth.asStateFlow()
 
     val allBudgetWithSpendingList = _selectedMonth.flatMapLatest { month ->
-        val (startDate, endDate) = DateUtils.getStartAndEndDate(month)
-        budgetRepository.getAllBudgetsWithSpending(
-            startDate,
-            endDate,
-            month.get(Calendar.MONTH) + 1
+        budgetRepository.getAllBudgetWithSpending(
+            month.get(Calendar.MONTH) + 1,
+            month.get(Calendar.YEAR)
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
+    
     val totalBudgetByMonthWithSpending = _selectedMonth.flatMapLatest { month ->
-        val (startDate, endDate) = DateUtils.getStartAndEndDate(month)
         budgetRepository.getTotalBudgetByMonthWithSpending(
-            startDate,
-            endDate,
-            month.get(Calendar.MONTH) + 1
+            month.get(Calendar.MONTH) + 1,
+            month.get(Calendar.YEAR)
         )
     }.stateIn(
         viewModelScope,

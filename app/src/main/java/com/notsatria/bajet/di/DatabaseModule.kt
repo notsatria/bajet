@@ -4,7 +4,7 @@ import android.content.Context
 import com.notsatria.bajet.data.dao.AccountDao
 import com.notsatria.bajet.data.dao.AccountGroupDao
 import com.notsatria.bajet.data.dao.BudgetDao
-import com.notsatria.bajet.data.dao.BudgetMonthDao
+import com.notsatria.bajet.data.dao.BudgetEntryDao
 import com.notsatria.bajet.data.dao.CashFlowDao
 import com.notsatria.bajet.data.dao.CategoryDao
 import com.notsatria.bajet.data.database.CashFlowDatabase
@@ -35,7 +35,7 @@ class DatabaseModule {
     fun provideBudgetDao(db: CashFlowDatabase): BudgetDao = db.budgetDao()
 
     @Provides
-    fun provideBudgetMonthDao(db: CashFlowDatabase): BudgetMonthDao = db.budgetMonthDao()
+    fun provideBudgetMonthDao(db: CashFlowDatabase): BudgetEntryDao = db.budgetMonthDao()
 
     @Provides
     fun provideAccountDao(db: CashFlowDatabase): AccountDao = db.accountDao()

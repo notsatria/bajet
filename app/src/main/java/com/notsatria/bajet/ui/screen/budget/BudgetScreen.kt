@@ -56,14 +56,12 @@ fun BudgetRoute(
     val totalBudgetWithSpendingPerMonth by viewModel.totalBudgetByMonthWithSpending.collectAsStateWithLifecycle()
 
     BudgetScreen(
-        modifier,
-        event = BudgetScreenEvent(
+        modifier, event = BudgetScreenEvent(
             onSettingsClicked = navigateToBudgetSettingScreen,
             onPreviousMonthClick = { viewModel.changeMonth(-1) },
             onNextMonthClick = { viewModel.changeMonth(1) },
-        ),
-        uiState = BudgetScreenUiState(
-            budgetList = budgetList.filter { it.budget != null },
+        ), state = BudgetScreenUiState(
+            budgetList = budgetList,
             selectedMonth = selectedMonth,
             totalBudgetWithSpendingPerMonth = totalBudgetWithSpendingPerMonth
         )
@@ -74,7 +72,7 @@ fun BudgetRoute(
 fun BudgetScreen(
     modifier: Modifier = Modifier,
     event: BudgetScreenEvent = BudgetScreenEvent(),
-    uiState: BudgetScreenUiState = BudgetScreenUiState()
+    state: BudgetScreenUiState = BudgetScreenUiState()
 ) {
     Scaffold(
         modifier,
@@ -83,23 +81,22 @@ fun BudgetScreen(
                 onSettingsClicked = event.onSettingsClicked,
                 onPreviousMonthClick = event.onPreviousMonthClick,
                 onNextMonthClick = event.onNextMonthClick,
-                selectedMonth = uiState.selectedMonth
+                selectedMonth = state.selectedMonth
             )
         },
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             Column {
                 MonthlyBudgetItem(
-                    month = uiState.selectedMonth,
-                    spending = uiState.totalBudgetWithSpendingPerMonth.totalSpending,
-                    budget = uiState.totalBudgetWithSpendingPerMonth.totalBudget
+                    month = state.selectedMonth,
+                    spending = state.totalBudgetWithSpendingPerMonth.totalSpending,
+                    budget = state.totalBudgetWithSpendingPerMonth.budget
                 )
                 HorizontalDivider(
-                    thickness = 3.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant
+                    thickness = 3.dp, color = MaterialTheme.colorScheme.outlineVariant
                 )
                 LazyColumn {
-                    items(uiState.budgetList) { budgetItem ->
+                    items(state.budgetList) { budgetItem ->
                         BudgetItem(
                             emoji = budgetItem.emoji,
                             categoryName = budgetItem.categoryName,
@@ -108,8 +105,7 @@ fun BudgetScreen(
                             categoryColor = budgetItem.categoryColor
                         )
                         HorizontalDivider(
-                            thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant
+                            thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant
                         )
                     }
                 }
@@ -166,10 +162,7 @@ fun BudgetItem(
 
 @Composable
 fun MonthlyBudgetItem(
-    modifier: Modifier = Modifier,
-    month: Calendar,
-    spending: Double,
-    budget: Double
+    modifier: Modifier = Modifier, month: Calendar, spending: Double, budget: Double
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         Box(
@@ -237,8 +230,7 @@ data class BudgetScreenUiState(
     val budgetList: List<BudgetItemByCategory> = emptyList(),
     val selectedMonth: Calendar = Calendar.getInstance(),
     val totalBudgetWithSpendingPerMonth: TotalBudgetByMonthWithSpending = TotalBudgetByMonthWithSpending(
-        0.0,
-        0.0
+        0.0, 0.0
     )
 )
 

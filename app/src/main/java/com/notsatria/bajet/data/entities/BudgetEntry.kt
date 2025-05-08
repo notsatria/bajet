@@ -4,8 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity("budget_month")
-data class BudgetMonth(
+@Entity("budget_entry")
+data class BudgetEntry(
     @PrimaryKey(autoGenerate = true)
     val budgetMonthId: Int = 0,
 
@@ -14,6 +14,9 @@ data class BudgetMonth(
 
     @ColumnInfo("month")
     val month: Int,
+
+    @ColumnInfo("year")
+    val year: Int,
 
     @ColumnInfo("amount")
     val amount: Double

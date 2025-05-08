@@ -10,13 +10,13 @@ import com.notsatria.bajet.R
 import com.notsatria.bajet.data.dao.AccountDao
 import com.notsatria.bajet.data.dao.AccountGroupDao
 import com.notsatria.bajet.data.dao.BudgetDao
-import com.notsatria.bajet.data.dao.BudgetMonthDao
+import com.notsatria.bajet.data.dao.BudgetEntryDao
 import com.notsatria.bajet.data.dao.CashFlowDao
 import com.notsatria.bajet.data.dao.CategoryDao
 import com.notsatria.bajet.data.entities.Account
 import com.notsatria.bajet.data.entities.AccountGroup
 import com.notsatria.bajet.data.entities.Budget
-import com.notsatria.bajet.data.entities.BudgetMonth
+import com.notsatria.bajet.data.entities.BudgetEntry
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.utils.Helper
@@ -27,7 +27,7 @@ import org.json.JSONException
 import timber.log.Timber
 
 @Database(
-    entities = [CashFlow::class, Category::class, Budget::class, BudgetMonth::class, Account::class, AccountGroup::class],
+    entities = [CashFlow::class, Category::class, Budget::class, BudgetEntry::class, Account::class, AccountGroup::class],
     version = 1
 )
 abstract class CashFlowDatabase : RoomDatabase() {
@@ -35,7 +35,7 @@ abstract class CashFlowDatabase : RoomDatabase() {
     abstract fun cashFlowDao(): CashFlowDao
     abstract fun categoryDao(): CategoryDao
     abstract fun budgetDao(): BudgetDao
-    abstract fun budgetMonthDao(): BudgetMonthDao
+    abstract fun budgetMonthDao(): BudgetEntryDao
     abstract fun accountDao(): AccountDao
     abstract fun accountGroupDao(): AccountGroupDao
 

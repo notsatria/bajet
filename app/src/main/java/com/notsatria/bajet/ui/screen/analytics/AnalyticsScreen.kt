@@ -45,7 +45,7 @@ import com.notsatria.bajet.ui.components.MonthSelection
 import com.notsatria.bajet.ui.components.PieChart
 import com.notsatria.bajet.ui.domain.Analytics
 import com.notsatria.bajet.ui.theme.BajetTheme
-import com.notsatria.bajet.utils.CashFlowTypes
+import com.notsatria.bajet.utils.CashFlowType
 import com.notsatria.bajet.utils.DummyData
 import com.notsatria.bajet.utils.formatToRupiah
 import kotlinx.coroutines.CoroutineScope
@@ -78,7 +78,7 @@ fun AnalyticsRoute(viewModel: AnalyticsViewModel = hiltViewModel()) {
             coroutineScope.launch {
                 pagerState.animateScrollToPage(index)
             }
-            viewModel.changeType(if (index == 0) CashFlowTypes.INCOME else CashFlowTypes.EXPENSES)
+            viewModel.changeType(if (index == 0) CashFlowType.INCOME else CashFlowType.EXPENSES)
         }),
         state = AnalyticsScreenUiState(
             selectedMonth = selectedMonth,

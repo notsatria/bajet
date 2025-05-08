@@ -21,7 +21,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,7 +54,7 @@ fun HomeRoute(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     context: Context = LocalContext.current
 ) {
-    val cashFlowAndCategoryList by viewModel.groupedCashflowAndCategory.collectAsState()
+    val cashFlowAndCategoryList by viewModel.groupedCashflowAndCategory.collectAsStateWithLifecycle()
     val cashFlowSummary by viewModel.cashFlowSummary.collectAsStateWithLifecycle()
     val selectedMonth by viewModel.selectedMonth.collectAsStateWithLifecycle()
 

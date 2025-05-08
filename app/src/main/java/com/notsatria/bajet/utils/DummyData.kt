@@ -14,7 +14,7 @@ object DummyData {
     val cashFlowList = listOf(
         CashFlow(
             id = 0,
-            type = CashFlowTypes.INCOME.type,
+            type = CashFlowType.INCOME,
             amount = 10000.0,
             note = "Jual buku",
             categoryId = 1,
@@ -23,7 +23,7 @@ object DummyData {
         ),
         CashFlow(
             id = 1,
-            type = CashFlowTypes.EXPENSES.type,
+            type = CashFlowType.EXPENSES,
             amount = 20000.0,
             note = "Jual buku",
             categoryId = 3,
@@ -32,7 +32,7 @@ object DummyData {
         ),
         CashFlow(
             id = 3,
-            type = CashFlowTypes.EXPENSES.type,
+            type = CashFlowType.EXPENSES,
             amount = 30000.0,
             note = "Jual buku",
             categoryId = 3,
@@ -41,7 +41,7 @@ object DummyData {
         ),
         CashFlow(
             id = 4,
-            type = CashFlowTypes.EXPENSES.type,
+            type = CashFlowType.EXPENSES,
             amount = 30000.0,
             note = "Makan",
             categoryId = 4,
@@ -70,7 +70,7 @@ object DummyData {
         CashFlowAndCategory(
             cashFlow = CashFlow(
                 id = 1,
-                type = CashFlowTypes.INCOME.type,
+                type = CashFlowType.INCOME,
                 amount = 10000.0,
                 note = "Salary",
                 date = Calendar.getInstance().timeInMillis,
@@ -82,7 +82,7 @@ object DummyData {
         CashFlowAndCategory(
             cashFlow = CashFlow(
                 id = 2,
-                type = CashFlowTypes.EXPENSES.type,
+                type = CashFlowType.EXPENSES,
                 amount = 20000.0,
                 note = "Food",
                 date = Calendar.getInstance().timeInMillis,
@@ -94,7 +94,7 @@ object DummyData {
         CashFlowAndCategory(
             cashFlow = CashFlow(
                 id = 3,
-                type = CashFlowTypes.EXPENSES.type,
+                type = CashFlowType.EXPENSES,
                 amount = 40000.0,
                 note = "Something",
                 date = Calendar.getInstance().timeInMillis,
@@ -109,7 +109,7 @@ object DummyData {
         CashFlowWithCategoryAndAccount(
             cashFlow = CashFlow(
                 id = 1,
-                type = CashFlowTypes.INCOME.type,
+                type = CashFlowType.INCOME,
                 amount = 10000.0,
                 note = "Salary",
                 date = Calendar.getInstance().timeInMillis,
@@ -127,7 +127,7 @@ object DummyData {
         CashFlowWithCategoryAndAccount(
             cashFlow = CashFlow(
                 id = 2,
-                type = CashFlowTypes.EXPENSES.type,
+                type = CashFlowType.EXPENSES,
                 amount = 20000.0,
                 note = "Food",
                 date = Calendar.getInstance().timeInMillis,
@@ -145,7 +145,7 @@ object DummyData {
         CashFlowWithCategoryAndAccount(
             cashFlow = CashFlow(
                 id = 3,
-                type = CashFlowTypes.EXPENSES.type,
+                type = CashFlowType.EXPENSES,
                 amount = 40000.0,
                 note = "Something",
                 date = Calendar.getInstance().timeInMillis,
