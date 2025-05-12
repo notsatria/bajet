@@ -56,6 +56,8 @@
     <string name="dark">Dark</string>
     <string name="system">System</string>
     <string name="selected">Selected</string>
+    <string name="edit_budget">Edit budget</string>
+    <string name="edit_amount">Edit amount</string>
 
     <string-array name="settings_title">
         <item>@string/configuration</item>

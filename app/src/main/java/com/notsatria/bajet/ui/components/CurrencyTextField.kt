@@ -21,12 +21,15 @@ import java.util.Currency
 fun CurrencyTextField(
     modifier: Modifier = Modifier,
     amount: String,
-    onValueChange: (String) -> Unit
+    onAmountChange: (String) -> Unit
 ) {
     OutlinedTextField(
         modifier = modifier,
         value = amount,
-        onValueChange = onValueChange,
+        onValueChange = { input ->
+            val trimmed = input.trimStart('0').trim { it.isDigit().not() }
+            onAmountChange(trimmed)
+        },
         label = {
             Text(text = stringResource(R.string.amount))
         },
@@ -52,7 +55,10 @@ class RupiahVisualTransformation : VisualTransformation {
         }
 
         val formattedText = numberFormatter.format(originalText.toInt())
-        return TransformedText(AnnotatedString(formattedText), CurrencyOffsetMapping(originalText, formattedText))
+        return TransformedText(
+            AnnotatedString(formattedText),
+            CurrencyOffsetMapping(originalText, formattedText)
+        )
     }
 }
 

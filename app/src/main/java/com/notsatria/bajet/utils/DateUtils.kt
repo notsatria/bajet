@@ -10,6 +10,7 @@ object DateUtils {
     val formatDate3 = SimpleDateFormat("MMMM yyyy", LOCALE_ID)
     val formatDate4 = SimpleDateFormat("dd MMM yyyy (EEE)", LOCALE_ID)
     val formatDate5 = SimpleDateFormat("MMMM", LOCALE_ID)
+    val formatDate6 = SimpleDateFormat("MMM", LOCALE_ID)
 
     fun Long.formatDateTo(format: SimpleDateFormat = formatDate1): String {
         val date = Date(this)
@@ -43,4 +44,12 @@ object DateUtils {
         return Pair(startOfMonth.timeInMillis, endOfMonth.timeInMillis)
     }
 
+}
+
+fun Int.toMonthName(format: SimpleDateFormat = DateUtils.formatDate6): String {
+    val month = Calendar.getInstance().apply {
+        set(Calendar.MONTH, this@toMonthName - 1)
+    }.time
+    
+    return format.format(month)
 }

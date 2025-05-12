@@ -22,7 +22,8 @@ interface BudgetDao {
         SELECT 
             c.name AS categoryName,
             c.emoji AS categoryEmoji,
-            be.amount AS budgetAmount
+            be.amount AS budgetAmount,
+            be.budgetId AS budgetId
         FROM budget b
         JOIN category c ON b.categoryId = c.id
         JOIN budget_entry be ON b.id = be.budgetId

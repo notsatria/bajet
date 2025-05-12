@@ -152,7 +152,7 @@ fun AddAccountScreen(
                 CurrencyTextField(
                     modifier = Modifier.fillMaxWidth(),
                     amount = amount,
-                    onValueChange = onAmountChange,
+                    onAmountChange = onAmountChange,
                 )
                 Spacer(Modifier.height(20.dp))
                 Button(onClick = onSaveClicked, modifier = Modifier.fillMaxWidth()) {

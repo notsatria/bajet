@@ -118,7 +118,7 @@ fun AddBudgetScreen(
                 CurrencyTextField(
                     modifier = Modifier.fillMaxWidth(),
                     amount = uiState.amount,
-                    onValueChange = onAmountChange
+                    onAmountChange = onAmountChange
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(

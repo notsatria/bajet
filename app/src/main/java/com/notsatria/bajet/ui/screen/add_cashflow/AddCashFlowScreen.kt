@@ -236,12 +236,7 @@ fun AddCashFlowScreen(
                 CurrencyTextField(
                     modifier = Modifier.fillMaxWidth(),
                     amount = uiState.uiData.amount,
-                    onValueChange = { newAmount ->
-                        val trimmed = newAmount.trimStart('0').trim { it.isDigit().not() }
-                        if (trimmed.isNotEmpty()) {
-                            onUpdateAmount(trimmed)
-                        }
-                    }
+                    onAmountChange = onUpdateAmount,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 ClickableTextField(

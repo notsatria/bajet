@@ -36,8 +36,9 @@ import com.notsatria.bajet.utils.formatToRupiah
 @Composable
 fun BudgetSettingRoute(
     modifier: Modifier = Modifier,
-    navigateBack: () -> Unit = {},
-    navigateToAddBudgetScreen: () -> Unit = {},
+    navigateBack: () -> Unit,
+    navigateToAddBudgetScreen: () -> Unit,
+    navigateToEditBudgetScreen: (budgetId: Int) -> Unit,
     viewModel: BudgetSettingViewModel = hiltViewModel()
 ) {
     val budgetList by viewModel.budgetList.collectAsStateWithLifecycle()
@@ -47,6 +48,7 @@ fun BudgetSettingRoute(
         event = BudgetSettingEvent(
             onNavigateBackClicked = navigateBack,
             onAddClicked = navigateToAddBudgetScreen,
+            navigateToEditBudgetScreen = navigateToEditBudgetScreen
         ),
         state = BudgetSettingUiState(budgetList)
     )
@@ -60,7 +62,8 @@ fun BudgetSettingScreen(
     state: BudgetSettingUiState = BudgetSettingUiState()
 ) {
     Scaffold(modifier, topBar = {
-        TopAppBar(title = { Text(text = "My Budget") },
+        TopAppBar(
+            title = { Text(text = "My Budget") },
             navigationIcon = {
                 IconButton(onClick = event.onNavigateBackClicked) {
                     Icon(
@@ -85,7 +88,11 @@ fun BudgetSettingScreen(
                 BudgetCategoryItem(
                     emoji = budgetAndCategory.categoryEmoji,
                     categoryName = budgetAndCategory.categoryName,
-                    amount = budgetAndCategory.budgetAmount
+                    amount = budgetAndCategory.budgetAmount,
+                    budgetId = budgetAndCategory.budgetId,
+                    navigateToEditBudget = { budgetId ->
+                        event.navigateToEditBudgetScreen(budgetId)
+                    }
                 )
                 HorizontalDivider()
             }
@@ -98,7 +105,9 @@ fun BudgetCategoryItem(
     modifier: Modifier = Modifier,
     emoji: String = "😭",
     categoryName: String = "Category name",
-    amount: Double = 0.0
+    amount: Double = 0.0,
+    budgetId: Int = 0,
+    navigateToEditBudget: (budgetId: Int) -> Unit = {}
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         Text(text = emoji, modifier = Modifier.padding(start = 12.dp))
@@ -107,10 +116,12 @@ fun BudgetCategoryItem(
         Spacer(modifier = Modifier.weight(1f))
         Text(text = amount.formatToRupiah())
         Spacer(modifier = Modifier.width(8.dp))
-        IconButton(onClick = { }) {
+        IconButton(onClick = {
+            navigateToEditBudget(budgetId)
+        }) {
             Icon(
                 imageVector = Icons.Outlined.Edit,
-                contentDescription = "Edit budget",
+                contentDescription = stringResource(R.string.edit_budget),
                 tint = MaterialTheme.colorScheme.outline
             )
         }
@@ -123,7 +134,8 @@ data class BudgetSettingUiState(
 
 data class BudgetSettingEvent(
     val onNavigateBackClicked: () -> Unit = {},
-    val onAddClicked: () -> Unit = {}
+    val onAddClicked: () -> Unit = {},
+    val navigateToEditBudgetScreen: (Int) -> Unit = {}
 )
 
 @Preview
@@ -136,12 +148,14 @@ fun BudgetSettingScreenPreview() {
                     BudgetWithCategoryAndBudgetEntry(
                         categoryName = DummyData.categories[0].name,
                         categoryEmoji = DummyData.categories[0].emoji,
-                        budgetAmount = DummyData.budgetEntries[0].amount
+                        budgetAmount = DummyData.budgetEntries[0].amount,
+                        budgetId = 0
                     ),
                     BudgetWithCategoryAndBudgetEntry(
                         categoryName = DummyData.categories[1].name,
                         categoryEmoji = DummyData.categories[1].emoji,
-                        budgetAmount = DummyData.budgetEntries[0].amount
+                        budgetAmount = DummyData.budgetEntries[0].amount,
+                        budgetId = 0
                     )
                 )
             )

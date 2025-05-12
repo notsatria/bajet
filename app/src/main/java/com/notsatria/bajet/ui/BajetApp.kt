@@ -21,6 +21,7 @@ import com.notsatria.bajet.ui.screen.add_cashflow.AddCashFlowRoute
 import com.notsatria.bajet.ui.screen.analytics.AnalyticsRoute
 import com.notsatria.bajet.ui.screen.budget.BudgetRoute
 import com.notsatria.bajet.ui.screen.budget.add_budget.AddBudgetRoute
+import com.notsatria.bajet.ui.screen.budget.edit_budget.EditBudgetRoute
 import com.notsatria.bajet.ui.screen.budget.setting.BudgetSettingRoute
 import com.notsatria.bajet.ui.screen.home.HomeRoute
 import com.notsatria.bajet.ui.screen.settings.SettingRoute
@@ -46,7 +47,7 @@ fun BajetApp(
             startDestination = Screen.Home.route,
         ) {
             composable(Screen.Home.route) {
-                HomeRoute(modifier = Modifier.padding(innerPadding), navigateToAddCashFlowScreen = {
+                HomeRoute(navigateToAddCashFlowScreen = {
                     navController.navigate(Screen.AddCashFlow.route)
                 }, navigateToEditCashFlowScreen = { cashFlowId ->
                     navController.navigate(Screen.EditCashFlow.createRoute(cashFlowId))
@@ -77,11 +78,22 @@ fun BajetApp(
                     navController.navigateUp()
                 }, navigateToAddBudgetScreen = {
                     navController.navigate(Screen.AddBudget.route)
+                }, navigateToEditBudgetScreen = { budgetId ->
+                    navController.navigate(Screen.EditBudget.createRoute(budgetId))
                 })
             }
             composable(Screen.AddBudget.route) {
                 AddBudgetRoute(
                     navigateBack = { navController.navigateUp() })
+            }
+            composable(Screen.EditBudget.route, arguments = listOf(navArgument("budgetId") {
+                type = NavType.IntType
+            })) {
+                val budgetId = it.arguments?.getInt("budgetId") ?: 0
+                EditBudgetRoute(
+                    navigateBack = { navController.navigateUp() },
+                    budgetId = budgetId
+                )
             }
             composable(Screen.Analytics.route) {
                 AnalyticsRoute()

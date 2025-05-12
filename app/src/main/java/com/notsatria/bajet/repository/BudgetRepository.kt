@@ -73,4 +73,9 @@ class BudgetRepository @Inject constructor(
             TotalBudgetByMonthWithSpending(budget, spending)
         }
     }
+
+    fun getBudgetEntriesByBudgetId(budgetId: Int): Flow<List<BudgetEntry>> {
+        val calendar = java.util.Calendar.getInstance()
+        return budgetEntryDao.getBudgetEntriesByBudgetId(budgetId, calendar.get(Calendar.YEAR))
+    }
 }
