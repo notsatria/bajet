@@ -21,6 +21,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,31 +50,16 @@ fun HomeRoute(
     modifier: Modifier = Modifier,
     navigateToAddCashFlowScreen: () -> Unit = {},
     navigateToEditCashFlowScreen: (Int) -> Unit = {},
-    viewModel: HomeViewModel = hiltViewModel(),
-    scope: CoroutineScope = rememberCoroutineScope(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    context: Context = LocalContext.current
+    scope: CoroutineScope = rememberCoroutineScope(),
+    context: Context = LocalContext.current,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val cashFlowAndCategoryList by viewModel.groupedCashflowAndCategory.collectAsStateWithLifecycle()
-    val cashFlowSummary by viewModel.cashFlowSummary.collectAsStateWithLifecycle()
-    val selectedMonth by viewModel.selectedMonth.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val deletedCashflow by viewModel.deletedCashflow.collectAsStateWithLifecycle()
 
-    HomeScreen(
-        modifier,
-        HomeUiState(
-            cashFlowSummary = cashFlowSummary,
-            groupedCashflowAndCategory = cashFlowAndCategoryList,
-            selectedMonth = selectedMonth
-        ),
-        navigateToAddCashFlowScreen,
-        onPreviousMonthClick = {
-            viewModel.changeMonth(-1)
-        },
-        onNextMonthClick = {
-            viewModel.changeMonth(1)
-        },
-        onDeleteCashFlow = {
-            viewModel.deleteCashFlow(it)
+    LaunchedEffect(deletedCashflow) {
+        if (deletedCashflow != null) {
             scope.launch {
                 val result = snackbarHostState.showSnackbar(
                     message = context.getString(R.string.cashflow_deleted),
@@ -81,27 +67,32 @@ fun HomeRoute(
                     duration = SnackbarDuration.Long
                 )
                 if (result == SnackbarResult.ActionPerformed) {
-                    viewModel.insertCashFlow()
+                    viewModel.setAction(HomeAction.InsertCashFlow)
                 }
             }
-        },
-        navigateToEditCashFlowScreen = {
-            navigateToEditCashFlowScreen(it)
-        },
-        snackbarHostState = snackbarHostState
+        }
+    }
+
+    HomeScreen(
+        modifier = modifier,
+        navigateToAddCashFlowScreen = navigateToAddCashFlowScreen,
+        navigateToEditCashFlowScreen = navigateToEditCashFlowScreen,
+        snackbarHostState = snackbarHostState,
+        uiState = uiState,
+        setActions = { action ->
+            viewModel.setAction(action)
+        }
     )
 }
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    homeUiState: HomeUiState,
     navigateToAddCashFlowScreen: () -> Unit = {},
-    onPreviousMonthClick: () -> Unit = {},
-    onNextMonthClick: () -> Unit = {},
-    onDeleteCashFlow: (CashFlow) -> Unit = {},
     navigateToEditCashFlowScreen: (Int) -> Unit = {},
-    snackbarHostState: SnackbarHostState,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    uiState: HomeUiState = HomeUiState(),
+    setActions: (HomeAction) -> Unit = {},
 ) {
     Scaffold(
         modifier,
@@ -110,12 +101,11 @@ fun HomeScreen(
             SnackbarHost(snackbarHostState)
         },
         floatingActionButton = {
-            HomeFloatingActionButton(navigateToAddCashFlowScreen)
+            HomeFloatingActionButton(navigateToAddCashFlowScreen, modifier = Modifier)
         },
     ) { innerPadding ->
         Box(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
         ) {
             Box(
@@ -129,18 +119,18 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp)
             ) {
-                if (homeUiState.cashFlowSummary != null)
+                if (uiState.cashFlowSummary != null)
                     CashFlowSummaryCard(
-                        cashFlowSummary = homeUiState.cashFlowSummary,
-                        selectedMonth = homeUiState.selectedMonth,
+                        cashFlowSummary = uiState.cashFlowSummary,
+                        selectedMonth = uiState.selectedMonth,
                         onPreviousMonthClick = {
-                            onPreviousMonthClick()
+                            setActions(HomeAction.PreviousMonth)
                         },
                         onNextMonthClick = {
-                            onNextMonthClick()
+                            setActions(HomeAction.NextMonth)
                         }
                     )
-                if (homeUiState.groupedCashflowAndCategory.isEmpty()) {
+                if (uiState.groupedCashflowAndCategory.isEmpty()) {
                     EmptyView(
                         Modifier.fillMaxSize(), drawable = R.drawable.ic_no_budget_found_24,
                         stringResource(R.string.no_cashflow_found)
@@ -148,8 +138,10 @@ fun HomeScreen(
                 }
                 GroupedCashFlowList(
                     modifier = Modifier.padding(top = 16.dp),
-                    groupedCashflow = homeUiState.groupedCashflowAndCategory,
-                    onDeleteCashFlow = onDeleteCashFlow,
+                    groupedCashflow = uiState.groupedCashflowAndCategory,
+                    onDeleteCashFlow = { cashFlow ->
+                        setActions(HomeAction.DeleteCashFlow(cashFlow))
+                    },
                     navigateToEditCashFlowScreen = navigateToEditCashFlowScreen
                 )
             }
@@ -164,6 +156,7 @@ fun GroupedCashFlowList(
     onDeleteCashFlow: (CashFlow) -> Unit,
     navigateToEditCashFlowScreen: (Int) -> Unit
 ) {
+    val spaceModifier = Modifier.height(12.dp)
     LazyColumn(modifier) {
         groupedCashflow.entries.map { entry ->
             item {
@@ -177,7 +170,7 @@ fun GroupedCashFlowList(
                     onDeleteCashFlow = onDeleteCashFlow,
                     navigateToEditCashFlowScreen = navigateToEditCashFlowScreen
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = spaceModifier)
             }
         }
     }
@@ -185,24 +178,18 @@ fun GroupedCashFlowList(
 }
 
 @Composable
-fun HomeFloatingActionButton(onClick: () -> Unit) {
+fun HomeFloatingActionButton(onClick: () -> Unit, modifier: Modifier) {
     FloatingActionButton(onClick = onClick) {
         Icon(imageVector = Icons.Filled.Add, contentDescription = "Add cashflow")
     }
 }
-
-data class HomeUiState(
-    val cashFlowSummary: CashFlowSummary? = null,
-    val groupedCashflowAndCategory: Map<String, List<CashFlowAndCategory>> = emptyMap(),
-    val selectedMonth: Calendar = Calendar.getInstance()
-)
 
 @Preview
 @Composable
 fun HomeScreenPreview() {
     BajetTheme {
         HomeScreen(
-            homeUiState = HomeUiState(
+            uiState = HomeUiState(
                 cashFlowSummary = CashFlowSummary(
                     income = 20000.0,
                     expenses = -40000.0,
@@ -222,7 +209,7 @@ fun HomeScreenPreview() {
 fun HomeScreenEmptyListPreview() {
     BajetTheme {
         HomeScreen(
-            homeUiState = HomeUiState(
+            uiState = HomeUiState(
                 cashFlowSummary = CashFlowSummary(
                     income = 20000.0,
                     expenses = -40000.0,

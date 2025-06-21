@@ -47,11 +47,14 @@ fun BajetApp(
             startDestination = Screen.Home.route,
         ) {
             composable(Screen.Home.route) {
-                HomeRoute(navigateToAddCashFlowScreen = {
-                    navController.navigate(Screen.AddCashFlow.route)
-                }, navigateToEditCashFlowScreen = { cashFlowId ->
-                    navController.navigate(Screen.EditCashFlow.createRoute(cashFlowId))
-                })
+                HomeRoute(
+                    modifier = Modifier.padding(innerPadding),
+                    navigateToAddCashFlowScreen = {
+                        navController.navigate(Screen.AddCashFlow.route)
+                    }, navigateToEditCashFlowScreen = { cashFlowId ->
+                        navController.navigate(Screen.EditCashFlow.createRoute(cashFlowId))
+                    }
+                )
             }
             // Edit Cashflow Screen
             composable(Screen.EditCashFlow.route, arguments = listOf(navArgument("cashFlowId") {
