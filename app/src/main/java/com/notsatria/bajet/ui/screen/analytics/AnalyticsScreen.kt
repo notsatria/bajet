@@ -1,5 +1,8 @@
 package com.notsatria.bajet.ui.screen.analytics
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -39,54 +42,38 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
 import com.notsatria.bajet.ui.components.EmptyView
 import com.notsatria.bajet.ui.components.MonthSelection
-import com.notsatria.bajet.ui.components.PieChart
 import com.notsatria.bajet.ui.domain.Analytics
 import com.notsatria.bajet.ui.theme.BajetTheme
-import com.notsatria.bajet.utils.CashFlowType
-import com.notsatria.bajet.utils.DummyData
 import com.notsatria.bajet.utils.formatToRupiah
-import kotlinx.coroutines.CoroutineScope
+import ir.ehsannarmani.compose_charts.PieChart
+import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Calendar
 import kotlin.math.roundToInt
 
 @Composable
 fun AnalyticsRoute(viewModel: AnalyticsViewModel = hiltViewModel()) {
-    val analytics by viewModel.analytics.collectAsState()
-    val selectedMonth by viewModel.selectedMonth.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState { 2 }
     val coroutineScope = rememberCoroutineScope()
-    val titles by viewModel.titles.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.observeAnalytics()
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.getAnalyticsTotalAmount()
+    LaunchedEffect(uiState.pageIndex) {
+        coroutineScope.launch {
+            pagerState.animateScrollToPage(uiState.pageIndex)
+        }
     }
 
     AnalyticsScreen(
-        event = AnalyticsScreenEvent(onPreviousMonthClick = {
-            viewModel.changeMonth(-1)
-        }, onNextMonthClick = {
-            viewModel.changeMonth(1)
-        }, onPageChange = { index ->
-            coroutineScope.launch {
-                pagerState.animateScrollToPage(index)
-            }
-            viewModel.changeType(if (index == 0) CashFlowType.INCOME else CashFlowType.EXPENSES)
-        }),
-        state = AnalyticsScreenUiState(
-            selectedMonth = selectedMonth,
-            analytics = analytics,
-            pagerState = pagerState,
-            coroutineScope = coroutineScope,
-            titles = titles
-        )
+        state = uiState,
+        pagerState = pagerState,
+        setActions = {
+            viewModel.setAction(it)
+        }
     )
 }
 
@@ -94,24 +81,25 @@ fun AnalyticsRoute(viewModel: AnalyticsViewModel = hiltViewModel()) {
 @Composable
 fun AnalyticsScreen(
     modifier: Modifier = Modifier,
-    event: AnalyticsScreenEvent,
-    state: AnalyticsScreenUiState
+    state: AnalyticsUiState,
+    pagerState: PagerState = rememberPagerState { 2 },
+    setActions: (AnalyticsAction) -> Unit = {}
 ) {
     Scaffold(modifier, topBar = {
         AnalyticsScreenTopBar(
             selectedMonth = state.selectedMonth,
-            onPreviousMonthClick = event.onPreviousMonthClick,
-            onNextMonthClick = event.onNextMonthClick
+            onPreviousMonthClick = { setActions(AnalyticsAction.PreviousMonthClick) },
+            onNextMonthClick = { setActions(AnalyticsAction.NextMonthClick) }
         )
     }) { innerPadding ->
         Box(Modifier.padding(innerPadding)) {
             Column(modifier = Modifier.fillMaxSize()) {
-                PrimaryTabRow(selectedTabIndex = state.pagerState.currentPage) {
+                PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
                     state.titles.forEachIndexed { index, title ->
                         Tab(
-                            selected = state.pagerState.currentPage == index,
+                            selected = pagerState.currentPage == index,
                             onClick = {
-                                event.onPageChange(index)
+                                setActions(AnalyticsAction.PageChange(index))
                             },
                             text = {
                                 Text(
@@ -124,9 +112,12 @@ fun AnalyticsScreen(
                         )
                     }
                 }
-                HorizontalPager(state = state.pagerState) {
-                    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        if (state.analytics.isEmpty()) {
+                HorizontalPager(state = pagerState) {
+                    Column(
+                        Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (state.pieData.isEmpty()) {
                             EmptyView(
                                 modifier = Modifier.fillMaxHeight(),
                                 drawable = R.drawable.ic_no_analytics_found_24,
@@ -134,7 +125,26 @@ fun AnalyticsScreen(
                             )
                         }
                         Spacer(Modifier.height(20.dp))
-                        PieChart(data = state.analytics)
+                        PieChart(
+                            modifier = Modifier.size(200.dp),
+                            data = state.pieData,
+                            onPieClick = {
+                                Timber.d("${it.label} Clicked")
+//                                val pieIndex = state.analytics.indexOf(it)
+//                                state.analytics =
+//                                    data.mapIndexed { mapIndex, pie -> pie.copy(selected = pieIndex == mapIndex) }
+                            },
+                            selectedScale = 1.2f,
+                            scaleAnimEnterSpec = spring<Float>(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            colorAnimEnterSpec = tween(300),
+                            colorAnimExitSpec = tween(300),
+                            scaleAnimExitSpec = tween(300),
+                            spaceDegreeAnimExitSpec = tween(300),
+                            style = Pie.Style.Fill
+                        )
                         Spacer(Modifier.height(20.dp))
                         LazyColumn {
                             items(state.analytics) {
@@ -195,34 +205,13 @@ fun AnalyticsScreenTopBar(
     })
 }
 
-data class AnalyticsScreenEvent(
-    val onPreviousMonthClick: () -> Unit,
-    val onNextMonthClick: () -> Unit,
-    val onPageChange: (Int) -> Unit = {}
-)
-
-data class AnalyticsScreenUiState(
-    val selectedMonth: Calendar,
-    val analytics: List<Analytics> = emptyList(),
-    val pagerState: PagerState,
-    val coroutineScope: CoroutineScope,
-    val titles: List<String> = listOf<String>("Income", "Expenses")
-)
-
 @Preview
 @Composable
 fun AnalyticsScreenPreview() {
     BajetTheme {
         AnalyticsScreen(
-            event = AnalyticsScreenEvent(
-                onPreviousMonthClick = {},
-                onNextMonthClick = {}
-            ),
-            state = AnalyticsScreenUiState(
+            state = AnalyticsUiState(
                 selectedMonth = Calendar.getInstance(),
-                analytics = DummyData.analytics,
-                pagerState = rememberPagerState { 2 },
-                coroutineScope = rememberCoroutineScope()
             )
         )
     }
@@ -233,15 +222,9 @@ fun AnalyticsScreenPreview() {
 fun AnalyticsEmptyScreenPreview() {
     BajetTheme {
         AnalyticsScreen(
-            event = AnalyticsScreenEvent(
-                onPreviousMonthClick = {},
-                onNextMonthClick = {}
-            ),
-            state = AnalyticsScreenUiState(
+            state = AnalyticsUiState(
                 selectedMonth = Calendar.getInstance(),
-                analytics = emptyList(),
-                pagerState = rememberPagerState { 2 },
-                coroutineScope = rememberCoroutineScope()
+                pieData = emptyList(),
             )
         )
     }

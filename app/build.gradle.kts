@@ -95,4 +95,7 @@ dependencies {
 
     // Data Store
     implementation(libs.androidx.datastore.preferences)
+
+    // Compose Charts
+    implementation(libs.compose.charts)
 }
