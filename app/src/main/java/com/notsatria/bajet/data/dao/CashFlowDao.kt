@@ -27,7 +27,7 @@ interface CashFlowDao {
     fun insertCategory(category: Category)
 
     @Transaction
-    @Query("SELECT * FROM cashflow JOIN category ON cashflow.categoryId = category.id WHERE date BETWEEN :startDate AND :endDate")
+    @Query("SELECT * FROM cashflow WHERE date BETWEEN :startDate AND :endDate")
     fun getCashFlowsAndCategoryListByMonth(
         startDate: Long,
         endDate: Long
@@ -54,30 +54,7 @@ interface CashFlowDao {
     suspend fun deleteCashFlow(cashFlow: CashFlow)
 
     @Transaction
-    @Query(
-        """
-        SELECT 
-            cashflow.id,
-            type,
-            amount,
-            note,
-            cashflow.categoryId,
-            date,
-            accountId,
-            category.name as categoryName,
-            emoji,
-            color,
-            groupId,
-            account.name as accountName,
-            balance
-        FROM cashflow 
-        JOIN category 
-        ON cashflow.categoryId = category.id
-        JOIN account 
-        ON cashflow.accountId = account.id
-        WHERE cashflow.id = :cashFlowId
-        """
-    )
+    @Query("SELECT * FROM cashflow WHERE cashflow.id = :cashFlowId")
     suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowWithCategoryAndAccount
 
     @Update

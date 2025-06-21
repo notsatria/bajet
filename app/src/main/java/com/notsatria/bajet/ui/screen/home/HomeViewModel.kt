@@ -11,15 +11,15 @@ import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber.Forest.i
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -33,79 +33,104 @@ sealed class HomeAction {
     object PreviousMonth : HomeAction()
     object NextMonth : HomeAction()
     data class DeleteCashFlow(val cashFlow: CashFlow) : HomeAction()
-    data object InsertCashFlow : HomeAction()
+    data object UndoDelete : HomeAction()
+}
+
+sealed class HomeUiEvent {
+    data object ShowDeleteSnackbar : HomeUiEvent()
+    data class ShowError(val message: String) : HomeUiEvent()
 }
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel @Inject constructor(private val repository: CashFlowRepository) : ViewModel() {
-    private val _monthIntent = MutableStateFlow(Calendar.getInstance())
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState get() = _uiState.asStateFlow()
 
-    val deletedCashflow = MutableStateFlow<CashFlow?>(null)
+    private val _uiEvents = Channel<HomeUiEvent>()
+    val uiEvents = _uiEvents.receiveAsFlow()
 
-    /**
-     * Function to change the selected month
-     *
-     * @param increment whether to increment or decrement the month
-     */
-    fun changeMonth(increment: Int) {
-        _monthIntent.update { calendar ->
-            i("selectedMonth: ${calendar.time}")
-            Calendar.getInstance().apply {
-                time = calendar.time
-                add(Calendar.MONTH, increment)
+    private var updateJob: Job? = null
+
+    private var pendingDeletedCashFlow: CashFlow? = null
+
+    init {
+        updateCashFlow()
+    }
+
+    private fun updateCashFlow(newMonth: Calendar = Calendar.getInstance()) {
+        updateJob?.cancel()
+        updateJob = viewModelScope.launch {
+            val (startDate, endDate) = DateUtils.getStartAndEndDate(newMonth)
+            combine(
+                repository.getCashFlowAndCategoryListByMonth(startDate, endDate),
+                repository.getCashFlowSummary(startDate, endDate)
+            ) { list, summary ->
+                Timber.d("updateCashFlow: $list")
+                transformToUiState(list, summary, newMonth)
+            }.collect {
+                _uiState.value = it
             }
         }
     }
 
-    val uiState: StateFlow<HomeUiState> = _monthIntent.flatMapLatest { selectedMonth ->
-        val (startDate, endDate) = DateUtils.getStartAndEndDate(selectedMonth)
+    private fun transformToUiState(
+        cashflowList: List<CashFlowAndCategory>,
+        summary: CashFlowSummary,
+        newMonth: Calendar,
+    ): HomeUiState {
+        val grouped = cashflowList.sortedByDescending { it.cashFlow.date }
+            .groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) }
 
-        combine(
-            repository.getCashFlowAndCategoryListByMonth(startDate, endDate),
-            repository.getCashFlowSummary(startDate, endDate)
-        ) { list, summary ->
-            val grouped = list.sortedByDescending { it.cashFlow.date }
-                .groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) }
-
-            HomeUiState(
-                selectedMonth = selectedMonth,
-                groupedCashflowAndCategory = grouped,
-                cashFlowSummary = summary
-            )
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HomeUiState())
+        return HomeUiState(
+            selectedMonth = newMonth,
+            groupedCashflowAndCategory = grouped,
+            cashFlowSummary = summary,
+        )
+    }
 
     private fun deleteCashFlow(cashFlow: CashFlow) {
         viewModelScope.launch {
-            repository.deleteCashFlow(cashFlow)
-            deletedCashflow.value = cashFlow
+            try {
+                withContext(Dispatchers.IO) { repository.deleteCashFlow(cashFlow) }
+                pendingDeletedCashFlow = cashFlow
+                _uiEvents.send(HomeUiEvent.ShowDeleteSnackbar)
+                updateCashFlow(_uiState.value.selectedMonth)
+            } catch (e: Exception) {
+                _uiEvents.send(HomeUiEvent.ShowError(e.message ?: "Unknown error"))
+            }
         }
     }
 
-    private fun insertCashFlow() {
-        viewModelScope.launch(Dispatchers.IO) {
-            deletedCashflow.value?.let { repository.insertCashFlow(it) }
+    private fun undoDelete() {
+        viewModelScope.launch {
+            pendingDeletedCashFlow?.let { withContext(Dispatchers.IO) { repository.insertCashFlow(it) } }
+            pendingDeletedCashFlow = null
+            updateCashFlow(_uiState.value.selectedMonth)
         }
     }
 
     fun setAction(action: HomeAction) {
         when (action) {
-            is HomeAction.DeleteCashFlow -> {
-                deleteCashFlow(action.cashFlow)
+            is HomeAction.DeleteCashFlow -> deleteCashFlow(action.cashFlow)
+
+            is HomeAction.NextMonth -> {
+                val newMonth = Calendar.getInstance().apply {
+                    time = _uiState.value.selectedMonth.time
+                    add(Calendar.MONTH, 1)
+                }
+                updateCashFlow(newMonth)
             }
 
-            HomeAction.NextMonth -> {
-                changeMonth(1)
+            is HomeAction.PreviousMonth -> {
+                val newMonth = Calendar.getInstance().apply {
+                    time = _uiState.value.selectedMonth.time
+                    add(Calendar.MONTH, -1)
+                }
+                updateCashFlow(newMonth)
             }
 
-            HomeAction.PreviousMonth -> {
-                changeMonth(-1)
-            }
-
-            HomeAction.InsertCashFlow -> {
-                insertCashFlow()
-            }
+            is HomeAction.UndoDelete -> undoDelete()
         }
     }
 }

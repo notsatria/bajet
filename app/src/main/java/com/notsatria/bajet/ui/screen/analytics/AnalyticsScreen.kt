@@ -52,7 +52,6 @@ import com.notsatria.bajet.utils.formatToRupiah
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.Calendar
 import kotlin.math.roundToInt
 
@@ -129,10 +128,7 @@ fun AnalyticsScreen(
                             modifier = Modifier.size(200.dp),
                             data = state.pieData,
                             onPieClick = {
-                                Timber.d("${it.label} Clicked")
-//                                val pieIndex = state.analytics.indexOf(it)
-//                                state.analytics =
-//                                    data.mapIndexed { mapIndex, pie -> pie.copy(selected = pieIndex == mapIndex) }
+                                setActions(AnalyticsAction.PieClick(it))
                             },
                             selectedScale = 1.2f,
                             scaleAnimEnterSpec = spring<Float>(

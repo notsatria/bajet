@@ -3,14 +3,15 @@ package com.notsatria.bajet.utils
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 object DateUtils {
-    val formatDate1 = SimpleDateFormat("EEE, dd MMM yyyy", LOCALE_ID)
-    val formatDate2 = SimpleDateFormat("dd MMM yyyy", LOCALE_ID)
-    val formatDate3 = SimpleDateFormat("MMMM yyyy", LOCALE_ID)
-    val formatDate4 = SimpleDateFormat("dd MMM yyyy (EEE)", LOCALE_ID)
-    val formatDate5 = SimpleDateFormat("MMMM", LOCALE_ID)
-    val formatDate6 = SimpleDateFormat("MMM", LOCALE_ID)
+    val formatDate1 = SimpleDateFormat("EEE, dd MMM yyyy", Locale.ENGLISH)
+    val formatDate2 = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
+    val formatDate3 = SimpleDateFormat("MMMM yyyy", Locale.ENGLISH)
+    val formatDate4 = SimpleDateFormat("dd MMM yyyy (EEE)", Locale.ENGLISH)
+    val formatDate5 = SimpleDateFormat("MMMM", Locale.ENGLISH)
+    val formatDate6 = SimpleDateFormat("MMM", Locale.ENGLISH)
 
     fun Long.formatDateTo(format: SimpleDateFormat = formatDate1): String {
         val date = Date(this)
@@ -50,6 +51,6 @@ fun Int.toMonthName(format: SimpleDateFormat = DateUtils.formatDate6): String {
     val month = Calendar.getInstance().apply {
         set(Calendar.MONTH, this@toMonthName - 1)
     }.time
-    
+
     return format.format(month)
 }

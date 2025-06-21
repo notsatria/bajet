@@ -11,6 +11,7 @@ import com.notsatria.bajet.ui.BajetApp
 import com.notsatria.bajet.ui.theme.BajetTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -18,6 +19,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Locale.setDefault(Locale.getDefault())
         enableEdgeToEdge()
         lifecycleScope.launch {
             viewModel.theme.collect { themeMode ->

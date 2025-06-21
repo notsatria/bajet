@@ -56,18 +56,30 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val deletedCashflow by viewModel.deletedCashflow.collectAsStateWithLifecycle()
 
-    LaunchedEffect(deletedCashflow) {
-        if (deletedCashflow != null) {
-            scope.launch {
-                val result = snackbarHostState.showSnackbar(
-                    message = context.getString(R.string.cashflow_deleted),
-                    actionLabel = context.getString(R.string.undo),
-                    duration = SnackbarDuration.Long
-                )
-                if (result == SnackbarResult.ActionPerformed) {
-                    viewModel.setAction(HomeAction.InsertCashFlow)
+    LaunchedEffect(Unit) {
+        viewModel.uiEvents.collect { event ->
+            when (event) {
+                is HomeUiEvent.ShowDeleteSnackbar -> {
+                    scope.launch {
+                        val result = snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.cashflow_deleted),
+                            actionLabel = context.getString(R.string.undo),
+                            duration = SnackbarDuration.Long
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            viewModel.setAction(HomeAction.UndoDelete)
+                        }
+                    }
+                }
+
+                is HomeUiEvent.ShowError -> {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = event.message,
+                            duration = SnackbarDuration.Short
+                        )
+                    }
                 }
             }
         }
@@ -103,7 +115,7 @@ fun HomeScreen(
         floatingActionButton = {
             HomeFloatingActionButton(navigateToAddCashFlowScreen, modifier = Modifier)
         },
-    ) { innerPadding ->
+    ) { _ ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
