@@ -45,6 +45,23 @@ object DateUtils {
         return Pair(startOfMonth.timeInMillis, endOfMonth.timeInMillis)
     }
 
+    fun getMonthAndYear(calendar: Calendar): Pair<Int, Int> {
+        return Pair(calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR))
+    }
+
+    fun getNextMonth(currentDate: Calendar): Calendar {
+        return Calendar.getInstance().apply {
+            time = currentDate.time
+            add(Calendar.MONTH, 1)
+        }
+    }
+
+    fun getPreviousMonth(currentDate: Calendar): Calendar {
+        return Calendar.getInstance().apply {
+            time = currentDate.time
+            add(Calendar.MONTH, -1)
+        }
+    }
 }
 
 fun Int.toMonthName(format: SimpleDateFormat = DateUtils.formatDate6): String {

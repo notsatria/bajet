@@ -95,7 +95,7 @@ fun EditBudgetScreen(
 ) {
     Scaffold(modifier, topBar = {
         BajetTopBar(
-            title = "Edit something",
+            title = "Budget 2025",
             canNavigateBack = true,
             navigateBack = navigateBack
         )
@@ -139,7 +139,7 @@ fun BudgetAndMonthRow(
         ) {
             Text(
                 monthName,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),

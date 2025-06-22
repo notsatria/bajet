@@ -36,8 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
-import com.notsatria.bajet.data.entities.relation.BudgetItemByCategory
-import com.notsatria.bajet.data.entities.relation.TotalBudgetByMonthWithSpending
 import com.notsatria.bajet.ui.components.MonthSelection
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DateUtils.formatDate5
@@ -51,36 +49,37 @@ fun BudgetRoute(
     navigateToBudgetSettingScreen: () -> Unit = {},
     viewModel: BudgetViewModel = hiltViewModel()
 ) {
-    val budgetList by viewModel.allBudgetWithSpendingList.collectAsStateWithLifecycle()
-    val selectedMonth by viewModel.selectedMonth.collectAsStateWithLifecycle()
-    val totalBudgetWithSpendingPerMonth by viewModel.totalBudgetByMonthWithSpending.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     BudgetScreen(
-        modifier, event = BudgetScreenEvent(
-            onSettingsClicked = navigateToBudgetSettingScreen,
-            onPreviousMonthClick = { viewModel.changeMonth(-1) },
-            onNextMonthClick = { viewModel.changeMonth(1) },
-        ), state = BudgetScreenUiState(
-            budgetList = budgetList,
-            selectedMonth = selectedMonth,
-            totalBudgetWithSpendingPerMonth = totalBudgetWithSpendingPerMonth
-        )
+        modifier = modifier,
+        state = uiState,
+        setAction = { action ->
+            if (action is BudgetAction.SettingClick) navigateToBudgetSettingScreen()
+            viewModel.setAction(action)
+        }
     )
 }
 
 @Composable
 fun BudgetScreen(
     modifier: Modifier = Modifier,
-    event: BudgetScreenEvent = BudgetScreenEvent(),
-    state: BudgetScreenUiState = BudgetScreenUiState()
+    state: BudgetUiState = BudgetUiState(),
+    setAction: (BudgetAction) -> Unit = {}
 ) {
     Scaffold(
         modifier,
         topBar = {
             BudgetScreenTopBar(
-                onSettingsClicked = event.onSettingsClicked,
-                onPreviousMonthClick = event.onPreviousMonthClick,
-                onNextMonthClick = event.onNextMonthClick,
+                onSettingsClicked = {
+                    setAction(BudgetAction.SettingClick)
+                },
+                onPreviousMonthClick = {
+                    setAction(BudgetAction.PreviousMonth)
+                },
+                onNextMonthClick = {
+                    setAction(BudgetAction.NextMonth)
+                },
                 selectedMonth = state.selectedMonth
             )
         },
@@ -219,20 +218,6 @@ fun BudgetScreenTopBar(
         }
     })
 }
-
-data class BudgetScreenEvent(
-    val onSettingsClicked: () -> Unit = {},
-    val onPreviousMonthClick: () -> Unit = {},
-    val onNextMonthClick: () -> Unit = {}
-)
-
-data class BudgetScreenUiState(
-    val budgetList: List<BudgetItemByCategory> = emptyList(),
-    val selectedMonth: Calendar = Calendar.getInstance(),
-    val totalBudgetWithSpendingPerMonth: TotalBudgetByMonthWithSpending = TotalBudgetByMonthWithSpending(
-        0.0, 0.0
-    )
-)
 
 @Preview
 @Composable

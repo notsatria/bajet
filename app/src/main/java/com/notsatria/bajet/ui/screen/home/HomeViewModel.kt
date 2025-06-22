@@ -1,5 +1,6 @@
 package com.notsatria.bajet.ui.screen.home
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.CashFlow
@@ -23,6 +24,7 @@ import timber.log.Timber
 import java.util.Calendar
 import javax.inject.Inject
 
+@Immutable
 data class HomeUiState(
     val cashFlowSummary: CashFlowSummary? = null,
     val groupedCashflowAndCategory: Map<String, List<CashFlowAndCategory>> = emptyMap(),
