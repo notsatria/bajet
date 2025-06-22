@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.relation.AnalyticsRaw
 import com.notsatria.bajet.data.entities.relation.AnalyticsTotalRaw
-import com.notsatria.bajet.repository.AnalyticsRepository
+import com.notsatria.bajet.data.repository.AnalyticsRepository
 import com.notsatria.bajet.ui.domain.Analytics
 import com.notsatria.bajet.utils.CashFlowType
 import com.notsatria.bajet.utils.DateUtils

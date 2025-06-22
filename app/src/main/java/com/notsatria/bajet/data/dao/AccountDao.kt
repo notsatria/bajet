@@ -33,5 +33,5 @@ interface AccountDao {
     fun getAllAccounts(): Flow<List<Account>>
 
     @Query("UPDATE account SET balance = balance + :amount WHERE id = :accountId")
-    fun updateAmount(accountId: Int, amount: Double)
+    suspend fun updateAmount(accountId: Int, amount: Double)
 }

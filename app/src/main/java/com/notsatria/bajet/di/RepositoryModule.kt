@@ -6,13 +6,18 @@ import com.notsatria.bajet.data.dao.BudgetDao
 import com.notsatria.bajet.data.dao.BudgetEntryDao
 import com.notsatria.bajet.data.dao.CashFlowDao
 import com.notsatria.bajet.data.dao.CategoryDao
-import com.notsatria.bajet.repository.AccountRepository
-import com.notsatria.bajet.repository.AddCashFlowRepository
-import com.notsatria.bajet.repository.AnalyticsRepository
-import com.notsatria.bajet.repository.BudgetRepository
-import com.notsatria.bajet.repository.BudgetRepositoryImpl
-import com.notsatria.bajet.repository.CashFlowRepository
-import com.notsatria.bajet.repository.CategoryRepository
+import com.notsatria.bajet.data.repository.AccountRepository
+import com.notsatria.bajet.data.repository.AccountRepositoryImpl
+import com.notsatria.bajet.data.repository.AddCashFlowRepository
+import com.notsatria.bajet.data.repository.AddCashFlowRepositoryImpl
+import com.notsatria.bajet.data.repository.AnalyticsRepository
+import com.notsatria.bajet.data.repository.AnalyticsRepositoryImpl
+import com.notsatria.bajet.data.repository.BudgetRepository
+import com.notsatria.bajet.data.repository.BudgetRepositoryImpl
+import com.notsatria.bajet.data.repository.CashFlowRepository
+import com.notsatria.bajet.data.repository.CashFlowRepositoryImpl
+import com.notsatria.bajet.data.repository.CategoryRepository
+import com.notsatria.bajet.data.repository.CategoryRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,19 +31,19 @@ class RepositoryModule {
     @Provides
     @Singleton
     fun provideAddCashFlowRepository(dao: CashFlowDao): AddCashFlowRepository {
-        return AddCashFlowRepository(dao)
+        return AddCashFlowRepositoryImpl(dao)
     }
 
     @Provides
     @Singleton
     fun provideCashFlowRepository(dao: CashFlowDao): CashFlowRepository {
-        return CashFlowRepository(dao)
+        return CashFlowRepositoryImpl(dao)
     }
 
     @Provides
     @Singleton
     fun provideCategoryRepository(dao: CategoryDao): CategoryRepository {
-        return CategoryRepository(dao)
+        return CategoryRepositoryImpl(dao)
     }
 
     @Provides
@@ -54,7 +59,7 @@ class RepositoryModule {
     @Provides
     @Singleton
     fun provideAnalyticsRepository(cashFlowDao: CashFlowDao): AnalyticsRepository {
-        return AnalyticsRepository(cashFlowDao)
+        return AnalyticsRepositoryImpl(cashFlowDao)
     }
 
     @Provides
@@ -63,7 +68,7 @@ class RepositoryModule {
         accountDao: AccountDao,
         accountGroupDao: AccountGroupDao
     ): AccountRepository {
-        return AccountRepository(accountDao, accountGroupDao)
+        return AccountRepositoryImpl(accountDao, accountGroupDao)
     }
 
 }

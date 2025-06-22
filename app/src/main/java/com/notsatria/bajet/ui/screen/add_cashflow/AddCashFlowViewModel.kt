@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.Account
 import com.notsatria.bajet.data.entities.CashFlow
-import com.notsatria.bajet.repository.AccountRepository
-import com.notsatria.bajet.repository.AddCashFlowRepository
+import com.notsatria.bajet.data.repository.AccountRepository
+import com.notsatria.bajet.data.repository.AddCashFlowRepository
 import com.notsatria.bajet.utils.CashFlowType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

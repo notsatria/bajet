@@ -1,4 +1,4 @@
-package com.notsatria.bajet.repository
+package com.notsatria.bajet.data.repository
 
 import android.icu.util.Calendar
 import androidx.room.Transaction
@@ -28,7 +28,7 @@ interface BudgetRepository {
 
     fun getBudgetEntriesByBudgetId(budgetId: Int): Flow<List<BudgetEntry>>
     fun getCategoryNameByBudgetId(budgetId: Int): Flow<String>
-  suspend  fun updateBudgetEntry(id: Int, amount: Double)
+    suspend fun updateBudgetEntry(id: Int, amount: Double)
 }
 
 class BudgetRepositoryImpl @Inject constructor(

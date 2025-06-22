@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.Budget
-import com.notsatria.bajet.repository.BudgetRepository
+import com.notsatria.bajet.data.repository.BudgetRepository
 import com.notsatria.bajet.utils.formatToCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

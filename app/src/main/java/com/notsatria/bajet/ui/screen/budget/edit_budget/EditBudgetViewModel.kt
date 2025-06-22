@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.BudgetEntry
-import com.notsatria.bajet.repository.BudgetRepository
+import com.notsatria.bajet.data.repository.BudgetRepository
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.MonthAndYear
 import dagger.hilt.android.lifecycle.HiltViewModel

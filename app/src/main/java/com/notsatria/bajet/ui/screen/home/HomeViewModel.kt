@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.relation.CashFlowSummary
-import com.notsatria.bajet.repository.CashFlowRepository
+import com.notsatria.bajet.data.repository.CashFlowRepository
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import dagger.hilt.android.lifecycle.HiltViewModel
