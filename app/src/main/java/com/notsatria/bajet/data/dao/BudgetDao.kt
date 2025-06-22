@@ -86,4 +86,7 @@ interface BudgetDao {
 
     @Query("SELECT SUM(amount) FROM budget_entry WHERE month = :month AND year = :year")
     fun getBudgetAmountByMonth(month: Int, year: Int): Flow<Double>
+
+    @Query("SELECT c.name FROM category c JOIN budget b ON b.categoryId = c.id WHERE b.id = :budgetId")
+    fun getCategoryNameByBudgetId(budgetId: Int): Flow<String>
 }

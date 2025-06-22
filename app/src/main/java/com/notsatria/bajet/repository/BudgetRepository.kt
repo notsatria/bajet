@@ -17,14 +17,26 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class BudgetRepository @Inject constructor(
+interface BudgetRepository {
+    suspend fun insertBudget(budget: Budget, amount: Double)
+    fun getAllBudget(): Flow<List<BudgetWithCategoryAndBudgetEntry>>
+    fun getAllBudgetWithSpending(month: Int, year: Int): Flow<List<BudgetItemByCategory>>
+    fun getTotalBudgetByMonthWithSpending(
+        month: Int,
+        year: Int
+    ): Flow<TotalBudgetByMonthWithSpending>
+
+    fun getBudgetEntriesByBudgetId(budgetId: Int): Flow<List<BudgetEntry>>
+    fun getCategoryNameByBudgetId(budgetId: Int): Flow<String>
+}
+
+class BudgetRepositoryImpl @Inject constructor(
     private val dao: BudgetDao,
     private val budgetEntryDao: BudgetEntryDao,
     private val cashFlowDao: CashFlowDao
-) {
-
+) : BudgetRepository {
     @Transaction
-    suspend fun insertBudget(budget: Budget, amount: Double) {
+    override suspend fun insertBudget(budget: Budget, amount: Double) {
         val budgetId: Long = dao.insert(budget)
         val year = Calendar.getInstance().get(Calendar.YEAR)
         repeat(12) {
@@ -39,12 +51,12 @@ class BudgetRepository @Inject constructor(
         }
     }
 
-    fun getAllBudget(): Flow<List<BudgetWithCategoryAndBudgetEntry>> {
+    override fun getAllBudget(): Flow<List<BudgetWithCategoryAndBudgetEntry>> {
         val calendar = java.util.Calendar.getInstance()
         return dao.getAllBudget(calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR))
     }
 
-    fun getAllBudgetWithSpending(month: Int, year: Int): Flow<List<BudgetItemByCategory>> =
+    override fun getAllBudgetWithSpending(month: Int, year: Int): Flow<List<BudgetItemByCategory>> =
         flow {
             val calendar = java.util.Calendar.getInstance().apply {
                 set(Calendar.MONTH, month - 1) // because calendar month start from 0
@@ -55,7 +67,7 @@ class BudgetRepository @Inject constructor(
         }
 
     @Transaction
-    fun getTotalBudgetByMonthWithSpending(
+    override fun getTotalBudgetByMonthWithSpending(
         month: Int,
         year: Int
     ): Flow<TotalBudgetByMonthWithSpending> {
@@ -74,8 +86,12 @@ class BudgetRepository @Inject constructor(
         }
     }
 
-    fun getBudgetEntriesByBudgetId(budgetId: Int): Flow<List<BudgetEntry>> {
+    override fun getBudgetEntriesByBudgetId(budgetId: Int): Flow<List<BudgetEntry>> {
         val calendar = java.util.Calendar.getInstance()
         return budgetEntryDao.getBudgetEntriesByBudgetId(budgetId, calendar.get(Calendar.YEAR))
+    }
+
+    override fun getCategoryNameByBudgetId(budgetId: Int): Flow<String> {
+        return dao.getCategoryNameByBudgetId(budgetId)
     }
 }

@@ -10,6 +10,7 @@ import com.notsatria.bajet.repository.AccountRepository
 import com.notsatria.bajet.repository.AddCashFlowRepository
 import com.notsatria.bajet.repository.AnalyticsRepository
 import com.notsatria.bajet.repository.BudgetRepository
+import com.notsatria.bajet.repository.BudgetRepositoryImpl
 import com.notsatria.bajet.repository.CashFlowRepository
 import com.notsatria.bajet.repository.CategoryRepository
 import dagger.Module
@@ -47,7 +48,7 @@ class RepositoryModule {
         budgetEntryDao: BudgetEntryDao,
         cashFlowDao: CashFlowDao
     ): BudgetRepository {
-        return BudgetRepository(dao, budgetEntryDao, cashFlowDao)
+        return BudgetRepositoryImpl(dao, budgetEntryDao, cashFlowDao)
     }
 
     @Provides

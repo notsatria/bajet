@@ -26,11 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -41,7 +37,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
-import com.notsatria.bajet.data.entities.BudgetEntry
 import com.notsatria.bajet.ui.components.BajetTopBar
 import com.notsatria.bajet.ui.components.CurrencyTextField
 import com.notsatria.bajet.ui.theme.BajetTheme
@@ -51,64 +46,55 @@ import com.notsatria.bajet.utils.toMonthName
 @Composable
 fun EditBudgetRoute(
     modifier: Modifier = Modifier,
-    budgetId: Int,
     navigateBack: () -> Unit,
     viewModel: EditBudgetViewModel = hiltViewModel()
 ) {
-    val budgetEntries by viewModel.budgetEntries.collectAsStateWithLifecycle()
-    val budgetAmount by viewModel.budgetAmount
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(budgetId) {
-        viewModel.setBudgetId(budgetId)
-    }
-
-    var showEditAmountDialog = remember { mutableStateOf(false) }
-
-    if (showEditAmountDialog.value) {
+    if (uiState.showEditAmountDialog) {
         EditAmountDialog(
-            showDialog = showEditAmountDialog,
-            amount = budgetAmount,
+            onDismissRequest = {
+                viewModel.setAction(EditBudgetAction.DismissDialog)
+            },
+            amount = uiState.budgetAmount,
             onAmountChange = {
-                viewModel.updateAmount(it)
+                viewModel.setAction(EditBudgetAction.UpdateAmount(it))
             })
     }
 
     EditBudgetScreen(
-        modifier,
+        modifier = modifier,
         navigateBack = navigateBack,
-        currentMonth = viewModel.currentMonth,
-        budgetEntries = budgetEntries,
-        onEditClicked = { amount ->
-            showEditAmountDialog.value = true
-            viewModel.updateAmount(amount)
-        }
+        state = uiState,
+        setAction = {
+            viewModel.setAction(it)
+        },
     )
 }
 
 @Composable
 fun EditBudgetScreen(
     modifier: Modifier = Modifier,
-    budgetEntries: List<BudgetEntry> = emptyList<BudgetEntry>(),
-    currentMonth: Int = 1,
+    state: EditBudgetUiState = EditBudgetUiState(),
+    setAction: (EditBudgetAction) -> Unit = {},
     navigateBack: () -> Unit = {},
-    onEditClicked: (budgetAmount: String) -> Unit = {}
 ) {
     Scaffold(modifier, topBar = {
         BajetTopBar(
-            title = "Budget 2025",
+            title = "Budget ${state.categoryName} ${state.monthAndYear.year}",
             canNavigateBack = true,
             navigateBack = navigateBack
         )
     }) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(budgetEntries) { budgetEntry ->
+            items(state.budgetEntries) { budgetEntry ->
                 BudgetAndMonthRow(
                     Modifier.fillMaxWidth(),
                     monthName = budgetEntry.month.toMonthName(),
                     amount = budgetEntry.amount,
-                    isCurrentMonth = budgetEntry.month == currentMonth,
+                    isCurrentMonth = budgetEntry.month == state.monthAndYear.month,
                     onEditClicked = {
-                        onEditClicked(budgetEntry.amount.toString())
+                        setAction(EditBudgetAction.EditClick(budgetEntry.amount.toString()))
                     })
                 Spacer(Modifier.height(8.dp))
             }
@@ -163,13 +149,11 @@ fun BudgetAndMonthRow(
 
 @Composable
 fun EditAmountDialog(
-    showDialog: MutableState<Boolean> = mutableStateOf(false),
+    onDismissRequest: () -> Unit = {},
     amount: String,
     onAmountChange: (String) -> Unit = {}
 ) {
-    Dialog(onDismissRequest = {
-        showDialog.value = false
-    }) {
+    Dialog(onDismissRequest = onDismissRequest) {
         Card(Modifier.height(200.dp), shape = RoundedCornerShape(16.dp)) {
             Column(
                 modifier = Modifier
@@ -191,14 +175,10 @@ fun EditAmountDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = {
-                        showDialog.value = false
-                    }) {
+                    TextButton(onClick = onDismissRequest) {
                         Text(stringResource(R.string.cancel))
                     }
-                    TextButton(onClick = {
-                        showDialog.value = false
-                    }) {
+                    TextButton(onClick = onDismissRequest) {
                         Text(
                             stringResource(R.string.edit)
                         )

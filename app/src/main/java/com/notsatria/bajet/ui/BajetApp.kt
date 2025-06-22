@@ -92,10 +92,8 @@ fun BajetApp(
             composable(Screen.EditBudget.route, arguments = listOf(navArgument("budgetId") {
                 type = NavType.IntType
             })) {
-                val budgetId = it.arguments?.getInt("budgetId") ?: 0
                 EditBudgetRoute(
                     navigateBack = { navController.navigateUp() },
-                    budgetId = budgetId
                 )
             }
             composable(Screen.Analytics.route) {
