@@ -59,7 +59,11 @@ fun EditBudgetRoute(
             amount = uiState.budgetAmount,
             onAmountChange = {
                 viewModel.setAction(EditBudgetAction.UpdateAmount(it))
-            })
+            },
+            onSaveClick = { amount ->
+                viewModel.setAction(EditBudgetAction.SaveClick(amount))
+            }
+        )
     }
 
     EditBudgetScreen(
@@ -94,7 +98,12 @@ fun EditBudgetScreen(
                     amount = budgetEntry.amount,
                     isCurrentMonth = budgetEntry.month == state.monthAndYear.month,
                     onEditClicked = {
-                        setAction(EditBudgetAction.EditClick(budgetEntry.amount.toString()))
+                        setAction(
+                            EditBudgetAction.EditClick(
+                                amount = budgetEntry.amount.toString(),
+                                budgetMonthId = budgetEntry.budgetMonthId
+                            )
+                        )
                     })
                 Spacer(Modifier.height(8.dp))
             }
@@ -151,7 +160,8 @@ fun BudgetAndMonthRow(
 fun EditAmountDialog(
     onDismissRequest: () -> Unit = {},
     amount: String,
-    onAmountChange: (String) -> Unit = {}
+    onAmountChange: (String) -> Unit = {},
+    onSaveClick: (amount: String) -> Unit = {}
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
         Card(Modifier.height(200.dp), shape = RoundedCornerShape(16.dp)) {
@@ -178,7 +188,9 @@ fun EditAmountDialog(
                     TextButton(onClick = onDismissRequest) {
                         Text(stringResource(R.string.cancel))
                     }
-                    TextButton(onClick = onDismissRequest) {
+                    TextButton(onClick = {
+                        onSaveClick(amount)
+                    }) {
                         Text(
                             stringResource(R.string.edit)
                         )

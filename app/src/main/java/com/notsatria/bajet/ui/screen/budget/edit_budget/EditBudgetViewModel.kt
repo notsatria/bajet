@@ -22,14 +22,16 @@ data class EditBudgetUiState(
     val monthAndYear: MonthAndYear = DateUtils.getMonthAndYear(),
     val budgetAmount: String = "0",
     val budgetId: Int = 0,
+    val budgetMonthId: Int = 0,
     val categoryName: String = "Category",
     val showEditAmountDialog: Boolean = false
 )
 
 sealed class EditBudgetAction {
     data class UpdateAmount(val amount: String) : EditBudgetAction()
-    data class EditClick(val amount: String) : EditBudgetAction()
+    data class EditClick(val amount: String, val budgetMonthId: Int) : EditBudgetAction()
     data object DismissDialog : EditBudgetAction()
+    data class SaveClick(val amount: String) : EditBudgetAction()
 }
 
 @HiltViewModel
@@ -47,7 +49,7 @@ class EditBudgetViewModel @Inject constructor(
         updateBudgetState(budgetId)
     }
 
-    private fun updateBudgetState(budgetId: Int) {
+    private fun updateBudgetState(budgetId: Int, showEditAmountDialog: Boolean = false) {
         viewModelScope.launch {
             combine(
                 budgetRepository.getBudgetEntriesByBudgetId(budgetId),
@@ -56,11 +58,21 @@ class EditBudgetViewModel @Inject constructor(
                 EditBudgetUiState(
                     budgetEntries = entries,
                     budgetId = budgetId,
-                    categoryName = categoryName
+                    categoryName = categoryName,
+                    showEditAmountDialog = showEditAmountDialog
                 )
             }.collect { newUiState ->
                 _uiState.update { newUiState }
             }
+        }
+    }
+
+    private fun updateBudgetAmount(amount: String) {
+        viewModelScope.launch {
+            budgetRepository.updateBudgetEntry(
+                id = _uiState.value.budgetMonthId,
+                amount = amount.toDouble()
+            )
         }
     }
 
@@ -74,12 +86,18 @@ class EditBudgetViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         budgetAmount = action.amount,
-                        showEditAmountDialog = true
+                        showEditAmountDialog = true,
+                        budgetMonthId = action.budgetMonthId
                     )
                 }
             }
 
             is EditBudgetAction.DismissDialog -> {
+                _uiState.update { it.copy(showEditAmountDialog = false) }
+            }
+
+            is EditBudgetAction.SaveClick -> {
+                updateBudgetAmount(action.amount)
                 _uiState.update { it.copy(showEditAmountDialog = false) }
             }
         }

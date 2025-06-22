@@ -19,4 +19,13 @@ interface BudgetEntryDao {
     """
     )
     fun getBudgetEntriesByBudgetId(budgetId: Int, year: Int): Flow<List<BudgetEntry>>
+
+    @Query(
+        """
+        UPDATE budget_entry
+        SET amount = :amount
+        WHERE budgetMonthId = :id
+        """
+    )
+    suspend fun updateBudgetEntry(id: Int, amount: Double)
 }
