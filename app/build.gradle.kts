@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.devtoolsKsp)
     alias(libs.plugins.hilt.android)
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 android {
@@ -98,4 +99,7 @@ dependencies {
 
     // Compose Charts
     implementation(libs.compose.charts)
+
+    // Serialization
+    implementation(libs.kotlinx.serialization)
 }

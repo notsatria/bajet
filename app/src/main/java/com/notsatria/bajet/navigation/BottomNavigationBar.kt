@@ -45,9 +45,9 @@ fun BottomNavigationBar(
 
         navItems.map { item ->
             NavigationBarItem(
-                selected = currentRoute == item.screen.route,
+                selected = currentRoute == item.screen::class.qualifiedName,
                 onClick = {
-                    navController.navigate(item.screen.route) {
+                    navController.navigate(item.screen) {
                         popUpTo(navController.graph.id) {
                             saveState = true
                         }

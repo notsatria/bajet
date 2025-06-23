@@ -7,12 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.notsatria.bajet.navigation.BottomNavigationBar
 import com.notsatria.bajet.navigation.Screen
 import com.notsatria.bajet.ui.screen.account.AccountRoute
@@ -34,88 +32,90 @@ fun BajetApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+    val bottomBarVisibleRoutes = listOf(
+        Screen.Home::class.qualifiedName,
+        Screen.Budget::class.qualifiedName,
+        Screen.Analytics::class.qualifiedName,
+        Screen.Account::class.qualifiedName,
+        Screen.Settings::class.qualifiedName
+    )
+
     Scaffold(
         modifier = modifier, containerColor = MaterialTheme.colorScheme.background, bottomBar = {
-            when (currentRoute) {
-                Screen.Home.route, Screen.Budget.route, Screen.Account.route, Screen.Analytics.route, Screen.Settings.route -> BottomNavigationBar(
-                    navController = navController, currentRoute = currentRoute
-                )
+            if (currentRoute in bottomBarVisibleRoutes) {
+                BottomNavigationBar(navController = navController, currentRoute = currentRoute)
             }
         }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Home.route,
+            startDestination = Screen.Home
         ) {
-            composable(Screen.Home.route) {
+            composable<Screen.Home> {
                 HomeRoute(
                     modifier = Modifier.padding(innerPadding),
                     navigateToAddCashFlowScreen = {
-                        navController.navigate(Screen.AddCashFlow.route)
+                        navController.navigate(Screen.AddCashFlow)
                     }, navigateToEditCashFlowScreen = { cashFlowId ->
-                        navController.navigate(Screen.EditCashFlow.createRoute(cashFlowId))
+                        navController.navigate(Screen.EditCashFlow(cashFlowId))
                     }
                 )
             }
             // Edit Cashflow Screen
-            composable(Screen.EditCashFlow.route, arguments = listOf(navArgument("cashFlowId") {
-                type = NavType.IntType
-            })) {
-                val cashFlowId = it.arguments?.getInt("cashFlowId") ?: -1
+            composable<Screen.EditCashFlow> {
                 AddCashFlowRoute(
-                    navigateBack = { navController.navigateUp() }, cashFlowId = cashFlowId
+                    navigateBack = { navController.navigateUp() }
                 )
             }
-            composable(Screen.AddCashFlow.route) {
+            composable<Screen.AddCashFlow> {
                 AddCashFlowRoute(
                     navigateBack = { navController.navigateUp() },
                 )
             }
-            composable(Screen.Budget.route) {
+            composable<Screen.Budget> {
                 BudgetRoute(
                     navigateToBudgetSettingScreen = {
-                        navController.navigate(Screen.BudgetSetting.route)
+                        navController.navigate(Screen.BudgetSetting)
                     })
             }
-            composable(Screen.BudgetSetting.route) {
+            composable<Screen.BudgetSetting> {
                 BudgetSettingRoute(navigateBack = {
                     navController.navigateUp()
                 }, navigateToAddBudgetScreen = {
-                    navController.navigate(Screen.AddBudget.route)
+                    navController.navigate(Screen.AddBudget)
                 }, navigateToEditBudgetScreen = { budgetId ->
-                    navController.navigate(Screen.EditBudget.createRoute(budgetId))
+                    navController.navigate(Screen.EditBudget(budgetId))
                 })
             }
-            composable(Screen.AddBudget.route) {
+            composable<Screen.AddBudget> {
                 AddBudgetRoute(
                     navigateBack = { navController.navigateUp() })
             }
-            composable(Screen.EditBudget.route, arguments = listOf(navArgument("budgetId") {
-                type = NavType.IntType
-            })) {
+            composable<Screen.EditBudget> {
                 EditBudgetRoute(
                     navigateBack = { navController.navigateUp() },
                 )
             }
-            composable(Screen.Analytics.route) {
+            composable<Screen.Analytics> {
                 AnalyticsRoute()
             }
-            composable(Screen.Account.route) {
+            composable<Screen.Account> {
                 AccountRoute(
                     modifier = Modifier.padding(innerPadding), navigateToAddAccountScreen = {
-                        navController.navigate(Screen.AddAccount.route)
+                        navController.navigate(Screen.AddAccount)
                     })
             }
-            composable(Screen.AddAccount.route) {
+            composable<Screen.AddAccount> {
                 AddAccountRoute(navigateBack = { navController.navigateUp() })
             }
-            composable(Screen.Settings.route) {
+            composable<Screen.Settings> {
                 SettingRoute(navigateToConfigurationScreen = {
-                    navController.navigate(Screen.Configuration.route)
+                    navController.navigate(Screen.Configuration)
                 })
             }
-            composable(Screen.Configuration.route) {
+            composable<Screen.Configuration> {
                 ConfigurationRoute(navigateBack = { navController.navigateUp() })
             }
         }
+
     }
 }

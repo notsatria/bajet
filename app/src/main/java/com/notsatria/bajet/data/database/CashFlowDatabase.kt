@@ -28,7 +28,8 @@ import timber.log.Timber
 
 @Database(
     entities = [CashFlow::class, Category::class, Budget::class, BudgetEntry::class, Account::class, AccountGroup::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 abstract class CashFlowDatabase : RoomDatabase() {
 

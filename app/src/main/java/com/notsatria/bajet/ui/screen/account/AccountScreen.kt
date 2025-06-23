@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -66,15 +67,18 @@ fun AccountScreen(
             },
         )
     }, floatingActionButton = {
-        FloatingActionButton(onClick = navigateToAddAccountScreen) {
+        FloatingActionButton(
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.fab_padding)),
+            onClick = navigateToAddAccountScreen
+        ) {
             Icon(
                 Icons.Default.Add,
                 "Add account",
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
-    }) { padding ->
-        Box(Modifier.padding(padding)) {
+    }) { innerPadding ->
+        Box(Modifier.padding(innerPadding)) {
             Column(Modifier.fillMaxSize()) {
                 TotalAccountRow(
                     Modifier
@@ -145,7 +149,11 @@ fun TotalAccountRow(modifier: Modifier = Modifier, totalAmount: Double) {
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Medium
         )
-        Text(totalAmount.formatToRupiah(), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+        Text(
+            totalAmount.formatToRupiah(),
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 

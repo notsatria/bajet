@@ -106,7 +106,7 @@ fun SettingItem(
             icon,
             title,
             modifier = Modifier.size(56.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer
+            tint = MaterialTheme.colorScheme.onSurface
         )
         Spacer(Modifier.height(8.dp))
         Text(

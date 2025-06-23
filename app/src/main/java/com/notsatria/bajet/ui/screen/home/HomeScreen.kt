@@ -113,7 +113,7 @@ fun HomeScreen(
             SnackbarHost(snackbarHostState)
         },
         floatingActionButton = {
-            HomeFloatingActionButton(navigateToAddCashFlowScreen, modifier = Modifier)
+            HomeFloatingActionButton(navigateToAddCashFlowScreen)
         },
     ) { _ ->
         Box(
@@ -190,8 +190,10 @@ fun GroupedCashFlowList(
 }
 
 @Composable
-fun HomeFloatingActionButton(onClick: () -> Unit, modifier: Modifier) {
-    FloatingActionButton(onClick = onClick) {
+fun HomeFloatingActionButton(onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = onClick
+    ) {
         Icon(imageVector = Icons.Filled.Add, contentDescription = "Add cashflow")
     }
 }

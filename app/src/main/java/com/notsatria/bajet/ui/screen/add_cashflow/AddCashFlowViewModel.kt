@@ -3,6 +3,7 @@ package com.notsatria.bajet.ui.screen.add_cashflow
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.Account
@@ -23,8 +24,15 @@ import javax.inject.Inject
 @HiltViewModel
 class AddCashFlowViewModel @Inject constructor(
     private val addCashFlowRepository: AddCashFlowRepository,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    val cashFlowId: Int = savedStateHandle.get<Int>("cashFlowId") ?: -1
+
+    init {
+        getCashFlowById(cashFlowId)
+    }
 
     var addCashFlowData by mutableStateOf(AddCashFlowData())
         private set
@@ -75,7 +83,7 @@ class AddCashFlowViewModel @Inject constructor(
     /**
      * Get cashflow by id (return cashflow, category and account)
      */
-    fun getCashFlowById(cashFlowId: Int) {
+    private fun getCashFlowById(cashFlowId: Int) {
         viewModelScope.launch {
             val data = withContext(Dispatchers.IO) {
                 addCashFlowRepository.getCashFlowAndCategoryById(cashFlowId)

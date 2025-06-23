@@ -68,7 +68,6 @@ import java.util.Calendar
 fun AddCashFlowRoute(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
-    cashFlowId: Int? = null,
     viewModel: AddCashFlowViewModel = hiltViewModel(),
     categoryViewModel: CategoriesViewModel = hiltViewModel()
 ) {
@@ -84,13 +83,9 @@ fun AddCashFlowRoute(
         }
     }
     val uiData = viewModel.addCashFlowData
-    val cashFlowIdExists = (cashFlowId != null && cashFlowId != -1)
+    val cashFlowIdExists = viewModel.cashFlowId != -1
     val categories by categoryViewModel.categories.collectAsState()
     val accounts by viewModel.accounts.collectAsState()
-
-    LaunchedEffect(key1 = cashFlowId) {
-        if (cashFlowIdExists) viewModel.getCashFlowById(cashFlowId!!)
-    }
 
     LaunchedEffect(categories) {
         categoryViewModel.getCategories()
@@ -127,7 +122,7 @@ fun AddCashFlowRoute(
             viewModel.updateNote(note)
         },
         onAddCashFlowClicked = {
-            if (cashFlowIdExists) viewModel.updateCashFlow(cashFlowId!!)
+            if (cashFlowIdExists) viewModel.updateCashFlow(viewModel.cashFlowId)
             else viewModel.insertCashFlow()
             navigateBack()
         },
