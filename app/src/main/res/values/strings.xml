@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Bajet</string>
+    <string name="app_name">Bajet: Money &amp; Budget Manager</string>
     <string name="update">Update</string>
     <string name="save">Save</string>
     <string name="note">Note</string>
@@ -58,6 +58,7 @@
     <string name="selected">Selected</string>
     <string name="edit_budget">Edit budget</string>
     <string name="edit_amount">Edit amount</string>
+    <string name="continue_text">Continue</string>
 
     <string-array name="settings_title">
         <item>@string/configuration</item>
@@ -77,5 +78,17 @@
         <item>@string/light</item>
         <item>@string/dark</item>
         <item>@string/system</item>
+    </string-array>
+
+    <string-array name="onboarding_titles">
+        <item>Track Your Cashflow</item>
+        <item>Set Your Budget Goals</item>
+        <item>Visualize with Smart Graphs</item>
+    </string-array>
+
+    <string-array name="onboarding_subtitles">
+        <item>Know where your money’s going no more “Where did it all go?” moments.</item>
+        <item>Set Your Budget Goals</item>
+        <item>Visualize with Smart Graphs</item>
     </string-array>
 </resources>
