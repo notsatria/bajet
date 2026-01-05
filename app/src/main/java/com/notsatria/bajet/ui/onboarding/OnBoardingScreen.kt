@@ -1,8 +1,14 @@
 package com.notsatria.bajet.ui.onboarding
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,10 +19,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -25,9 +34,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,26 +52,47 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.notsatria.bajet.R
 import com.notsatria.bajet.ui.theme.BajetTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.math.PI
+import kotlin.math.sin
 
 @Composable
 fun OnBoardingRoute(modifier: Modifier = Modifier) {
-    OnBoardingScreen(modifier = modifier)
+    val pagerState: PagerState = rememberPagerState { 3 }
+    val images: List<Int> = listOf(
+        R.drawable.il_onboarding_1,
+        R.drawable.il_onboarding_2,
+        R.drawable.il_onboarding_3
+    )
+    val scope: CoroutineScope = rememberCoroutineScope()
+
+
+    LaunchedEffect(pagerState.currentPage) {
+        scope.launch {
+            delay(3000)
+            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+        }
+    }
+
+    OnBoardingScreen(modifier = modifier, pagerState = pagerState, images = images, scope = scope)
 }
 
 @Composable
-fun OnBoardingScreen(modifier: Modifier = Modifier) {
-    val pagerState = rememberPagerState { 3 }
-    val images by remember {
-        mutableStateOf(
-            listOf(
-                R.drawable.il_onboarding_1,
-                R.drawable.il_onboarding_2,
-                R.drawable.il_onboarding_3
-            )
-        )
-    }
+fun OnBoardingScreen(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState = rememberPagerState { 3 },
+    images: List<Int> = listOf(
+        R.drawable.il_onboarding_1,
+        R.drawable.il_onboarding_2,
+        R.drawable.il_onboarding_3
+    ),
+    scope: CoroutineScope = rememberCoroutineScope()
+) {
     Column(
         modifier
+            .safeDrawingPadding()
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
@@ -86,33 +116,53 @@ fun OnBoardingScreen(modifier: Modifier = Modifier) {
                 Text("Skip")
             }
         }
-        Spacer(Modifier.height(12.dp))
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+        Spacer(Modifier.height(40.dp))
+        HorizontalPager(
+            state = pagerState,
             modifier = Modifier.weight(1f)
         ) {
-            Text(
-                stringArrayResource(R.array.onboarding_titles)[pagerState.currentPage],
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.White
+            val infiniteTransition = rememberInfiniteTransition()
+            val animatedFloat by infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(3000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Reverse
+                )
             )
-            Text(
-                stringArrayResource(R.array.onboarding_subtitles)[pagerState.currentPage],
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White
-            )
-            Spacer(Modifier.height(16.dp))
-            HorizontalPager(state = pagerState) {
+
+            val floatOffset = sin(animatedFloat * PI.toFloat()).times(10).dp
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    stringArrayResource(R.array.onboarding_titles)[pagerState.currentPage],
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = Color.White,
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    stringArrayResource(R.array.onboarding_subtitles)[pagerState.currentPage],
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White
+                )
+                Spacer(Modifier.height(16.dp))
                 Image(
+                    modifier = Modifier.offset(y = -floatOffset),
                     painter = painterResource(images[pagerState.currentPage]),
                     contentDescription = null
                 )
+                ShadowCircle(size = 220.dp, intensity = 0.2f)
             }
         }
         Button(
-            onClick = {}, modifier = Modifier
+            onClick = {
+                scope.launch {
+                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                }
+            }, modifier = Modifier
                 .padding(bottom = 12.dp)
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(

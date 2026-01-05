@@ -13,6 +13,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.notsatria.bajet.navigation.BottomNavigationBar
 import com.notsatria.bajet.navigation.Screen
+import com.notsatria.bajet.ui.onboarding.OnBoardingRoute
 import com.notsatria.bajet.ui.screen.account.AccountRoute
 import com.notsatria.bajet.ui.screen.account.add_account.AddAccountRoute
 import com.notsatria.bajet.ui.screen.add_cashflow.AddCashFlowRoute
@@ -50,6 +51,9 @@ fun BajetApp(
             navController = navController,
             startDestination = Screen.Home
         ) {
+            composable<Screen.OnBoarding> {
+                OnBoardingRoute()
+            }
             composable<Screen.Home> {
                 HomeRoute(
                     modifier = Modifier.padding(innerPadding),

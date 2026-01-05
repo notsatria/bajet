@@ -31,7 +31,7 @@ class AddCashFlowViewModel @Inject constructor(
     val cashFlowId: Int = savedStateHandle.get<Int>("cashFlowId") ?: -1
 
     init {
-        getCashFlowById(cashFlowId)
+        if (cashFlowId != -1) getCashFlowById(cashFlowId)
     }
 
     var addCashFlowData by mutableStateOf(AddCashFlowData())
