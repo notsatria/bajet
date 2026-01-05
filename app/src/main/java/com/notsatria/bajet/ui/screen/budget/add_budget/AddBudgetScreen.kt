@@ -1,5 +1,7 @@
 package com.notsatria.bajet.ui.screen.budget.add_budget
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,7 +46,8 @@ import com.notsatria.bajet.ui.theme.BajetTheme
 fun AddBudgetRoute(
     navigateBack: () -> Unit,
     viewModel: AddBudgetViewModel = hiltViewModel(),
-    categoryViewModel: CategoriesViewModel = hiltViewModel()
+    categoryViewModel: CategoriesViewModel = hiltViewModel(),
+    context: Context = LocalContext.current,
 ) {
     val shouldShowCategoryDialog = rememberSaveable { mutableStateOf(false) }
     val categories by categoryViewModel.categories.collectAsStateWithLifecycle()
@@ -53,9 +57,27 @@ fun AddBudgetRoute(
             viewModel.isFormsValid()
         }
     }
+    val showError by viewModel.showError.collectAsStateWithLifecycle("")
+    val addBudgetSuccess by viewModel.addBudgetSuccess.collectAsStateWithLifecycle(null)
 
     LaunchedEffect(categories) {
         categoryViewModel.getCategories()
+    }
+
+    LaunchedEffect(showError) {
+        if (showError.isNotEmpty()) {
+            Toast.makeText(
+                context,
+                showError,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    LaunchedEffect(addBudgetSuccess) {
+        if (addBudgetSuccess != null) {
+            navigateBack()
+        }
     }
 
     AddBudgetScreen(
@@ -80,7 +102,6 @@ fun AddBudgetRoute(
         },
         onAddBudgetClicked = {
             viewModel.insertBudget()
-            navigateBack()
         }
     )
 }

@@ -89,4 +89,7 @@ interface BudgetDao {
 
     @Query("SELECT c.name FROM category c JOIN budget b ON b.categoryId = c.id WHERE b.id = :budgetId")
     fun getCategoryNameByBudgetId(budgetId: Int): Flow<String>
+
+    @Query("SELECT * FROM budget WHERE categoryId = :category")
+    suspend fun getBudgetByCategoryId(category: Int): Budget?
 }

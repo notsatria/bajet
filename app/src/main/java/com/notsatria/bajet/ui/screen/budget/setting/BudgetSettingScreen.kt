@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -121,7 +122,8 @@ fun BudgetCategoryItem(
     categoryName: String = "Category name",
     amount: Double = 0.0,
     budgetId: Int = 0,
-    navigateToEditBudget: (budgetId: Int) -> Unit = {}
+    navigateToEditBudget: (budgetId: Int) -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         Text(text = emoji, modifier = Modifier.padding(start = 12.dp))
@@ -136,6 +138,13 @@ fun BudgetCategoryItem(
             Icon(
                 imageVector = Icons.Outlined.Edit,
                 contentDescription = stringResource(R.string.edit_budget),
+                tint = MaterialTheme.colorScheme.outline
+            )
+        }
+        IconButton(onClick = {}) {
+            Icon(
+                imageVector = Icons.Outlined.Delete,
+                contentDescription = stringResource(R.string.delete_budget),
                 tint = MaterialTheme.colorScheme.outline
             )
         }

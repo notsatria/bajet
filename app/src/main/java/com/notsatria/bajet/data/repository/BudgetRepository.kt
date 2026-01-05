@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 interface BudgetRepository {
-    suspend fun insertBudget(budget: Budget, amount: Double)
+    suspend fun insertBudget(budget: Budget, amount: Double): Long
     fun getAllBudget(): Flow<List<BudgetWithCategoryAndBudgetEntry>>
     fun getAllBudgetWithSpending(month: Int, year: Int): Flow<List<BudgetItemByCategory>>
     fun getTotalBudgetByMonthWithSpending(
@@ -29,6 +29,7 @@ interface BudgetRepository {
     fun getBudgetEntriesByBudgetId(budgetId: Int): Flow<List<BudgetEntry>>
     fun getCategoryNameByBudgetId(budgetId: Int): Flow<String>
     suspend fun updateBudgetEntry(id: Int, amount: Double)
+    suspend fun getBudgetByCategoryId(categoryId: Int): Budget?
 }
 
 class BudgetRepositoryImpl @Inject constructor(
@@ -37,7 +38,7 @@ class BudgetRepositoryImpl @Inject constructor(
     private val cashFlowDao: CashFlowDao
 ) : BudgetRepository {
     @Transaction
-    override suspend fun insertBudget(budget: Budget, amount: Double) {
+    override suspend fun insertBudget(budget: Budget, amount: Double): Long {
         val budgetId: Long = dao.insert(budget)
         val year = Calendar.getInstance().get(Calendar.YEAR)
         repeat(12) {
@@ -50,6 +51,7 @@ class BudgetRepositoryImpl @Inject constructor(
                 )
             )
         }
+        return budgetId
     }
 
     override fun getAllBudget(): Flow<List<BudgetWithCategoryAndBudgetEntry>> {
@@ -66,6 +68,10 @@ class BudgetRepositoryImpl @Inject constructor(
             val (startDate, endDate) = DateUtils.getStartAndEndDate(calendar)
             emitAll(dao.getAllBudgetWithSpending(month, year, startDate, endDate))
         }
+
+    override suspend fun getBudgetByCategoryId(categoryId: Int): Budget? {
+        return dao.getBudgetByCategoryId(categoryId)
+    }
 
     @Transaction
     override fun getTotalBudgetByMonthWithSpending(

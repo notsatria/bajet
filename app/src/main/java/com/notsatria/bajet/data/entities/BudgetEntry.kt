@@ -2,9 +2,20 @@ package com.notsatria.bajet.data.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity("budget_entry")
+@Entity(
+    "budget_entry",
+    foreignKeys = [
+        ForeignKey(
+            entity = Budget::class,
+            parentColumns = ["id"],
+            childColumns = ["budgetId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
 data class BudgetEntry(
     @PrimaryKey(autoGenerate = true)
     val budgetMonthId: Int = 0,

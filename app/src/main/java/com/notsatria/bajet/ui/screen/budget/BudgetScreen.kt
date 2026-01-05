@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
+import com.notsatria.bajet.ui.components.EmptyView
 import com.notsatria.bajet.ui.components.MonthSelection
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DateUtils.formatDate5
@@ -94,6 +96,14 @@ fun BudgetScreen(
                 HorizontalDivider(
                     thickness = 3.dp, color = MaterialTheme.colorScheme.outlineVariant
                 )
+                if (state.budgetList.isEmpty()) {
+                    EmptyView(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        drawable = R.drawable.ic_no_budget_found_24,
+                        text = stringResource(R.string.no_budget_found)
+                    )
+                }
                 LazyColumn {
                     items(state.budgetList) { budgetItem ->
                         BudgetItem(
@@ -138,8 +148,13 @@ fun BudgetItem(
             Spacer(Modifier.height(4.dp))
             LinearProgressIndicator(
                 progress = {
-                    val progress = (spending / budget).toFloat()
-                    progress
+                    val currentProgress = (spending / budget).toFloat()
+                    val safeCurrentProgress = if (currentProgress.isNaN() || !currentProgress.isFinite()) {
+                        0f
+                    } else {
+                        currentProgress
+                    }
+                    safeCurrentProgress
                 },
                 modifier = Modifier.fillMaxWidth(),
                 color = if (spending >= budget) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
