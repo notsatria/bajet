@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.notsatria.bajet" />
+                  <option name="mobileSdkAppId" value="1:264958616814:android:e5abb36237a32977e4ffff" />
+                  <option name="projectId" value="bajet-86457" />
+                  <option name="projectNumber" value="264958616814" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

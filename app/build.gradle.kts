@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.devtoolsKsp)
     alias(libs.plugins.hilt.android)
     kotlin("plugin.serialization") version "1.9.0"
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -64,7 +67,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.text.google.fonts)
-    implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.androidx.foundation.layout.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -102,4 +104,8 @@ dependencies {
 
     // Serialization
     implementation(libs.kotlinx.serialization)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
 }

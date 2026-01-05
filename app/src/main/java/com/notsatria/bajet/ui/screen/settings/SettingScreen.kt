@@ -1,6 +1,7 @@
 package com.notsatria.bajet.ui.screen.settings
 
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -17,11 +18,11 @@ import androidx.compose.material.icons.outlined.AppShortcut
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.Feedback
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.MonetizationOn
 import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -57,6 +58,7 @@ import com.notsatria.bajet.ui.theme.BajetTheme
 
 enum class SettingAction {
     OpenThemeDialog,
+    SendFeedback,
     FeatureNotImplemented
 }
 
@@ -108,12 +110,9 @@ private fun getSettings(appVersion: String): List<SettingGroup> {
             title = "More",
             settings = listOf(
                 SettingItem(
-                    title = "About",
-                    icon = Icons.Outlined.Info,
-                ),
-                SettingItem(
                     title = "Feedback",
                     icon = Icons.Outlined.Feedback,
+                    action = SettingAction.SendFeedback
                 ),
                 SettingItem(
                     title = "App Version",
@@ -123,6 +122,24 @@ private fun getSettings(appVersion: String): List<SettingGroup> {
             )
         )
     )
+}
+
+private fun openFeedbackEmail(context: Context) {
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "message/rfc822"
+        putExtra(Intent.EXTRA_EMAIL, arrayOf("notsatria.dev@gmail.com"))
+        putExtra(Intent.EXTRA_SUBJECT, "Bajet App Feedback")
+        putExtra(Intent.EXTRA_TEXT, "Please share your feedback about Bajet app:\n\n")
+    }
+    try {
+        context.startActivity(Intent.createChooser(intent, "Send Feedback"))
+    } catch (e: Exception) {
+        Toast.makeText(
+            context,
+            "No email client found",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
 }
 
 @Composable
@@ -163,6 +180,10 @@ fun SettingRoute(
             when (action) {
                 SettingAction.OpenThemeDialog -> {
                     showThemeDialog.value = true
+                }
+
+                SettingAction.SendFeedback -> {
+                    openFeedbackEmail(context)
                 }
 
                 SettingAction.FeatureNotImplemented -> {
@@ -211,6 +232,13 @@ fun SettingScreen(
                     settings = group.settings,
                     onAction = onAction
                 )
+            }
+            item {
+                Button(onClick = {
+                    throw RuntimeException("Test Crash")
+                }) {
+                    Text("Test Crash")
+                }
             }
         }
     }
