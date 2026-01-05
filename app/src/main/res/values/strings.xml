@@ -59,6 +59,7 @@
     <string name="edit_budget">Edit budget</string>
     <string name="edit_amount">Edit amount</string>
     <string name="continue_text">Continue</string>
+    <string name="no_budget_found">No budget found</string>
 
     <string-array name="settings_title">
         <item>@string/configuration</item>

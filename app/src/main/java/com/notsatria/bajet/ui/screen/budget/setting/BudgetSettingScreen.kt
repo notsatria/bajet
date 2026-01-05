@@ -2,6 +2,7 @@ package com.notsatria.bajet.ui.screen.budget.setting
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.relation.BudgetWithCategoryAndBudgetEntry
+import com.notsatria.bajet.ui.components.EmptyView
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DummyData
 import com.notsatria.bajet.utils.formatToRupiah
@@ -83,7 +85,19 @@ fun BudgetSettingScreen(
                 }
             })
     }) { innerPadding ->
-        LazyColumn(modifier = Modifier.padding(innerPadding)) {
+        if (state.budgetList.isEmpty()) {
+            EmptyView(
+                modifier = Modifier
+                    .fillMaxSize(),
+                drawable = R.drawable.ic_no_budget_found_24,
+                text = stringResource(R.string.no_budget_found)
+            )
+        }
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             items(state.budgetList) { budgetAndCategory ->
                 BudgetCategoryItem(
                     emoji = budgetAndCategory.categoryEmoji,
@@ -160,5 +174,13 @@ fun BudgetSettingScreenPreview() {
                 )
             )
         )
+    }
+}
+
+@Preview
+@Composable
+fun BudgetEmptyScreenPreview() {
+    BajetTheme {
+        BudgetSettingScreen()
     }
 }
