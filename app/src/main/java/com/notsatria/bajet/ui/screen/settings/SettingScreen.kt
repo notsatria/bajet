@@ -22,7 +22,6 @@ import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.MonetizationOn
 import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -153,7 +152,7 @@ fun SettingRoute(
     val appVersion = remember {
         try {
             val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-            packageInfo.versionName
+            packageInfo.versionName ?: "N/A"
         } catch (e: Exception) {
             "N/A"
         }
@@ -232,13 +231,6 @@ fun SettingScreen(
                     settings = group.settings,
                     onAction = onAction
                 )
-            }
-            item {
-                Button(onClick = {
-                    throw RuntimeException("Test Crash")
-                }) {
-                    Text("Test Crash")
-                }
             }
         }
     }

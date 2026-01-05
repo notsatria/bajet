@@ -11,12 +11,12 @@ plugins {
 
 android {
     namespace = "com.notsatria.bajet"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.notsatria.bajet"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -99,13 +99,17 @@ dependencies {
     // Data Store
     implementation(libs.androidx.datastore.preferences)
 
-    // Compose Charts
-    implementation(libs.compose.charts)
+     // Compose Charts
+     implementation(libs.compose.charts)
 
-    // Serialization
-    implementation(libs.kotlinx.serialization)
+     // Serialization
+     implementation(libs.kotlinx.serialization)
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.crashlytics)
-}
+     // System UI Controller
+     implementation(libs.accompanist.systemuicontroller)
+
+     // Firebase
+     implementation(platform(libs.firebase.bom))
+     implementation(libs.firebase.crashlytics)
+     implementation(libs.firebase.analytics)
+ }

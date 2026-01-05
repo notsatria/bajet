@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -267,6 +268,13 @@ fun BajetTheme(
         darkTheme -> darkScheme
         else -> lightScheme
     }
+
+    // Control system UI (status bar and navigation bar) appearance
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(
+        color = colorScheme.background,
+        darkIcons = !darkTheme
+    )
 
     MaterialTheme(
         colorScheme = colorScheme,
