@@ -112,9 +112,7 @@ fun BajetApp(
                 AddAccountRoute(navigateBack = { navController.navigateUp() })
             }
             composable<Screen.Settings> {
-                SettingRoute(navigateToConfigurationScreen = {
-                    navController.navigate(Screen.Configuration)
-                })
+                SettingRoute()
             }
             composable<Screen.Configuration> {
                 ConfigurationRoute(navigateBack = { navController.navigateUp() })
