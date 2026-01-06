@@ -26,6 +26,8 @@ interface BudgetRepository {
         year: Int
     ): Flow<TotalBudgetByMonthWithSpending>
 
+    suspend fun deleteBudget(budgetId: Int): Int
+
     fun getBudgetEntriesByBudgetId(budgetId: Int): Flow<List<BudgetEntry>>
     fun getCategoryNameByBudgetId(budgetId: Int): Flow<String>
     suspend fun updateBudgetEntry(id: Int, amount: Double)
@@ -71,6 +73,16 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun getBudgetByCategoryId(categoryId: Int): Budget? {
         return dao.getBudgetByCategoryId(categoryId)
+    }
+
+    @Transaction
+    override suspend fun deleteBudget(budgetId: Int): Int {
+        return try {
+            dao.deleteBudget(budgetId)
+        } catch (e: Exception) {
+            // Log the error for debugging
+            throw Exception("Failed to delete budget with ID $budgetId: ${e.message}", e)
+        }
     }
 
     @Transaction

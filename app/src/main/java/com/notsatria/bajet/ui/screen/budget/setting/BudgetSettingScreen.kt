@@ -1,5 +1,7 @@
 package com.notsatria.bajet.ui.screen.budget.setting
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,9 +23,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,16 +46,41 @@ fun BudgetSettingRoute(
     navigateBack: () -> Unit,
     navigateToAddBudgetScreen: () -> Unit,
     navigateToEditBudgetScreen: (budgetId: Int) -> Unit,
-    viewModel: BudgetSettingViewModel = hiltViewModel()
+    viewModel: BudgetSettingViewModel = hiltViewModel(),
+    context: Context = LocalContext.current
 ) {
     val budgetList by viewModel.budgetList.collectAsStateWithLifecycle()
+    val deleteBudgetSuccess by viewModel.deleteBudgetSuccess.collectAsStateWithLifecycle(
+        initialValue = null
+    )
+    val deleteBudgetError by viewModel.deleteBudgetError.collectAsStateWithLifecycle("")
+
+    LaunchedEffect(deleteBudgetSuccess) {
+        if (deleteBudgetSuccess != null)
+            Toast.makeText(
+                context,
+                context.getString(R.string.delete_budget_success),
+                Toast.LENGTH_SHORT
+            ).show()
+    }
+
+    LaunchedEffect(deleteBudgetError) {
+        if (deleteBudgetError.isNotEmpty()) {
+            Toast.makeText(
+                context,
+                deleteBudgetError,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
     BudgetSettingScreen(
         modifier,
         event = BudgetSettingEvent(
             onNavigateBackClicked = navigateBack,
             onAddClicked = navigateToAddBudgetScreen,
-            navigateToEditBudgetScreen = navigateToEditBudgetScreen
+            navigateToEditBudgetScreen = navigateToEditBudgetScreen,
+            onDeleteClicked = viewModel::deleteBudget
         ),
         state = BudgetSettingUiState(budgetList)
     )
@@ -107,6 +136,9 @@ fun BudgetSettingScreen(
                     budgetId = budgetAndCategory.budgetId,
                     navigateToEditBudget = { budgetId ->
                         event.navigateToEditBudgetScreen(budgetId)
+                    },
+                    onDeleteClick = { budgetId ->
+                        event.onDeleteClicked(budgetId)
                     }
                 )
                 HorizontalDivider()
@@ -123,7 +155,7 @@ fun BudgetCategoryItem(
     amount: Double = 0.0,
     budgetId: Int = 0,
     navigateToEditBudget: (budgetId: Int) -> Unit = {},
-    onDeleteClick: () -> Unit = {}
+    onDeleteClick: (budgetId: Int) -> Unit = {}
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         Text(text = emoji, modifier = Modifier.padding(start = 12.dp))
@@ -141,7 +173,7 @@ fun BudgetCategoryItem(
                 tint = MaterialTheme.colorScheme.outline
             )
         }
-        IconButton(onClick = {}) {
+        IconButton(onClick = { onDeleteClick(budgetId) }) {
             Icon(
                 imageVector = Icons.Outlined.Delete,
                 contentDescription = stringResource(R.string.delete_budget),
@@ -158,7 +190,8 @@ data class BudgetSettingUiState(
 data class BudgetSettingEvent(
     val onNavigateBackClicked: () -> Unit = {},
     val onAddClicked: () -> Unit = {},
-    val navigateToEditBudgetScreen: (Int) -> Unit = {}
+    val navigateToEditBudgetScreen: (Int) -> Unit = {},
+    val onDeleteClicked: (budgetId: Int) -> Unit = {}
 )
 
 @Preview

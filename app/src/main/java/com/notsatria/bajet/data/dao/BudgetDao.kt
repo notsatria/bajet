@@ -92,4 +92,7 @@ interface BudgetDao {
 
     @Query("SELECT * FROM budget WHERE categoryId = :category")
     suspend fun getBudgetByCategoryId(category: Int): Budget?
+
+    @Query("DELETE FROM budget WHERE id = :budgetId")
+    suspend fun deleteBudget(budgetId: Int): Int
 }

@@ -50,21 +50,25 @@ class AddBudgetViewModel @Inject constructor(private val budgetRepository: Budge
     fun insertBudget() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val existingBudget =
-                    budgetRepository.getBudgetByCategoryId(addBudgetData.categoryId)
-                if (existingBudget != null) {
-                    _showError.send("Budget for this category already exists.")
-                    return@withContext
-                }
-                val budgetId = budgetRepository.insertBudget(
-                    budget = addBudgetData.toBudget(),
-                    amount = addBudgetData.amount.toDouble()
-                )
+                try {
+                    val existingBudget =
+                        budgetRepository.getBudgetByCategoryId(addBudgetData.categoryId)
+                    if (existingBudget != null) {
+                        _showError.send("Budget for this category already exists.")
+                        return@withContext
+                    }
+                    val budgetId = budgetRepository.insertBudget(
+                        budget = addBudgetData.toBudget(),
+                        amount = addBudgetData.amount.toDouble()
+                    )
 
-                if (budgetId > 0) {
-                    _addBudgetSuccess.send(Unit)
-                } else {
-                    _showError.send("Failed to add budget. Please try again.")
+                    if (budgetId > 0) {
+                        _addBudgetSuccess.send(Unit)
+                    } else {
+                        _showError.send("Failed to add budget. Please try again.")
+                    }
+                } catch (e: Exception) {
+                    _showError.send("Error adding budget: ${e.message}")
                 }
             }
         }
