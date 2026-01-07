@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.notsatria.bajet.R
 import com.notsatria.bajet.data.dao.AccountDao
@@ -59,22 +60,24 @@ abstract class CashFlowDatabase : RoomDatabase() {
                     CashFlowDatabase::class.java,
                     "cashflow.db"
                 )
+                    .addMigrations(MIGRATION_1_2)
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
                             CoroutineScope(Dispatchers.IO).launch {
-                                prepopulateCategories(context, getInstance(context).cashFlowDao())
-                                prepopulateAccountGroup(
-                                    context,
-                                    getInstance(context).accountGroupDao()
-                                )
-                                prepopulateDefaultAccount(getInstance(context).accountDao())
+                                prepopulateData(context)
                             }
                         }
                     })
-                    .fallbackToDestructiveMigration()
                     .build()
             }
+        }
+
+        private fun prepopulateData(context: Context) {
+            val db = getInstance(context)
+            prepopulateCategories(context, db.cashFlowDao())
+            prepopulateAccountGroup(context, db.accountGroupDao())
+            prepopulateDefaultAccount(db.accountDao())
         }
 
         private fun prepopulateCategories(context: Context, dao: CashFlowDao) {
@@ -123,6 +126,14 @@ abstract class CashFlowDatabase : RoomDatabase() {
                 dao.insert(Account(id = 1, name = "Cash", balance = 0.0, groupId = 1))
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // If there were any schema changes from version 1 to 2, define them here
+                // For now, this is empty because we're just upgrading without schema changes
+                // If you added new columns or tables, add the SQL statements here
             }
         }
     }

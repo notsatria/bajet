@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,10 +32,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +60,7 @@ import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.components.BajetOutlinedTextField
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DummyData
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun CategoryManagementScreen(
@@ -68,6 +72,17 @@ fun CategoryManagementScreen(
 ) {
     val shouldShowAddCategoryDialog = remember { mutableStateOf(false) }
     val onEditCategoryMode = remember { mutableStateOf(false) }
+
+    // Collect UI events (errors)
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collectLatest { event ->
+            when (event) {
+                is CategoriesUiEvent.ShowError -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     CategoriesDialog(
         shouldShowCategoryDialog = shouldShowCategoryDialog,
@@ -100,7 +115,6 @@ fun CategoryManagementScreen(
         onEditCategoryMode = onEditCategoryMode,
         emoji = viewModel.emoji,
         onCategoryNameChange = { name ->
-            viewModel.updateEmoji(name)
             viewModel.updateCategoryName(name)
         },
         categoryName = viewModel.categoryName,
@@ -118,6 +132,9 @@ fun CategoryManagementScreen(
             if (onEditCategoryMode.value) viewModel.updateCategory()
             else viewModel.insertCategory()
             onEditCategoryMode.value = false
+        },
+        onEmojiChange = { emoji ->
+            viewModel.updateEmoji(emoji)
         }
     )
 }
@@ -174,7 +191,7 @@ fun CategoriesDialog(
                         onEditCategory = {
                             onEditCategoryMode.value = true
                             shouldShowAddCategoryDialog.value = true
-                           onEditCategory(categories[index])
+                            onEditCategory(categories[index])
                         }
                     )
                 }
@@ -344,8 +361,11 @@ fun AddCategoryDialog(
     emoji: String = "",
     categoryName: String = "",
     onCategoryNameChange: (String) -> Unit = {},
-    onSaveOrEditClicked: (onSave: () -> Unit) -> Unit = {},
+    onSaveOrEditClicked: () -> Unit = {},
+    onEmojiChange: (String) -> Unit = {},
 ) {
+    val shouldShowEmojiPicker = remember { mutableStateOf(false) }
+
     if (shouldAddShowCategoryDialog.value) {
         Dialog(onDismissRequest = {
             shouldAddShowCategoryDialog.value = false
@@ -375,6 +395,9 @@ fun AddCategoryDialog(
                         Text(
                             text = emoji,
                             fontSize = 48.sp,
+                            modifier = Modifier
+                                .clickable { shouldShowEmojiPicker.value = true }
+                                .padding(8.dp),
                             style = TextStyle(platformStyle = PlatformTextStyle(emojiSupportMatch = EmojiSupportMatch.None))
                         )
                         Spacer(modifier = Modifier.width(12.dp))
@@ -394,7 +417,7 @@ fun AddCategoryDialog(
                             Text(stringResource(R.string.cancel))
                         }
                         TextButton(onClick = {
-                            onSaveOrEditClicked
+                            onSaveOrEditClicked()
                             onCancel()
                         }) {
                             Text(
@@ -403,6 +426,115 @@ fun AddCategoryDialog(
                                 )
                             )
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    // Emoji Picker Dialog
+    if (shouldShowEmojiPicker.value) {
+        EmojiPickerDialog(
+            shouldShow = shouldShowEmojiPicker,
+            onEmojiSelected = { selectedEmoji ->
+                onEmojiChange(selectedEmoji)
+                shouldShowEmojiPicker.value = false
+            }
+        )
+    }
+}
+
+@Composable
+fun EmojiPickerDialog(
+    shouldShow: MutableState<Boolean>,
+    onEmojiSelected: (String) -> Unit
+) {
+    val emojis = listOf(
+        "😊", "😂", "😍", "🥰", "😎", "🤩", "😘", "😁",
+        "😄", "😃", "😀", "😆", "😅", "🤣", "😌", "😔",
+        "😕", "😲", "😱", "😤", "😡", "😠", "🤬", "😈",
+        "💀", "☠️", "💩", "🤡", "👻", "👽", "👾", "🤖",
+        "😻", "😸", "😹", "😺", "😻", "😼", "😽", "😾",
+        "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍",
+        "💔", "💕", "💞", "💓", "💗", "💖", "💘", "💝",
+        "🎈", "🎉", "🎊", "🎁", "🎀", "🎂", "🍰", "🧁",
+        "🍕", "🍔", "🍟", "🌭", "🥪", "🥙", "🧆", "🌮",
+        "🌯", "🥗", "🍝", "🍜", "🍲", "🍛", "🍣", "🍱",
+        "🥘", "🍢", "🍙", "🍚", "🍌", "🍎", "🍊", "🍋",
+        "🍌", "🍉", "🍇", "🍓", "🍈", "🍒", "🍑", "🥭",
+        "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼",
+        "🐨", "🐯", "🦁", "🐮", "🐷", "🐸", "🐵", "🙈",
+        "🙉", "🙊", "🐒", "🐔", "🐧", "🐦", "🐤", "🦆",
+        "🚗", "🚕", "🚙", "🚌", "🚎", "🏎️", "🚐", "🛻",
+        "🚚", "🚛", "🚜", "🏍️", "🏎️", "🛵", "🦯", "🦽",
+        "⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉",
+        "🥏", "🎳", "🏓", "🏸", "🏒", "🏑", "🥍", "🏏",
+        "🌈", "⭐", "✨", "⚡", "❄️", "☄️", "💥", "🔥",
+        "🎨", "🎭", "🎪", "🎬", "🎤", "🎧", "🎼", "🎹",
+        "🎸", "🎺", "🎷", "🥁", "🎻", "🎲", "🎯", "🎳"
+    )
+
+    if (shouldShow.value) {
+        Dialog(
+            onDismissRequest = { shouldShow.value = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .height(500.dp),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = "Select Emoji",
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(count = 6),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(emojis.size) { index ->
+                            Surface(
+                                modifier = Modifier
+                                    .size(60.dp)
+                                    .clickable {
+                                        onEmojiSelected(emojis[index])
+                                    },
+                                shape = RoundedCornerShape(8.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = emojis[index],
+                                        fontSize = 32.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    TextButton(
+                        onClick = { shouldShow.value = false },
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .padding(top = 16.dp)
+                    ) {
+                        Text("Close")
                     }
                 }
             }
