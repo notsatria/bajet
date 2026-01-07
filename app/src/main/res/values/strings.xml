@@ -62,6 +62,7 @@
     <string name="no_budget_found">No budget found</string>
     <string name="delete_budget">Delete budget</string>
     <string name="delete_budget_success">Budget deleted</string>
+    <string name="done">Done</string>
 
     <string-array name="settings_title">
         <item>@string/configuration</item>

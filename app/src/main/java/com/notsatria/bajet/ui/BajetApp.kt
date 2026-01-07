@@ -4,15 +4,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.notsatria.bajet.MainViewModel
 import com.notsatria.bajet.navigation.BottomNavigationBar
 import com.notsatria.bajet.navigation.Screen
+import com.notsatria.bajet.ui.components.LoadingScreen
 import com.notsatria.bajet.ui.onboarding.OnBoardingRoute
 import com.notsatria.bajet.ui.screen.account.AccountRoute
 import com.notsatria.bajet.ui.screen.account.add_account.AddAccountRoute
@@ -28,7 +33,9 @@ import com.notsatria.bajet.ui.screen.settings.configuration.ConfigurationRoute
 
 @Composable
 fun BajetApp(
-    modifier: Modifier = Modifier, navController: NavHostController = rememberNavController()
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -41,18 +48,40 @@ fun BajetApp(
         Screen.Settings::class.qualifiedName
     )
 
+    val isFirstLaunch by mainViewModel.isFirstLaunch.collectAsState(initial = null)
+
+    if (isFirstLaunch == null) {
+        LoadingScreen()
+        return
+    }
     Scaffold(
         modifier = modifier, containerColor = MaterialTheme.colorScheme.background, bottomBar = {
             if (currentRoute in bottomBarVisibleRoutes) {
                 BottomNavigationBar(navController = navController, currentRoute = currentRoute)
             }
         }) { innerPadding ->
+        val startDestination = remember(isFirstLaunch) {
+            if (isFirstLaunch == true) {
+                Screen.OnBoarding
+            } else {
+                Screen.Home
+            }
+        }
         NavHost(
             navController = navController,
-            startDestination = Screen.Home
+            startDestination = startDestination
         ) {
             composable<Screen.OnBoarding> {
-                OnBoardingRoute()
+                OnBoardingRoute(
+                    onNavigateToHome = {
+                        navController.navigate(Screen.Home) {
+                            popUpTo(Screen.OnBoarding) {
+                                inclusive = true
+                            }
+                        }
+                        mainViewModel.setFirstLaunch(false)
+                    }
+                )
             }
             composable<Screen.Home> {
                 HomeRoute(

@@ -27,8 +27,15 @@ import org.json.JSONException
 import timber.log.Timber
 
 @Database(
-    entities = [CashFlow::class, Category::class, Budget::class, BudgetEntry::class, Account::class, AccountGroup::class],
-    version = 1,
+    entities = [
+        CashFlow::class,
+        Category::class,
+        Budget::class,
+        BudgetEntry::class,
+        Account::class,
+        AccountGroup::class
+    ],
+    version = 2,
     exportSchema = false
 )
 abstract class CashFlowDatabase : RoomDatabase() {

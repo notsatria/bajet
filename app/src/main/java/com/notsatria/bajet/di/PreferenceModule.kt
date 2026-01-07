@@ -1,7 +1,9 @@
 package com.notsatria.bajet.di
 
 import android.content.Context
+import com.notsatria.bajet.data.preferences.AppDataStore
 import com.notsatria.bajet.data.preferences.SettingsManager
+import com.notsatria.bajet.data.preferences.appDataStore
 import com.notsatria.bajet.data.preferences.settingsDataStore
 import dagger.Module
 import dagger.Provides
@@ -18,5 +20,11 @@ object PreferenceModule {
     @Singleton
     fun provideSettingsManager(@ApplicationContext context: Context): SettingsManager {
         return SettingsManager(context.settingsDataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppDataStore(@ApplicationContext context: Context): AppDataStore {
+        return AppDataStore(context.appDataStore)
     }
 }

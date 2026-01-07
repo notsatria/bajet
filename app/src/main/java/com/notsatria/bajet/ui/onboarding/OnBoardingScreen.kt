@@ -9,6 +9,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -59,7 +61,7 @@ import kotlin.math.PI
 import kotlin.math.sin
 
 @Composable
-fun OnBoardingRoute(modifier: Modifier = Modifier) {
+fun OnBoardingRoute(modifier: Modifier = Modifier, onNavigateToHome: () -> Unit) {
     val pagerState: PagerState = rememberPagerState { 3 }
     val images: List<Int> = listOf(
         R.drawable.il_onboarding_1,
@@ -68,7 +70,6 @@ fun OnBoardingRoute(modifier: Modifier = Modifier) {
     )
     val scope: CoroutineScope = rememberCoroutineScope()
 
-
     LaunchedEffect(pagerState.currentPage) {
         scope.launch {
             delay(3000)
@@ -76,7 +77,13 @@ fun OnBoardingRoute(modifier: Modifier = Modifier) {
         }
     }
 
-    OnBoardingScreen(modifier = modifier, pagerState = pagerState, images = images, scope = scope)
+    OnBoardingScreen(
+        modifier = modifier,
+        pagerState = pagerState,
+        images = images,
+        scope = scope,
+        onSkipClick = onNavigateToHome
+    )
 }
 
 @Composable
@@ -88,7 +95,8 @@ fun OnBoardingScreen(
         R.drawable.il_onboarding_2,
         R.drawable.il_onboarding_3
     ),
-    scope: CoroutineScope = rememberCoroutineScope()
+    scope: CoroutineScope = rememberCoroutineScope(),
+    onSkipClick: () -> Unit = {}
 ) {
     Column(
         modifier
@@ -110,7 +118,7 @@ fun OnBoardingScreen(
             Indicator(pageCount = pagerState.pageCount, currentPage = pagerState.currentPage)
             Spacer(Modifier.weight(1f))
             TextButton(
-                onClick = {},
+                onClick = onSkipClick,
                 colors = ButtonDefaults.textButtonColors(contentColor = Color.White)
             ) {
                 Text("Skip")
@@ -157,24 +165,47 @@ fun OnBoardingScreen(
                 ShadowCircle(size = 220.dp, intensity = 0.2f)
             }
         }
-        Button(
-            onClick = {
-                scope.launch {
-                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                }
-            }, modifier = Modifier
-                .padding(bottom = 12.dp)
-                .fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color(0xFF4E5BE7)
-            )
-        ) {
-            Text(
-                stringResource(R.string.continue_text),
-                modifier = Modifier.padding(vertical = 4.dp),
-                style = TextStyle(fontWeight = FontWeight.SemiBold)
-            )
+        if (pagerState.currentPage == pagerState.pageCount - 1) {
+            Button(
+                onClick = {
+                    onSkipClick()
+                }, modifier = Modifier
+                    .padding(bottom = 12.dp)
+                    .fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color(0xFF4E5BE7)
+                )
+            ) {
+                Text(
+                    stringResource(R.string.done),
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    style = TextStyle(fontWeight = FontWeight.SemiBold)
+                )
+            }
+        } else {
+            OutlinedButton(
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    }
+                }, modifier = Modifier
+                    .padding(bottom = 12.dp)
+                    .fillMaxWidth(),
+                border = BorderStroke(
+                    1.dp,
+                    Color.White
+                ),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    stringResource(R.string.continue_text),
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    style = TextStyle(fontWeight = FontWeight.SemiBold)
+                )
+            }
         }
     }
 }
@@ -189,7 +220,7 @@ fun Indicator(pageCount: Int, currentPage: Int) {
             )
             Box(
                 Modifier
-                    .size(width = indicatorWidth, height = 4.dp)
+                    .size(width = indicatorWidth, height = 6.dp)
                     .clip(CircleShape)
                     .background(Color.White)
             )

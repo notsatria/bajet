@@ -17,7 +17,7 @@ android {
         applicationId = "com.notsatria.bajet"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -53,6 +53,9 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    lint {
+        disable += "RememberReturnType"
     }
 }
 
@@ -99,17 +102,17 @@ dependencies {
     // Data Store
     implementation(libs.androidx.datastore.preferences)
 
-     // Compose Charts
-     implementation(libs.compose.charts)
+    // Compose Charts
+    implementation(libs.compose.charts)
 
-     // Serialization
-     implementation(libs.kotlinx.serialization)
+    // Serialization
+    implementation(libs.kotlinx.serialization)
 
-     // System UI Controller
-     implementation(libs.accompanist.systemuicontroller)
+    // System UI Controller
+    implementation(libs.accompanist.systemuicontroller)
 
-     // Firebase
-     implementation(platform(libs.firebase.bom))
-     implementation(libs.firebase.crashlytics)
-     implementation(libs.firebase.analytics)
- }
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
+}
