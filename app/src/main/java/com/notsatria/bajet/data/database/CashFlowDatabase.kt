@@ -130,10 +130,68 @@ abstract class CashFlowDatabase : RoomDatabase() {
         }
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                // If there were any schema changes from version 1 to 2, define them here
-                // For now, this is empty because we're just upgrading without schema changes
-                // If you added new columns or tables, add the SQL statements here
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Recreate the budget table with the correct schema (including the unique index on categoryId)
+                // Step 1: Create a new budget table with correct schema
+                db.execSQL(
+                    """CREATE TABLE budget_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        categoryId INTEGER NOT NULL
+                    )""".trimMargin()
+                )
+
+                // create new BudgetEntry table
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS budget_entry_new (
+                        budgetMonthId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        budgetId INTEGER NOT NULL,
+                        month INTEGER NOT NULL,
+                        year INTEGER NOT NULL,
+                        amount REAL NOT NULL,
+                        FOREIGN KEY(budgetId) REFERENCES budget(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+
+                // create new Account table
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS account_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        groupId INTEGER NOT NULL,
+                        name TEXT NOT NULL,
+                        balance REAL NOT NULL,
+                        FOREIGN KEY(groupId) REFERENCES account_group(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+                
+                // Step 2: Copy data from old table to new table
+                db.execSQL("INSERT INTO budget_new (id, categoryId) SELECT id, categoryId FROM budget")
+
+                // copy data from old budget_entry to new budget_entry_new
+                db.execSQL("""
+                    INSERT INTO budget_entry_new (budgetMonthId, budgetId, month, year, amount
+                    )
+                    SELECT budgetMonthId, budgetId, month, year, amount FROM budget_entry
+                """.trimIndent())
+
+                // copy data from old account to new account_new
+                db.execSQL("""
+                    INSERT INTO account_new (id, groupId, name, balance
+                    )
+                    SELECT id, groupId, name, balance FROM account
+                """.trimIndent())
+                
+                // Step 3: Drop old table
+                db.execSQL("DROP TABLE budget")
+                db.execSQL("DROP TABLE budget_entry")
+                db.execSQL("DROP TABLE account")
+                
+                // Step 4: Rename new table to original name
+                db.execSQL("ALTER TABLE budget_new RENAME TO budget")
+                db.execSQL("ALTER TABLE budget_entry_new RENAME TO budget_entry")
+                db.execSQL("ALTER TABLE account_new RENAME TO account")
+                
+                // Step 5: Create the unique index on categoryId
+                db.execSQL("CREATE UNIQUE INDEX index_budget_categoryId ON budget(categoryId)")
             }
         }
     }
