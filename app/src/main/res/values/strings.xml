@@ -63,6 +63,18 @@
     <string name="delete_budget">Delete budget</string>
     <string name="delete_budget_success">Budget deleted</string>
     <string name="done">Done</string>
+    <string name="english">English</string>
+    <string name="indonesian">Indonesian</string>
+    <string name="language">Language</string>
+    <string name="currency">Currency</string>
+    <string name="send_feedback">Send Feedback</string>
+    <string name="app_version">App Version</string>
+    <string name="more">More</string>
+    <string name="developer_email">notsatria.dev@gmail.com</string>
+    <string name="bajet_app_feedback">Bajet App Feedback</string>
+    <string name="bajet_app_feedback_extra">Please share your feedback about Bajet app:\n\n</string>
+    <string name="income_format">Income %s</string>
+    <string name="expense_format">Expense %s</string>
 
     <string-array name="settings_title">
         <item>@string/configuration</item>
@@ -82,6 +94,11 @@
         <item>@string/light</item>
         <item>@string/dark</item>
         <item>@string/system</item>
+    </string-array>
+
+    <string-array name="language_list">
+        <item>@string/indonesian</item>
+        <item>@string/english</item>
     </string-array>
 
     <string-array name="onboarding_titles">

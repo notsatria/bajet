@@ -29,9 +29,6 @@ sealed class Screen() {
     data object Settings : Screen()
 
     @Serializable
-    data object Configuration : Screen()
-
-    @Serializable
     data object AddCashFlow : Screen()
 
     @Serializable

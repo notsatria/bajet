@@ -8,6 +8,7 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.Locale
 import kotlin.random.Random
 
 object Helper {
@@ -44,4 +45,11 @@ object Helper {
         )
     }
 
+    fun getLocale(languageCode: String): Locale {
+        return when (languageCode) {
+            "id" -> Locale("id", "ID")
+            "en" -> Locale.ENGLISH
+            else -> Locale.getDefault()
+        }
+    }
 }

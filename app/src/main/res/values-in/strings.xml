@@ -1,0 +1,115 @@
+<resources>
+    <string name="app_name">Bajet: Manajemen Keuangan</string>
+    <string name="update">Ubah</string>
+    <string name="save">Simpan</string>
+    <string name="note">Catatan</string>
+    <string name="date">Tanggal</string>
+    <string name="amount">Jumlah</string>
+    <string name="category">Kategori</string>
+    <string name="rp">Rp</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Batal</string>
+    <string name="select_category">Pilih Kategori</string>
+    <string name="add_cashflow">Tambah Transaksi</string>
+    <string name="back">Kembali</string>
+    <string name="dismiss">Tutup</string>
+    <string name="expenses">Pengeluaran</string>
+    <string name="income">Pemasukan</string>
+    <string name="balance">Saldo</string>
+    <string name="home">Beranda</string>
+    <string name="budget">Anggaran</string>
+    <string name="analytics">Analisis</string>
+    <string name="settings">Pengaturan</string>
+    <string name="add_category">Tambah Kategori</string>
+    <string name="category_name">Nama Kategori</string>
+    <string name="delete_category">Hapus Kategori</string>
+    <string name="are_you_sure_you_want_to_delete_this_category">Apakah Anda yakin ingin menghapus kategori ini?</string>
+    <string name="confirm">Konfirmasi</string>
+    <string name="field_cannot_be_empty">%1$s tidak boleh kosong</string>
+    <string name="edit_category">Ubah Kategori</string>
+    <string name="category_deleted">Kategori dihapus</string>
+    <string name="edit">Ubah</string>
+    <string name="cashflow_deleted">Transaksi dihapus</string>
+    <string name="undo">Batal</string>
+    <string name="my_budget">Anggaran Saya</string>
+    <string name="add_budget">Tambah Anggaran</string>
+    <string name="no_cashflow_found">Belum ada transaksi</string>
+    <string name="edit_cashflow">Ubah Transaksi</string>
+    <string name="no_analytics_found">Belum ada analisis</string>
+    <string name="accounts">Akun</string>
+    <string name="account">Akun</string>
+    <string name="add_account">Tambah Akun</string>
+    <string name="name">Nama</string>
+    <string name="group">Grup</string>
+    <string name="format_field_is_empty">Bagian %1$s kosong</string>
+    <string name="total">Total</string>
+    <string name="choose_account">Pilih biaya</string>
+    <string name="configuration">Konfigurasi</string>
+    <string name="passcode">Kode Sandi</string>
+    <string name="backup">Cadangan</string>
+    <string name="about">Tentang</string>
+    <string name="feedback">Masukan</string>
+    <string name="theme">Tema</string>
+    <string name="language_settings">Pengaturan Bahasa</string>
+    <string name="currency_settings">Pengaturan Mata Uang</string>
+    <string name="light">Terang</string>
+    <string name="dark">Gelap</string>
+    <string name="system">Sistem</string>
+    <string name="selected">Dipilih</string>
+    <string name="edit_budget">Ubah anggaran</string>
+    <string name="edit_amount">Ubah jumlah</string>
+    <string name="continue_text">Lanjut</string>
+    <string name="no_budget_found">Belum ada anggaran</string>
+    <string name="delete_budget">Hapus anggaran</string>
+    <string name="delete_budget_success">Anggaran dihapus</string>
+    <string name="done">Selesai</string>
+    <string name="english">Inggris</string>
+    <string name="indonesian">Indonesia</string>
+    <string name="language">Bahasa</string>
+    <string name="currency">Mata Uang</string>
+    <string name="send_feedback">Kirim Feedback</string>
+    <string name="app_version">Versi Aplikasi</string>
+    <string name="more">Lain-lain</string>
+    <string name="developer_email">notsatria.dev@gmail.com</string>
+    <string name="bajet_app_feedback">Bajet App Feedback</string>
+    <string name="bajet_app_feedback_extra">Tolong bagikan feedback anda untuk aplikasi Bajet:\n\n</string>
+    <string name="income_format">Pemasukan %s</string>
+    <string name="expense_format">Pengeluaran %s</string>
+
+    <string-array name="settings_title">
+        <item>@string/configuration</item>
+        <item>@string/passcode</item>
+        <item>@string/backup</item>
+        <item>@string/about</item>
+        <item>@string/feedback</item>
+    </string-array>
+
+    <string-array name="configuration_items">
+        <item>@string/theme</item>
+        <item>@string/currency_settings</item>
+        <item>@string/language_settings</item>
+    </string-array>
+
+    <string-array name="theme_list">
+        <item>@string/light</item>
+        <item>@string/dark</item>
+        <item>@string/system</item>
+    </string-array>
+
+    <string-array name="language_list">
+        <item>@string/indonesian</item>
+        <item>@string/english</item>
+    </string-array>
+
+    <string-array name="onboarding_titles">
+        <item>Pantau Arus Kas Anda</item>
+        <item>Tetapkan Tujuan Anggaran</item>
+        <item>Visualisasi Grafik Pintar</item>
+    </string-array>
+
+    <string-array name="onboarding_subtitles">
+        <item>Ketahui kemana uang Anda pergi, tidak ada lagi momen "Kemana perginya semua itu?".</item>
+        <item>Kelola batas pengeluaran Anda.</item>
+        <item>Pahami keuangan Anda dengan mudah.</item>
+    </string-array>
+</resources>

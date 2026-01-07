@@ -17,6 +17,7 @@ class MainViewModel @Inject constructor(
     ViewModel() {
 
     val theme: Flow<String> = settingsManager.themeMode
+    val language: Flow<String> = settingsManager.language
 
     val isFirstLaunch: Flow<Boolean> = appDataStore.isFirstLaunch
 

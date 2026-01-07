@@ -29,7 +29,6 @@ import com.notsatria.bajet.ui.screen.budget.edit_budget.EditBudgetRoute
 import com.notsatria.bajet.ui.screen.budget.setting.BudgetSettingRoute
 import com.notsatria.bajet.ui.screen.home.HomeRoute
 import com.notsatria.bajet.ui.screen.settings.SettingRoute
-import com.notsatria.bajet.ui.screen.settings.configuration.ConfigurationRoute
 
 @Composable
 fun BajetApp(
@@ -142,9 +141,6 @@ fun BajetApp(
             }
             composable<Screen.Settings> {
                 SettingRoute()
-            }
-            composable<Screen.Configuration> {
-                ConfigurationRoute(navigateBack = { navController.navigateUp() })
             }
         }
 

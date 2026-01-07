@@ -3,6 +3,7 @@ package com.notsatria.bajet.ui.screen.settings
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -52,69 +54,69 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.notsatria.bajet.R
-import com.notsatria.bajet.ui.screen.settings.configuration.ConfigurationViewModel
 import com.notsatria.bajet.ui.theme.BajetTheme
 
 enum class SettingAction {
     OpenThemeDialog,
+    OpenLanguageDialog,
     SendFeedback,
-    FeatureNotImplemented
+    FeatureNotImplemented,
 }
 
 data class SettingItem(
-    val title: String,
+    @StringRes val title: Int,
     val icon: ImageVector,
     val action: SettingAction? = null,
     val description: String? = null
 )
 
 data class SettingGroup(
-    val title: String,
+    @StringRes val title: Int,
     val settings: List<SettingItem>
 )
 
 private fun getSettings(appVersion: String): List<SettingGroup> {
     return listOf(
         SettingGroup(
-            title = "Configuration",
+            title = R.string.configuration,
             settings = listOf(
                 SettingItem(
-                    title = "Theme",
+                    title = R.string.theme,
                     icon = Icons.Outlined.ColorLens,
                     action = SettingAction.OpenThemeDialog
                 ),
                 SettingItem(
-                    title = "Language",
+                    title = R.string.language,
                     icon = Icons.Outlined.Language,
-                    action = SettingAction.FeatureNotImplemented
+                    action = SettingAction.OpenLanguageDialog
                 ),
                 SettingItem(
-                    title = "Currency",
+                    title = R.string.currency,
                     icon = Icons.Outlined.MonetizationOn,
                     action = SettingAction.FeatureNotImplemented
                 ),
                 SettingItem(
-                    title = "Passcode",
+                    title = R.string.passcode,
                     icon = Icons.Outlined.Password,
                     action = SettingAction.FeatureNotImplemented
                 ),
                 SettingItem(
-                    title = "Backup",
+                    title = R.string.backup,
                     icon = Icons.Outlined.Backup,
                     action = SettingAction.FeatureNotImplemented
                 ),
             )
         ),
         SettingGroup(
-            title = "More",
+            title = R.string.more,
             settings = listOf(
                 SettingItem(
-                    title = "Feedback",
+                    title = R.string.send_feedback,
                     icon = Icons.Outlined.Feedback,
                     action = SettingAction.SendFeedback
                 ),
                 SettingItem(
-                    title = "App Version",
+                    title = R.string.app_version,
                     icon = Icons.Outlined.AppShortcut,
                     description = appVersion
                 )
@@ -126,9 +128,9 @@ private fun getSettings(appVersion: String): List<SettingGroup> {
 private fun openFeedbackEmail(context: Context) {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "message/rfc822"
-        putExtra(Intent.EXTRA_EMAIL, arrayOf("notsatria.dev@gmail.com"))
-        putExtra(Intent.EXTRA_SUBJECT, "Bajet App Feedback")
-        putExtra(Intent.EXTRA_TEXT, "Please share your feedback about Bajet app:\n\n")
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.developer_email)))
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.bajet_app_feedback))
+        putExtra(Intent.EXTRA_TEXT, context.getString(R.string.bajet_app_feedback_extra))
     }
     try {
         context.startActivity(Intent.createChooser(intent, "Send Feedback"))
@@ -144,11 +146,13 @@ private fun openFeedbackEmail(context: Context) {
 @Composable
 fun SettingRoute(
     modifier: Modifier = Modifier,
-    viewModel: ConfigurationViewModel = hiltViewModel(),
+    viewModel: SettingsViewModel = hiltViewModel(),
     context: Context = LocalContext.current
 ) {
-    val theme = viewModel.theme.collectAsState(initial = "")
+    val theme by viewModel.theme.collectAsState(initial = "")
+    val language by viewModel.language.collectAsState(initial = "")
     val showThemeDialog = remember { mutableStateOf(false) }
+    val showLanguageDialog = remember { mutableStateOf(false) }
     val appVersion = remember {
         try {
             val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -164,11 +168,23 @@ fun SettingRoute(
     if (showThemeDialog.value) {
         ThemeListDialog(
             showDialog = showThemeDialog,
-            selectedTheme = theme.value,
+            selectedTheme = theme,
             onThemeSelected = {
                 viewModel.setThemeMode(it)
                 showThemeDialog.value = false
             }
+        )
+    }
+
+    if (showLanguageDialog.value) {
+        LanguageListDialog(
+            showDialog = showLanguageDialog,
+            selectedLanguage = language,
+            onLanguageSelected = {
+                viewModel.setLanguage(it)
+                showLanguageDialog.value = false
+            },
+            languageCodes = viewModel.languageCode
         )
     }
 
@@ -193,6 +209,10 @@ fun SettingRoute(
                             Toast.LENGTH_SHORT
                         )
                         .show()
+                }
+
+                SettingAction.OpenLanguageDialog -> {
+                    showLanguageDialog.value = true
                 }
             }
         }
@@ -223,7 +243,7 @@ fun SettingScreen(
         ) {
             items(settings) { group ->
                 Text(
-                    text = group.title,
+                    text = stringResource(group.title),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
@@ -251,11 +271,11 @@ fun SettingsCard(
         Column {
             settings.forEachIndexed { index, item ->
                 ListItem(
-                    headlineContent = { Text(item.title) },
+                    headlineContent = { Text(stringResource(item.title)) },
                     leadingContent = {
                         Icon(
                             imageVector = item.icon,
-                            contentDescription = item.title
+                            contentDescription = stringResource(item.title)
                         )
                     },
                     modifier = Modifier
@@ -309,11 +329,56 @@ fun ThemeListDialog(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = (theme == selectedTheme),
+                            selected = (theme.lowercase() == selectedTheme.lowercase()),
                             onClick = null // null recommended for accessibility with screenreaders
                         )
                         Text(
                             text = theme,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { showDialog.value = false }) {
+                Text(stringResource(R.string.ok))
+            }
+        }
+    )
+}
+
+@Composable
+fun LanguageListDialog(
+    showDialog: MutableState<Boolean> = mutableStateOf(false),
+    selectedLanguage: String = "",
+    onLanguageSelected: (String) -> Unit = {},
+    languageCodes: Map<String, Int>
+) {
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        title = { Text(stringResource(R.string.language)) },
+        text = {
+            Column(Modifier.selectableGroup()) {
+                languageCodes.forEach { (code, language) ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (code == selectedLanguage),
+                                onClick = { onLanguageSelected(code) },
+                                role = Role.RadioButton
+                            )
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (code == selectedLanguage),
+                            onClick = null // null recommended for accessibility with screenreaders
+                        )
+                        Text(
+                            text = stringResource(language),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(start = 16.dp)
                         )

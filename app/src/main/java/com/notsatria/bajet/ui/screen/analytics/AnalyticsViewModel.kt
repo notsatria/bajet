@@ -9,7 +9,6 @@ import com.notsatria.bajet.data.repository.AnalyticsRepository
 import com.notsatria.bajet.ui.domain.Analytics
 import com.notsatria.bajet.utils.CashFlowType
 import com.notsatria.bajet.utils.DateUtils
-import com.notsatria.bajet.utils.formatToRupiah
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.ehsannarmani.compose_charts.models.Pie
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +32,8 @@ data class AnalyticsUiState(
     val selectedMonth: Calendar = Calendar.getInstance(),
     val pieData: List<Pie> = emptyList(),
     val analytics: List<Analytics> = emptyList(),
-    val titles: List<String> = listOf("Income", "Expenses"),
+    val income: Double = 0.0,
+    val expenses: Double = 0.0,
     val selectedType: String = CashFlowType.INCOME,
     val pageIndex: Int = 0,
     val isLoading: Boolean = false,
@@ -146,17 +146,12 @@ class AnalyticsViewModel @Inject constructor(private val repository: AnalyticsRe
         val expenses =
             totalAmountList.firstOrNull { it.type == CashFlowType.EXPENSES }?.total ?: 0.0
 
-        // Create formatted titles (your existing logic)
-        val titles = listOf(
-            "Income ${income.formatToRupiah()}",
-            "Expenses ${expenses.formatToRupiah()}"
-        )
-
         return AnalyticsUiState(
             selectedMonth = month,
             pieData = pieData,
             analytics = sortedAnalytics,
-            titles = titles,
+            income = income,
+            expenses = expenses,
             selectedType = type,
             pageIndex = currentPageIndex,
             isLoading = false,

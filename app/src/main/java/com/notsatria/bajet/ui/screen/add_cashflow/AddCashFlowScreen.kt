@@ -59,7 +59,6 @@ import com.notsatria.bajet.ui.components.CurrencyTextField
 import com.notsatria.bajet.ui.screen.category.CategoriesViewModel
 import com.notsatria.bajet.ui.screen.category.CategoryManagementScreen
 import com.notsatria.bajet.ui.theme.BajetTheme
-import com.notsatria.bajet.utils.CashFlowType
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import java.util.Calendar
@@ -202,7 +201,9 @@ fun AddCashFlowScreen(
                     repeat(2) { index ->
                         CashFlowTypeRadioButton(
                             modifier = Modifier.weight(1f),
-                            type = if (index == 0) CashFlowType.INCOME else CashFlowType.EXPENSES,
+                            type = if (index == 0) stringResource(R.string.income) else stringResource(
+                                R.string.expenses
+                            ),
                             onClick = {
                                 onUpdateSelectedCashFlowType(index)
                             },

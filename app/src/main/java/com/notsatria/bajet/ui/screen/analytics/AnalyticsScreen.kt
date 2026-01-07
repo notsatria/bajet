@@ -84,6 +84,11 @@ fun AnalyticsScreen(
     pagerState: PagerState = rememberPagerState { 2 },
     setActions: (AnalyticsAction) -> Unit = {}
 ) {
+    val titles = listOf(
+        stringResource(R.string.income_format, state.income.formatToRupiah()),
+        stringResource(R.string.expense_format, state.expenses.formatToRupiah())
+    )
+
     Scaffold(modifier, topBar = {
         AnalyticsScreenTopBar(
             selectedMonth = state.selectedMonth,
@@ -94,7 +99,7 @@ fun AnalyticsScreen(
         Box(Modifier.padding(innerPadding)) {
             Column(modifier = Modifier.fillMaxSize()) {
                 PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
-                    state.titles.forEachIndexed { index, title ->
+                    titles.forEachIndexed { index, title ->
                         Tab(
                             selected = pagerState.currentPage == index,
                             onClick = {

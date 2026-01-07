@@ -1,17 +1,38 @@
 package com.notsatria.bajet.utils
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 object DateUtils {
-    val formatDate1 = SimpleDateFormat("EEE, dd MMM yyyy", Locale.ENGLISH)
-    val formatDate2 = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
-    val formatDate3 = SimpleDateFormat("MMMM yyyy", Locale.ENGLISH)
-    val formatDate4 = SimpleDateFormat("dd MMM yyyy (EEE)", Locale.ENGLISH)
-    val formatDate5 = SimpleDateFormat("MMMM", Locale.ENGLISH)
-    val formatDate6 = SimpleDateFormat("MMM", Locale.ENGLISH)
+
+    private val _currentLocale = MutableStateFlow<Locale>(Locale.getDefault())
+    val currentLocale: StateFlow<Locale> = _currentLocale
+
+    /**
+     * Called from MainActivity when language changes
+     */
+    fun updateLocale(locale: Locale) {
+        _currentLocale.value = locale
+    }
+
+    val formatDate1: SimpleDateFormat =
+        SimpleDateFormat("EEE, dd MMM yyyy", _currentLocale.value)
+
+    val formatDate2: SimpleDateFormat =
+        SimpleDateFormat("dd MMM yyyy", _currentLocale.value)
+
+    val formatDate3: SimpleDateFormat =
+        SimpleDateFormat("MMMM yyyy", _currentLocale.value)
+
+    val formatDate4: SimpleDateFormat =
+        SimpleDateFormat("dd MMM yyyy (EEE)", _currentLocale.value)
+
+    val formatDate5: SimpleDateFormat = SimpleDateFormat("MMMM", _currentLocale.value)
+    val formatDate6: SimpleDateFormat = SimpleDateFormat("MMM", _currentLocale.value)
 
     fun Long.formatDateTo(format: SimpleDateFormat = formatDate1): String {
         val date = Date(this)
@@ -66,17 +87,17 @@ object DateUtils {
     fun getCurrentMonth(): Int {
         return Calendar.getInstance().get(Calendar.MONTH) + 1
     }
+
+    fun Int.toMonthName(format: SimpleDateFormat = DateUtils.formatDate6): String {
+        val month = Calendar.getInstance().apply {
+            set(Calendar.MONTH, this@toMonthName - 1)
+        }.time
+
+        return format.format(month)
+    }
 }
 
 data class MonthAndYear(
     val month: Int,
     val year: Int
 )
-
-fun Int.toMonthName(format: SimpleDateFormat = DateUtils.formatDate6): String {
-    val month = Calendar.getInstance().apply {
-        set(Calendar.MONTH, this@toMonthName - 1)
-    }.time
-
-    return format.format(month)
-}
