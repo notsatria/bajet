@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.preferences.AppDataStore
 import com.notsatria.bajet.data.preferences.SettingsManager
+import com.notsatria.bajet.utils.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -16,7 +17,7 @@ class MainViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    val theme: Flow<String> = settingsManager.themeMode
+    val theme: Flow<String?> = settingsManager.themeMode
     val language: Flow<String> = settingsManager.language
 
     val isFirstLaunch: Flow<Boolean> = appDataStore.isFirstLaunch
@@ -24,6 +25,12 @@ class MainViewModel @Inject constructor(
     fun setFirstLaunch(isFirstLaunch: Boolean) {
         viewModelScope.launch {
             appDataStore.setFirstLaunch(isFirstLaunch)
+        }
+    }
+
+    fun setDefaultTheme() {
+        viewModelScope.launch {
+            settingsManager.setThemeMode(ThemeMode.SYSTEM.value)
         }
     }
 }

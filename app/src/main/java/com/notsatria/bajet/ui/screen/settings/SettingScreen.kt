@@ -47,14 +47,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.notsatria.bajet.R
 import com.notsatria.bajet.ui.theme.BajetTheme
+import com.notsatria.bajet.utils.ThemeMode
 
 enum class SettingAction {
     OpenThemeDialog,
@@ -168,9 +169,9 @@ fun SettingRoute(
     if (showThemeDialog.value) {
         ThemeListDialog(
             showDialog = showThemeDialog,
-            selectedTheme = theme,
-            onThemeSelected = {
-                viewModel.setThemeMode(it)
+            selectedTheme = theme ?: ThemeMode.SYSTEM.value,
+            onThemeSelected = { themeMode ->
+                viewModel.setThemeMode(themeMode.value)
                 showThemeDialog.value = false
             }
         )
@@ -308,20 +309,19 @@ fun SettingsCard(
 fun ThemeListDialog(
     showDialog: MutableState<Boolean> = mutableStateOf(false),
     selectedTheme: String = "",
-    onThemeSelected: (String) -> Unit = {}
+    onThemeSelected: (ThemeMode) -> Unit = {}
 ) {
-    val themes = stringArrayResource(R.array.theme_list)
     AlertDialog(
         onDismissRequest = { showDialog.value = false },
         title = { Text(stringResource(R.string.theme)) },
         text = {
             Column(Modifier.selectableGroup()) {
-                themes.forEach { theme ->
+                ThemeMode.entries.forEach { theme ->
                     Row(
                         Modifier
                             .fillMaxWidth()
                             .selectable(
-                                selected = (theme == selectedTheme),
+                                selected = (theme.value == selectedTheme.lowercase()),
                                 onClick = { onThemeSelected(theme) },
                                 role = Role.RadioButton
                             )
@@ -329,11 +329,11 @@ fun ThemeListDialog(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = (theme.lowercase() == selectedTheme.lowercase()),
+                            selected = (theme.value == selectedTheme.lowercase()),
                             onClick = null // null recommended for accessibility with screenreaders
                         )
                         Text(
-                            text = theme,
+                            text = stringResource(theme.resId),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(start = 16.dp)
                         )
@@ -394,6 +394,7 @@ fun LanguageListDialog(
     )
 }
 
+@PreviewScreenSizes
 @Preview
 @Composable
 fun SettingScreenPreview() {

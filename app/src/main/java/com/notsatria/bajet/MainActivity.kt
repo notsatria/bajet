@@ -13,6 +13,7 @@ import com.notsatria.bajet.ui.BajetApp
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.Helper
+import com.notsatria.bajet.utils.ThemeMode
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -45,10 +46,16 @@ class MainActivity : ComponentActivity() {
         
         lifecycleScope.launch {
             viewModel.theme.collect { themeMode ->
+                val finalThemeMode = if (themeMode == null) {
+                    viewModel.setDefaultTheme()
+                    ThemeMode.SYSTEM.value
+                } else {
+                    themeMode
+                }
                 setContent {
-                    val darkTheme = when (themeMode) {
-                        getString(R.string.light) -> false
-                        getString(R.string.dark) -> true
+                    val darkTheme = when (finalThemeMode) {
+                        ThemeMode.LIGHT.value -> false
+                        ThemeMode.DARK.value -> true
                         else -> isSystemInDarkTheme()
                     }
                     BajetTheme(darkTheme = darkTheme) {

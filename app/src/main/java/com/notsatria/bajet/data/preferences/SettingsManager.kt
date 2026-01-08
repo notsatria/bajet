@@ -39,7 +39,7 @@ class SettingsManager(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { it[PASSCODE] = passcode }
     }
 
-    val themeMode: Flow<String> = dataStore.data.map { it[THEME_MODE] ?: "system" }
+    val themeMode: Flow<String?> = dataStore.data.map { it[THEME_MODE] }
 
     val currency: Flow<String> = dataStore.data.map { it[CURRENCY] ?: "IDR" }
 

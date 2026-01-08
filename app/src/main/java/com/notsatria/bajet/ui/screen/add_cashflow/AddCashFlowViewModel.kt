@@ -13,6 +13,7 @@ import com.notsatria.bajet.data.repository.AddCashFlowRepository
 import com.notsatria.bajet.utils.CashFlowType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -67,8 +68,11 @@ class AddCashFlowViewModel @Inject constructor(
         addCashFlowData = addCashFlowData.copy(selectedAccount = account)
     }
 
+    var insertCashflowJob: Job? = null
     fun insertCashFlow() {
-        viewModelScope.launch {
+        if (insertCashflowJob != null) return
+
+        insertCashflowJob = viewModelScope.launch {
             val cashFlow = addCashFlowData.toCashFlow()
             withContext(Dispatchers.IO) {
                 addCashFlowRepository.insertCashFlow(cashFlow)
@@ -104,8 +108,10 @@ class AddCashFlowViewModel @Inject constructor(
         }
     }
 
+    private var updateCashFlowJob: Job? = null
     fun updateCashFlow(cashFowId: Int) {
-        viewModelScope.launch {
+        if (updateCashFlowJob != null) return
+        updateCashFlowJob = viewModelScope.launch {
             val cashFlow = addCashFlowData.toCashFlow()
             i("Update CashFlow: $cashFlow")
             withContext(Dispatchers.IO) {

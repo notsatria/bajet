@@ -13,7 +13,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(private val settingsManager: SettingsManager) :
     ViewModel() {
 
-    val theme: Flow<String> = settingsManager.themeMode
+    val theme: Flow<String?> = settingsManager.themeMode
     val language: Flow<String> = settingsManager.language
 
     val languageCode: Map<String, Int> = mapOf(
