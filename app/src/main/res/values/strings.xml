@@ -50,6 +50,7 @@
     <string name="about">About</string>
     <string name="feedback">Feedback</string>
     <string name="theme">Theme</string>
+    <string name="daily_reminder">Daily Reminder</string>
     <string name="language_settings">Language settings</string>
     <string name="currency_settings">Currency settings</string>
     <string name="light">Light</string>

@@ -5,6 +5,8 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AppShortcut
 import androidx.compose.material.icons.outlined.Backup
@@ -22,20 +25,24 @@ import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.MonetizationOn
 import androidx.compose.material.icons.outlined.Password
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -44,13 +51,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.notsatria.bajet.R
@@ -60,64 +66,85 @@ import com.notsatria.bajet.utils.ThemeMode
 enum class SettingAction {
     OpenThemeDialog,
     OpenLanguageDialog,
+    OpenReminderTimeDialog,
     SendFeedback,
     FeatureNotImplemented,
 }
 
+enum class SettingTitle(@StringRes val resId: Int) {
+    THEME(R.string.theme),
+    LANGUAGE(R.string.language),
+    DAILY_REMINDER(R.string.daily_reminder),
+    CURRENCY(R.string.currency),
+    PASSCODE(R.string.passcode),
+    BACKUP(R.string.backup),
+    SEND_FEEDBACK(R.string.send_feedback),
+    APP_VERSION(R.string.app_version),
+}
+
 data class SettingItem(
-    @StringRes val title: Int,
+    @StringRes val titleId: Int,
     val icon: ImageVector,
     val action: SettingAction? = null,
-    val description: String? = null
+    val description: String? = null,
+    val subtitle: String? = null,
+    val hasSwitch: Boolean = false
 )
 
 data class SettingGroup(
-    @StringRes val title: Int,
+    @StringRes val titleId: Int,
     val settings: List<SettingItem>
 )
 
 private fun getSettings(appVersion: String): List<SettingGroup> {
     return listOf(
         SettingGroup(
-            title = R.string.configuration,
+            titleId = R.string.configuration,
             settings = listOf(
                 SettingItem(
-                    title = R.string.theme,
+                    titleId = SettingTitle.DAILY_REMINDER.resId,
+                    icon = Icons.Outlined.Timer,
+                    action = SettingAction.OpenReminderTimeDialog,
+                    subtitle = "Select reminder time",
+                    hasSwitch = true
+                ),
+                SettingItem(
+                    titleId = SettingTitle.THEME.resId,
                     icon = Icons.Outlined.ColorLens,
                     action = SettingAction.OpenThemeDialog
                 ),
                 SettingItem(
-                    title = R.string.language,
+                    titleId = SettingTitle.LANGUAGE.resId,
                     icon = Icons.Outlined.Language,
                     action = SettingAction.OpenLanguageDialog
                 ),
                 SettingItem(
-                    title = R.string.currency,
+                    titleId = SettingTitle.CURRENCY.resId,
                     icon = Icons.Outlined.MonetizationOn,
                     action = SettingAction.FeatureNotImplemented
                 ),
                 SettingItem(
-                    title = R.string.passcode,
+                    titleId = SettingTitle.PASSCODE.resId,
                     icon = Icons.Outlined.Password,
                     action = SettingAction.FeatureNotImplemented
                 ),
                 SettingItem(
-                    title = R.string.backup,
+                    titleId = SettingTitle.BACKUP.resId,
                     icon = Icons.Outlined.Backup,
                     action = SettingAction.FeatureNotImplemented
                 ),
             )
         ),
         SettingGroup(
-            title = R.string.more,
+            titleId = R.string.more,
             settings = listOf(
                 SettingItem(
-                    title = R.string.send_feedback,
+                    titleId = SettingTitle.SEND_FEEDBACK.resId,
                     icon = Icons.Outlined.Feedback,
                     action = SettingAction.SendFeedback
                 ),
                 SettingItem(
-                    title = R.string.app_version,
+                    titleId = SettingTitle.APP_VERSION.resId,
                     icon = Icons.Outlined.AppShortcut,
                     description = appVersion
                 )
@@ -154,6 +181,9 @@ fun SettingRoute(
     val language by viewModel.language.collectAsState(initial = "")
     val showThemeDialog = remember { mutableStateOf(false) }
     val showLanguageDialog = remember { mutableStateOf(false) }
+    val showReminderTimeDialog = remember { mutableStateOf(false) }
+    val selectedReminderTime = remember { mutableStateOf("09:00") }
+    val reminderEnabled = remember { mutableStateOf(false) }
     val appVersion = remember {
         try {
             val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -189,13 +219,30 @@ fun SettingRoute(
         )
     }
 
+    if (showReminderTimeDialog.value) {
+        ReminderTimePickerDialog(
+            showDialog = showReminderTimeDialog,
+            selectedTime = selectedReminderTime.value,
+            onTimeSelected = { time ->
+                selectedReminderTime.value = time
+                showReminderTimeDialog.value = false
+            }
+        )
+    }
+
     SettingScreen(
         modifier = modifier,
         settings = settings,
+        reminderEnabled = reminderEnabled,
+        selectedReminderTime = selectedReminderTime,
         onAction = { action ->
             when (action) {
                 SettingAction.OpenThemeDialog -> {
                     showThemeDialog.value = true
+                }
+
+                SettingAction.OpenReminderTimeDialog -> {
+                    showReminderTimeDialog.value = true
                 }
 
                 SettingAction.SendFeedback -> {
@@ -225,6 +272,8 @@ fun SettingRoute(
 fun SettingScreen(
     modifier: Modifier = Modifier,
     settings: List<SettingGroup>,
+    reminderEnabled: MutableState<Boolean> = mutableStateOf(false),
+    selectedReminderTime: MutableState<String> = mutableStateOf("09:00"),
     onAction: (SettingAction) -> Unit = {}
 ) {
     Scaffold(modifier = modifier, topBar = {
@@ -244,12 +293,14 @@ fun SettingScreen(
         ) {
             items(settings) { group ->
                 Text(
-                    text = stringResource(group.title),
+                    text = stringResource(group.titleId),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
                 SettingsCard(
                     settings = group.settings,
+                    reminderEnabled = reminderEnabled,
+                    selectedReminderTime = selectedReminderTime,
                     onAction = onAction
                 )
             }
@@ -261,6 +312,8 @@ fun SettingScreen(
 fun SettingsCard(
     modifier: Modifier = Modifier,
     settings: List<SettingItem>,
+    reminderEnabled: MutableState<Boolean> = mutableStateOf(false),
+    selectedReminderTime: MutableState<String> = mutableStateOf("09:00"),
     onAction: (SettingAction) -> Unit
 ) {
     Card(
@@ -271,36 +324,130 @@ fun SettingsCard(
     ) {
         Column {
             settings.forEachIndexed { index, item ->
-                ListItem(
-                    headlineContent = { Text(stringResource(item.title)) },
-                    leadingContent = {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = stringResource(item.title)
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            item.action?.let { onAction(it) }
-                        },
-                    colors = ListItemDefaults.colors(
-                        containerColor = Color.Transparent
-                    ),
-                    trailingContent = {
-                        if (item.description != null) {
-                            Text(
-                                text = item.description,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
+                CustomSettingListItem(
+                    item = item,
+                    reminderEnabled = reminderEnabled,
+                    selectedReminderTime = selectedReminderTime,
+                    onAction = onAction
                 )
                 if (index < settings.lastIndex) {
                     HorizontalDivider()
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun CustomSettingListItem(
+    modifier: Modifier = Modifier,
+    item: SettingItem,
+    reminderEnabled: MutableState<Boolean> = mutableStateOf(false),
+    selectedReminderTime: MutableState<String> = mutableStateOf("09:00"),
+    onAction: (SettingAction) -> Unit
+) {
+    val isSubtitleClickable = item.titleId == SettingTitle.DAILY_REMINDER.resId
+    val isDailyReminder = item.titleId == SettingTitle.DAILY_REMINDER.resId
+    
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(enabled = item.action != null && !isSubtitleClickable) {
+                item.action?.let { onAction(it) }
+            }
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        // Main row with icon, title, and trailing content
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Leading icon
+            Icon(
+                imageVector = item.icon,
+                contentDescription = stringResource(item.titleId),
+                modifier = Modifier.padding(end = 16.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            // Title (with flex to push trailing content to the right)
+            Text(
+                text = stringResource(item.titleId),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
+            )
+            
+            // Trailing content (description, switch, or nothing)
+            when {
+                item.hasSwitch -> {
+                    Switch(
+                        checked = reminderEnabled.value,
+                        onCheckedChange = { isChecked ->
+                            reminderEnabled.value = isChecked
+                        },
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+                item.description != null -> {
+                    Text(
+                        text = item.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+        }
+        
+        // Subtitle with time display (only shown if reminder is enabled and it's daily reminder)
+        if (isDailyReminder && reminderEnabled.value) {
+            Row(
+                modifier = Modifier
+                    .padding(start = 40.dp, top = 12.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = item.subtitle ?: "Select reminder time",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                ReminderTimeDisplay(
+                    time = selectedReminderTime.value,
+                    onClick = {
+                        if (reminderEnabled.value && item.action != null) {
+                            onAction(item.action)
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ReminderTimeDisplay(
+    time: String = "09:00",
+    onClick: () -> Unit = {}
+) {
+    OutlinedCard(
+        modifier = Modifier.clickable { onClick() },
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = time,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                fontFamily = FontFamily.Monospace
+            )
         }
     }
 }
@@ -394,7 +541,57 @@ fun LanguageListDialog(
     )
 }
 
-@PreviewScreenSizes
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReminderTimePickerDialog(
+    showDialog: MutableState<Boolean> = mutableStateOf(false),
+    selectedTime: String = "09:00",
+    onTimeSelected: (String) -> Unit = {}
+) {
+    // Parse the selected time to initialize the time picker
+    val (initialHour, initialMinute) = selectedTime.split(":").let {
+        Pair(it[0].toIntOrNull() ?: 9, it[1].toIntOrNull() ?: 0)
+    }
+    
+    val timePickerState = rememberTimePickerState(
+        initialHour = initialHour,
+        initialMinute = initialMinute,
+        is24Hour = true
+    )
+    
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        title = { Text("Select Reminder Time") },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TimePicker(state = timePickerState)
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val formattedTime = String.format(
+                        "%02d:%02d",
+                        timePickerState.hour,
+                        timePickerState.minute
+                    )
+                    onTimeSelected(formattedTime)
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { showDialog.value = false }) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
 @Preview
 @Composable
 fun SettingScreenPreview() {

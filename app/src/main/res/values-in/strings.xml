@@ -43,13 +43,14 @@
     <string name="group">Grup</string>
     <string name="format_field_is_empty">Bagian %1$s kosong</string>
     <string name="total">Total</string>
-    <string name="choose_account">Pilih biaya</string>
+    <string name="choose_account">Pilih akun</string>
     <string name="configuration">Konfigurasi</string>
     <string name="passcode">Kode Sandi</string>
     <string name="backup">Cadangan</string>
     <string name="about">Tentang</string>
     <string name="feedback">Masukan</string>
     <string name="theme">Tema</string>
+    <string name="daily_reminder">Daily Reminder</string>
     <string name="language_settings">Pengaturan Bahasa</string>
     <string name="currency_settings">Pengaturan Mata Uang</string>
     <string name="light">Terang</string>
