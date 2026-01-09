@@ -148,11 +148,11 @@ fun BudgetItem(
             Spacer(Modifier.height(4.dp))
             LinearProgressIndicator(
                 progress = {
-                    val currentProgress = (spending / budget).toFloat()
-                    val safeCurrentProgress = if (currentProgress.isNaN() || !currentProgress.isFinite()) {
+                    val currentProgress = (spending / budget)
+                    val safeCurrentProgress: Float = if (currentProgress.isNaN() || !currentProgress.isFinite()) {
                         0f
                     } else {
-                        currentProgress
+                        currentProgress.toFloat().coerceIn(0f, 1f)
                     }
                     safeCurrentProgress
                 },
@@ -193,8 +193,13 @@ fun MonthlyBudgetItem(
             Text(month.formatDateTo(formatDate5), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(4.dp))
             LinearProgressIndicator(progress = {
-                val progress = (spending / budget).toFloat()
-                progress
+                val progressValue = (spending / budget)
+                val safeProgress: Float = if (progressValue.isNaN() || !progressValue.isFinite()) {
+                    0f
+                } else {
+                    progressValue.toFloat().coerceIn(0f, 1f)
+                }
+                safeProgress
             }, modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(8.dp))
             Row {
