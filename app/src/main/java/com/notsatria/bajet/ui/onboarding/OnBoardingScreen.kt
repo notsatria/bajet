@@ -1,5 +1,6 @@
 package com.notsatria.bajet.ui.onboarding
 
+import android.os.Build
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
@@ -52,6 +53,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import com.notsatria.bajet.R
 import com.notsatria.bajet.ui.theme.BajetTheme
 import kotlinx.coroutines.CoroutineScope
@@ -60,6 +63,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.sin
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun OnBoardingRoute(modifier: Modifier = Modifier, onNavigateToHome: () -> Unit) {
     val pagerState: PagerState = rememberPagerState { 3 }
@@ -69,6 +73,8 @@ fun OnBoardingRoute(modifier: Modifier = Modifier, onNavigateToHome: () -> Unit)
         R.drawable.il_onboarding_3
     )
     val scope: CoroutineScope = rememberCoroutineScope()
+    val notificationPermissionState =
+        rememberPermissionState(android.Manifest.permission.POST_NOTIFICATIONS)
 
     LaunchedEffect(pagerState.currentPage) {
         scope.launch {
@@ -82,7 +88,12 @@ fun OnBoardingRoute(modifier: Modifier = Modifier, onNavigateToHome: () -> Unit)
         pagerState = pagerState,
         images = images,
         scope = scope,
-        onSkipClick = onNavigateToHome
+        onSkipClick = {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+               notificationPermissionState.launchPermissionRequest()
+            }
+            onNavigateToHome()
+        }
     )
 }
 

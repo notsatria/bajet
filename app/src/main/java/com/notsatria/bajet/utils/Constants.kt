@@ -16,3 +16,7 @@ enum class ThemeMode(val value: String, val id: Int, @StringRes val resId: Int) 
     DARK("dark", 1, R.string.dark),
     SYSTEM("system", 2, R.string.system)
 }
+
+object IntentAction {
+    const val SEND_REMINDER = "com.notsatria.bajet.SEND_REMINDER"
+}

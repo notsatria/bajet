@@ -21,6 +21,8 @@ class SettingsManager(private val dataStore: DataStore<Preferences>) {
         val CURRENCY = stringPreferencesKey("currency")
         val LANGUAGE = stringPreferencesKey("language")
         val PASSCODE = stringPreferencesKey("passcode")
+        val REMINDER_ENABLED = stringPreferencesKey("reminder_enabled")
+        val REMINDER_TIME = stringPreferencesKey("reminder_time")
     }
 
     suspend fun setThemeMode(mode: String) {
@@ -39,6 +41,14 @@ class SettingsManager(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { it[PASSCODE] = passcode }
     }
 
+    suspend fun setReminderEnabled(enabled: Boolean) {
+        dataStore.edit { it[REMINDER_ENABLED] = enabled.toString() }
+    }
+
+    suspend fun setReminderTime(time: String) {
+        dataStore.edit { it[REMINDER_TIME] = time }
+    }
+
     val themeMode: Flow<String?> = dataStore.data.map { it[THEME_MODE] }
 
     val currency: Flow<String> = dataStore.data.map { it[CURRENCY] ?: "IDR" }
@@ -46,4 +56,8 @@ class SettingsManager(private val dataStore: DataStore<Preferences>) {
     val language: Flow<String> = dataStore.data.map { it[LANGUAGE] ?: "id" }
 
     val passcode: Flow<String> = dataStore.data.map { it[PASSCODE] ?: "" }
+
+    val reminderEnabled: Flow<Boolean> = dataStore.data.map { it[REMINDER_ENABLED]?.toBoolean() ?: false }
+
+    val reminderTime: Flow<String> = dataStore.data.map { it[REMINDER_TIME] ?: "09:00" }
 }

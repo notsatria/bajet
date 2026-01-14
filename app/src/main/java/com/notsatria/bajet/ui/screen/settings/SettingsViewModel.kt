@@ -15,6 +15,8 @@ class SettingsViewModel @Inject constructor(private val settingsManager: Setting
 
     val theme: Flow<String?> = settingsManager.themeMode
     val language: Flow<String> = settingsManager.language
+    val reminderEnabled: Flow<Boolean> = settingsManager.reminderEnabled
+    val reminderTime: Flow<String> = settingsManager.reminderTime
 
     val languageCode: Map<String, Int> = mapOf(
         "id" to R.string.indonesian,
@@ -30,6 +32,18 @@ class SettingsViewModel @Inject constructor(private val settingsManager: Setting
     fun setLanguage(language: String) {
         viewModelScope.launch {
             settingsManager.setLanguage(language)
+        }
+    }
+
+    fun setReminderEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsManager.setReminderEnabled(enabled)
+        }
+    }
+
+    fun setReminderTime(time: String) {
+        viewModelScope.launch {
+            settingsManager.setReminderTime(time)
         }
     }
 }
