@@ -18,7 +18,7 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = 4
-        versionName = "1.0-beta"
+        versionName = "1.0.1-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -110,6 +110,7 @@ dependencies {
 
     // System UI Controller
     implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.permissions)
 
     // Firebase
     implementation(platform(libs.firebase.bom))

@@ -27,8 +27,13 @@ fun CurrencyTextField(
         modifier = modifier,
         value = amount,
         onValueChange = { input ->
-            val trimmed = input.trimStart('0').trim { it.isDigit().not() }
-            onAmountChange(trimmed)
+            // Extract only digits from the input
+            val digitsOnly = input.filter { it.isDigit() }
+            
+            // Remove leading zeros, but keep at least "0"
+            val cleanAmount = digitsOnly.trimStart('0').ifEmpty { "0" }
+            
+            onAmountChange(cleanAmount)
         },
         label = {
             Text(text = stringResource(R.string.amount))
@@ -47,18 +52,34 @@ class RupiahVisualTransformation : VisualTransformation {
 
     override fun filter(text: AnnotatedString): TransformedText {
         val originalText = text.text.trim()
+        
+        // Empty input
         if (originalText.isEmpty()) {
             return TransformedText(text, OffsetMapping.Identity)
         }
+        
+        // Only format if it contains only digits
         if (originalText.isDigitsOnly().not()) {
             return TransformedText(text, OffsetMapping.Identity)
         }
 
-        val formattedText = numberFormatter.format(originalText.toInt())
-        return TransformedText(
-            AnnotatedString(formattedText),
-            CurrencyOffsetMapping(originalText, formattedText)
-        )
+        // Prevent overflow by limiting to 18 digits (max for Long)
+        val safeText = if (originalText.length > 18) {
+            originalText.substring(0, 18)
+        } else {
+            originalText
+        }
+
+        return try {
+            val formattedText = numberFormatter.format(safeText.toLong())
+            TransformedText(
+                AnnotatedString(formattedText),
+                CurrencyOffsetMapping(safeText, formattedText)
+            )
+        } catch (e: Exception) {
+            // Fallback if formatting fails
+            TransformedText(text, OffsetMapping.Identity)
+        }
     }
 }
 
@@ -69,12 +90,14 @@ class CurrencyOffsetMapping(originalText: String, formattedText: String) : Offse
     private fun findDigitIndices(firstString: String, secondString: String): List<Int> {
         val digitIndices = mutableListOf<Int>()
         var currentIndex = 0
+        
         for (digit in firstString) {
             val index = secondString.indexOf(digit, currentIndex)
             if (index != -1) {
                 digitIndices.add(index)
                 currentIndex = index + 1
             } else {
+                // If a digit is not found, fallback to empty list for Identity mapping
                 return emptyList()
             }
         }
@@ -82,14 +105,16 @@ class CurrencyOffsetMapping(originalText: String, formattedText: String) : Offse
     }
 
     override fun originalToTransformed(offset: Int): Int {
+        if (indices.isEmpty()) return offset
         if (offset >= originalLength) {
-            return indices.last() + 1
+            return indices.lastOrNull()?.plus(1) ?: offset
         }
-
-        return indices[offset]
+        return indices.getOrNull(offset) ?: offset
     }
 
     override fun transformedToOriginal(offset: Int): Int {
-        return indices.indexOfFirst { it >= offset }.takeIf { it != -1 } ?: originalLength
+        if (indices.isEmpty()) return offset
+        val index = indices.indexOfFirst { it >= offset }.takeIf { it != -1 } ?: originalLength
+        return index
     }
 }
