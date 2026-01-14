@@ -100,7 +100,7 @@ fun EditBudgetScreen(
                     onEditClicked = {
                         setAction(
                             EditBudgetAction.EditClick(
-                                amount = budgetEntry.amount.toString(),
+                                amount = budgetEntry.amount.formatToRupiah(),
                                 budgetMonthId = budgetEntry.budgetMonthId
                             )
                         )

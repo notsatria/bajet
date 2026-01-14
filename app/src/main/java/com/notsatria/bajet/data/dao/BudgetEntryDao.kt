@@ -28,4 +28,14 @@ interface BudgetEntryDao {
         """
     )
     suspend fun updateBudgetEntry(id: Int, amount: Double)
+
+    @Query(
+        """
+        UPDATE budget_entry
+        SET amount = amount + :amountToAdd
+        WHERE budgetMonthId = :monthId
+            AND budgetId = :budgetId
+        """
+    )
+    suspend fun addAmountToBudgetEntry(monthId: Int, amountToAdd: Double, budgetId: Int)
 }

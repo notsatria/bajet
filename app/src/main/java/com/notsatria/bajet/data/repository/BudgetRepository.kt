@@ -32,6 +32,7 @@ interface BudgetRepository {
     fun getCategoryNameByBudgetId(budgetId: Int): Flow<String>
     suspend fun updateBudgetEntry(id: Int, amount: Double)
     suspend fun getBudgetByCategoryId(categoryId: Int): Budget?
+    suspend fun updateBudgetEntries(budgetId: Int, amount: Double)
 }
 
 class BudgetRepositoryImpl @Inject constructor(
@@ -116,5 +117,15 @@ class BudgetRepositoryImpl @Inject constructor(
 
     override suspend fun updateBudgetEntry(id: Int, amount: Double) {
         return budgetEntryDao.updateBudgetEntry(id, amount)
+    }
+
+    override suspend fun updateBudgetEntries(budgetId: Int, amount: Double) {
+        repeat(12) { monthIndex ->
+            budgetEntryDao.addAmountToBudgetEntry(
+                monthId = monthIndex + 1,
+                amountToAdd = amount,
+                budgetId = budgetId
+            )
+        }
     }
 }

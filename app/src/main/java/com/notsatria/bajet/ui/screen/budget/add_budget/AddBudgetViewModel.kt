@@ -1,10 +1,12 @@
 package com.notsatria.bajet.ui.screen.budget.add_budget
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.notsatria.bajet.R
 import com.notsatria.bajet.data.entities.Budget
 import com.notsatria.bajet.data.repository.BudgetRepository
 import com.notsatria.bajet.utils.formatToCurrency
@@ -16,11 +18,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+sealed class AddBudgetAction {
+    data class ShowError(@StringRes val messageRes: Int) : AddBudgetAction()
+    data class ShowSuccess(@StringRes val messageRes: Int) : AddBudgetAction()
+    object UpdateBudgetSuccess : AddBudgetAction()
+}
+
 @HiltViewModel
 class AddBudgetViewModel @Inject constructor(private val budgetRepository: BudgetRepository) :
     ViewModel() {
     var addBudgetData by mutableStateOf(AddBudgetData())
         private set
+
+    private val _addBudgetAction = Channel<AddBudgetAction>()
+    val addBudgetAction = _addBudgetAction.receiveAsFlow()
 
     fun updateAmount(rawAmount: String) {
         addBudgetData = addBudgetData.copy(
@@ -41,11 +52,9 @@ class AddBudgetViewModel @Inject constructor(private val budgetRepository: Budge
         return addBudgetData.amount.isNotEmpty() && addBudgetData.amount.toDouble() > 0 && addBudgetData.categoryId != 0
     }
 
-    private val _showError = Channel<String>()
-    val showError = _showError.receiveAsFlow()
-
-    private val _addBudgetSuccess = Channel<Unit>()
-    val addBudgetSuccess = _addBudgetSuccess.receiveAsFlow()
+    private suspend fun setAction(action: AddBudgetAction) {
+        _addBudgetAction.send(action)
+    }
 
     fun insertBudget() {
         viewModelScope.launch {
@@ -54,7 +63,11 @@ class AddBudgetViewModel @Inject constructor(private val budgetRepository: Budge
                     val existingBudget =
                         budgetRepository.getBudgetByCategoryId(addBudgetData.categoryId)
                     if (existingBudget != null) {
-                        _showError.send("Budget for this category already exists.")
+                        budgetRepository.updateBudgetEntries(
+                            budgetId = existingBudget.id,
+                            amount = addBudgetData.amount.toDouble()
+                        )
+                        setAction(AddBudgetAction.ShowSuccess(R.string.budget_updated_successfully))
                         return@withContext
                     }
                     val budgetId = budgetRepository.insertBudget(
@@ -63,12 +76,12 @@ class AddBudgetViewModel @Inject constructor(private val budgetRepository: Budge
                     )
 
                     if (budgetId > 0) {
-                        _addBudgetSuccess.send(Unit)
+                        setAction(AddBudgetAction.ShowSuccess(R.string.budget_added_successfully))
                     } else {
-                        _showError.send("Failed to add budget. Please try again.")
+                        setAction(AddBudgetAction.ShowError(R.string.failed_to_add_budget_please_try_again))
                     }
                 } catch (e: Exception) {
-                    _showError.send("Error adding budget: ${e.message}")
+                    setAction(AddBudgetAction.ShowError(R.string.failed_to_add_budget_please_try_again))
                 }
             }
         }

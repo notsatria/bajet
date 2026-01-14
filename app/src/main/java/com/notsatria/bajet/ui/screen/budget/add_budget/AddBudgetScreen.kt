@@ -57,27 +57,41 @@ fun AddBudgetRoute(
             viewModel.isFormsValid()
         }
     }
-    val showError by viewModel.showError.collectAsStateWithLifecycle("")
-    val addBudgetSuccess by viewModel.addBudgetSuccess.collectAsStateWithLifecycle(null)
+    val action by viewModel.addBudgetAction.collectAsStateWithLifecycle(null)
 
     LaunchedEffect(categories) {
         categoryViewModel.getCategories()
     }
 
-    LaunchedEffect(showError) {
-        if (showError.isNotEmpty()) {
-            Toast.makeText(
-                context,
-                showError,
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
+    LaunchedEffect(action) {
+        if (action != null) {
+            when (action) {
+                is AddBudgetAction.ShowError -> {
+                    val message = (action as AddBudgetAction.ShowError).messageRes
+                    Toast.makeText(
+                        context,
+                        message,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
 
-    LaunchedEffect(addBudgetSuccess) {
-        if (addBudgetSuccess != null) {
-            navigateBack()
+                is AddBudgetAction.ShowSuccess -> {
+                    navigateBack()
+                }
+
+                is AddBudgetAction.UpdateBudgetSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.budget_added_successfully),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    navigateBack()
+                }
+
+                else -> { /* No-op */}
+            }
         }
+
     }
 
     AddBudgetScreen(
@@ -100,9 +114,7 @@ fun AddBudgetRoute(
             viewModel.updateCategoryId(category.id)
             viewModel.updateCategoryText("${category.emoji} ${category.name}")
         },
-        onAddBudgetClicked = {
-            viewModel.insertBudget()
-        }
+        onAddBudgetClicked = viewModel::insertBudget
     )
 }
 

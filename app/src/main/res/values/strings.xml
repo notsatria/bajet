@@ -76,6 +76,9 @@
     <string name="bajet_app_feedback_extra">Please share your feedback about Bajet app:\n\n</string>
     <string name="income_format">Income %s</string>
     <string name="expense_format">Expense %s</string>
+    <string name="budget_updated_successfully">Budget updated successfully.</string>
+    <string name="budget_added_successfully">Budget added.</string>
+    <string name="failed_to_add_budget_please_try_again">Failed to add budget. Please try again.</string>
 
     <string-array name="settings_title">
         <item>@string/configuration</item>

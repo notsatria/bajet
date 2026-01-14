@@ -11,6 +11,7 @@ import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.repository.AccountRepository
 import com.notsatria.bajet.data.repository.AddCashFlowRepository
 import com.notsatria.bajet.utils.CashFlowType
+import com.notsatria.bajet.utils.formatToRupiah
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -93,11 +94,14 @@ class AddCashFlowViewModel @Inject constructor(
                 addCashFlowRepository.getCashFlowAndCategoryById(cashFlowId)
             }
             // if amount is less than 0, times with -1 to create minus
-            val amount =
-                if (data.cashFlow.amount < 0) (data.cashFlow.amount * -1).toString() else data.cashFlow.amount.toString()
+            val rawAmount = if (data.cashFlow.amount < 0) {
+                (data.cashFlow.amount * -1).toLong().toString()
+            } else {
+                data.cashFlow.amount.toLong().toString()
+            }
 
             addCashFlowData = addCashFlowData.copy(
-                amount = amount,
+                amount = rawAmount,
                 note = data.cashFlow.note,
                 date = data.cashFlow.date,
                 categoryId = data.cashFlow.categoryId,
