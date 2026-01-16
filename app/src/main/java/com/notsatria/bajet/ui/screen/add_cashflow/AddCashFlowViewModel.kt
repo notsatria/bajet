@@ -126,7 +126,7 @@ class AddCashFlowViewModel @Inject constructor(
     }
 
     fun validateFields(expensesCategory: Boolean) =
-        addCashFlowData.amount.isEmpty() || addCashFlowData.amount == "0" || (expensesCategory && addCashFlowData.categoryId == 0 || addCashFlowData.selectedAccount.id == 0)
+        addCashFlowData.amount.isEmpty() || addCashFlowData.amount == "0" || addCashFlowData.categoryId == 0 || addCashFlowData.selectedAccount.id == 0
 }
 
 data class AddCashFlowData(
@@ -145,8 +145,8 @@ data class AddCashFlowData(
             type = if (selectedCashflowTypeIndex == 0) CashFlowType.INCOME else CashFlowType.EXPENSES,
             amount = if (selectedCashflowTypeIndex == 0) finalAmount else -finalAmount,
             note = this.note,
-            date = this.date,/* If selected category is income, set category id to 1, otherwise set it to categoryId */
-            categoryId = if (selectedCashflowTypeIndex == 0) 1 else categoryId,
+            date = this.date,
+            categoryId = categoryId,  // Use selected category for both income and expense
             accountId = selectedAccount.id
         )
     }

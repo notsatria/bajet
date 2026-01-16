@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.notsatria.bajet.utils.CategoryType
 import com.notsatria.bajet.utils.Helper
 
 @Entity("category")
@@ -18,5 +19,8 @@ data class Category(
     val emoji: String,
 
     @ColumnInfo("color")
-    val color: Int = Helper.randomColor().toArgb()
+    val color: Int = Helper.randomColor().toArgb(),
+
+    @ColumnInfo("type")
+    val type: String = CategoryType.EXPENSE.name
 )

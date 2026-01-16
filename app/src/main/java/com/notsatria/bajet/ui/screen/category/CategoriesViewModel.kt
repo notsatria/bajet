@@ -134,11 +134,17 @@ class CategoriesViewModel @Inject constructor(private val categoryRepository: Ca
     }
 
     // get categories and filter not income and expenses
-    fun getCategories() {
+    fun getCategories(type: String? = null) {
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    categoryRepository.getCategories().collect { categories ->
+                    val flow = if (type != null) {
+                        categoryRepository.getCategoriesByType(type)
+                    } else {
+                        categoryRepository.getCategories()
+                    }
+                    
+                    flow.collect { categories ->
                         withContext(Dispatchers.Main) {
                             _categories.value = categories.filter { category ->
                                 category.id != INCOME_CATEGORY_ID && category.id != EXPENSE_CATEGORY_ID

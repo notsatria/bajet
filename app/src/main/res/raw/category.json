@@ -3,77 +3,128 @@
     {
       "id": 1,
       "name": "Income",
-      "emoji": "💰"
+      "emoji": "💰",
+      "type": "INCOME"
     },
     {
       "id": 2,
       "name": "Expenses",
-      "emoji": "💸"
+      "emoji": "💸",
+      "type": "EXPENSE"
     },
     {
       "id": 3,
       "name": "Food",
-      "emoji": "🍔"
+      "emoji": "🍔",
+      "type": "EXPENSE"
     },
     {
       "id": 4,
       "name": "Transportation",
-      "emoji": "🚗"
+      "emoji": "🚗",
+      "type": "EXPENSE"
     },
     {
       "id": 5,
       "name": "Shopping",
-      "emoji": "🛍️"
+      "emoji": "🛍️",
+      "type": "EXPENSE"
     },
     {
       "id": 6,
       "name": "Entertainment",
-      "emoji": "🎬"
+      "emoji": "🎬",
+      "type": "EXPENSE"
     },
     {
       "id": 7,
       "name": "Health",
-      "emoji": "🏥"
+      "emoji": "🏥",
+      "type": "EXPENSE"
     },
     {
       "id": 8,
       "name": "Utilities",
-      "emoji": "💡"
+      "emoji": "💡",
+      "type": "EXPENSE"
     },
     {
       "id": 9,
       "name": "Education",
-      "emoji": "🎓"
+      "emoji": "🎓",
+      "type": "EXPENSE"
     },
     {
       "id": 10,
       "name": "Savings",
-      "emoji": "🏦"
+      "emoji": "🏦",
+      "type": "EXPENSE"
     },
     {
       "id": 11,
       "name": "Gifts",
-      "emoji": "🎁"
+      "emoji": "🎁",
+      "type": "EXPENSE"
     },
     {
       "id": 12,
       "name": "Travel",
-      "emoji": "✈️"
+      "emoji": "✈️",
+      "type": "EXPENSE"
     },
     {
       "id": 13,
       "name": "Pets",
-      "emoji": "🐾"
+      "emoji": "🐾",
+      "type": "EXPENSE"
     },
     {
       "id": 14,
       "name": "Subscriptions",
-      "emoji": "📺"
+      "emoji": "📺",
+      "type": "EXPENSE"
     },
     {
       "id": 15,
       "name": "Other",
-      "emoji": "\uD83E\uDDF0"
+      "emoji": "🧰",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 16,
+      "name": "Salary",
+      "emoji": "💼",
+      "type": "INCOME"
+    },
+    {
+      "id": 17,
+      "name": "Freelance",
+      "emoji": "💻",
+      "type": "INCOME"
+    },
+    {
+      "id": 18,
+      "name": "Investment",
+      "emoji": "📈",
+      "type": "INCOME"
+    },
+    {
+      "id": 19,
+      "name": "Gift Received",
+      "emoji": "🎁",
+      "type": "INCOME"
+    },
+    {
+      "id": 20,
+      "name": "Business",
+      "emoji": "🏪",
+      "type": "INCOME"
+    },
+    {
+      "id": 21,
+      "name": "Bonus",
+      "emoji": "💵",
+      "type": "INCOME"
     }
   ]
 }

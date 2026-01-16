@@ -36,7 +36,7 @@ import timber.log.Timber
         Account::class,
         AccountGroup::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class CashFlowDatabase : RoomDatabase() {
@@ -60,7 +60,7 @@ abstract class CashFlowDatabase : RoomDatabase() {
                     CashFlowDatabase::class.java,
                     "cashflow.db"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
@@ -91,7 +91,8 @@ abstract class CashFlowDatabase : RoomDatabase() {
                                 id = item.getInt("id"),
                                 name = item.getString("name"),
                                 emoji = item.getString("emoji"),
-                                color = Helper.randomColor().toArgb()
+                                color = Helper.randomColor().toArgb(),
+                                type = item.optString("type", "EXPENSE")
                             )
                         )
                     }
@@ -192,6 +193,35 @@ abstract class CashFlowDatabase : RoomDatabase() {
                 
                 // Step 5: Create the unique index on categoryId
                 db.execSQL("CREATE UNIQUE INDEX index_budget_categoryId ON budget(categoryId)")
+            }
+        }
+
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Step 1: Add type column with default value EXPENSE
+                db.execSQL("ALTER TABLE category ADD COLUMN type TEXT NOT NULL DEFAULT 'EXPENSE'")
+
+                // Step 2: Update existing "Income" category (ID 1) to INCOME type
+                db.execSQL("UPDATE category SET type = 'INCOME' WHERE id = 1")
+
+                // Step 3: Insert new income categories
+                val incomeCategories = listOf(
+                    "INSERT INTO category (id, name, emoji, color, type) VALUES (16, 'Salary', '💼', ${Helper.randomColor().toArgb()}, 'INCOME')",
+                    "INSERT INTO category (id, name, emoji, color, type) VALUES (17, 'Freelance', '💻', ${Helper.randomColor().toArgb()}, 'INCOME')",
+                    "INSERT INTO category (id, name, emoji, color, type) VALUES (18, 'Investment', '📈', ${Helper.randomColor().toArgb()}, 'INCOME')",
+                    "INSERT INTO category (id, name, emoji, color, type) VALUES (19, 'Gift Received', '🎁', ${Helper.randomColor().toArgb()}, 'INCOME')",
+                    "INSERT INTO category (id, name, emoji, color, type) VALUES (20, 'Business', '🏪', ${Helper.randomColor().toArgb()}, 'INCOME')",
+                    "INSERT INTO category (id, name, emoji, color, type) VALUES (21, 'Bonus', '💵', ${Helper.randomColor().toArgb()}, 'INCOME')"
+                )
+
+                incomeCategories.forEach { sql ->
+                    try {
+                        db.execSQL(sql)
+                    } catch (e: Exception) {
+                        // Category might already exist, skip
+                        Timber.e("Migration 2->3: ${e.message}")
+                    }
+                }
             }
         }
     }

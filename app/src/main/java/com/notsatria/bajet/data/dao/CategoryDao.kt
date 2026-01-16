@@ -18,6 +18,9 @@ interface CategoryDao {
     @Query("SELECT * FROM category")
     fun getCategories(): Flow<List<Category>>
 
+    @Query("SELECT * FROM category WHERE type = :type")
+    fun getCategoriesByType(type: String): Flow<List<Category>>
+
     @Delete
     fun deleteCategory(category: Category)
 

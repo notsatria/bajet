@@ -1,6 +1,5 @@
 package com.notsatria.bajet.ui.screen.settings
 
-import android.content.Context
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -189,7 +188,6 @@ fun SettingScreen(
     settings: List<SettingGroup>,
     reminderEnabled: MutableState<Boolean> = mutableStateOf(false),
     selectedReminderTime: MutableState<String> = mutableStateOf("09:00"),
-    context: Context = LocalContext.current,
     onAction: (SettingAction) -> Unit = {}
 ) {
     Scaffold(modifier = modifier, topBar = {
@@ -518,6 +516,24 @@ fun ReminderTimePickerDialog(
 @Preview
 @Composable
 fun SettingScreenPreview() {
+    BajetTheme {
+        SettingScreen(settings = getSettings("1.0.0-preview"))
+    }
+}
+
+// preview for small device
+@Preview(widthDp = 320, heightDp = 640)
+@Composable
+fun SettingScreenSmallPreview() {
+    BajetTheme {
+        SettingScreen(settings = getSettings("1.0.0-preview"))
+    }
+}
+
+// preview for smaller device (320dp) (720x1280)
+@Preview(widthDp = 320, heightDp = 720)
+@Composable
+fun SettingScreenSmallerPreview() {
     BajetTheme {
         SettingScreen(settings = getSettings("1.0.0-preview"))
     }

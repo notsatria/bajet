@@ -61,6 +61,7 @@ import com.notsatria.bajet.ui.components.CurrencyTextField
 import com.notsatria.bajet.ui.screen.category.CategoriesViewModel
 import com.notsatria.bajet.ui.screen.category.CategoryManagementScreen
 import com.notsatria.bajet.ui.theme.BajetTheme
+import com.notsatria.bajet.utils.CategoryType
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import java.util.Calendar
@@ -89,7 +90,11 @@ fun AddCashFlowRoute(
     val accounts by viewModel.accounts.collectAsState()
 
     LaunchedEffect(categories) {
-        categoryViewModel.getCategories()
+        val categoryType = if (viewModel.addCashFlowData.selectedCashflowTypeIndex == 0)
+            CategoryType.INCOME.name
+        else
+            CategoryType.EXPENSE.name
+        categoryViewModel.getCategories(categoryType)
     }
 
     AddCashFlowScreen(
@@ -146,7 +151,12 @@ fun AddCashFlowScreen(
     onAddCashFlowClicked: () -> Unit = {},
     onAccountSelected: (Account) -> Unit = {}
 ) {
-    if (uiState.shouldShowCategoryDialog.value)
+    if (uiState.shouldShowCategoryDialog.value) {
+        val categoryType = if (uiState.uiData.selectedCashflowTypeIndex == 0)
+            CategoryType.INCOME.name
+        else
+            CategoryType.EXPENSE.name
+            
         CategoryManagementScreen(
             categories = uiState.categories,
             shouldShowCategoryDialog = uiState.shouldShowCategoryDialog,
@@ -154,6 +164,7 @@ fun AddCashFlowScreen(
                 onCategorySelected(category)
                 uiState.shouldShowCategoryDialog.value = false
             })
+    }
 
     if (uiState.shouldShowDatePickerDialog.value) CashFlowDatePickerDialog(
         shouldShowDialog = uiState.shouldShowDatePickerDialog,
@@ -213,22 +224,17 @@ fun AddCashFlowScreen(
                         )
                     }
                 }
-                if (uiState.expensesCategory) Spacer(modifier = Modifier.height(12.dp))
-                AnimatedVisibility(
-                    visible = uiState.expensesCategory
-                ) {
-                    // check if its edit cashflow and category is not income and expenses
-                    ClickableTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = stringResource(R.string.category),
-                        value = if (onEditAndIncomeAndExpensesCategory) "" else uiState.uiData.categoryText,
-                        readOnly = false,
-                        onClick = {
-                            uiState.shouldShowCategoryDialog.value = true
-                        },
-                    )
-                }
-                if (!uiState.expensesCategory) Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+                ClickableTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = stringResource(R.string.category),
+                    value = if (onEditAndIncomeAndExpensesCategory) "" else uiState.uiData.categoryText,
+                    readOnly = false,
+                    onClick = {
+                        uiState.shouldShowCategoryDialog.value = true
+                    },
+                )
+                Spacer(modifier = Modifier.height(12.dp))
                 CurrencyTextField(
                     modifier = Modifier.fillMaxWidth(),
                     amount = uiState.uiData.amount,

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface CategoryRepository {
     suspend fun insertCategory(category: Category)
     fun getCategories(): Flow<List<Category>>
+    fun getCategoriesByType(type: String): Flow<List<Category>>
     suspend fun deleteCategory(category: Category)
     suspend fun updateCategory(category: Category)
 }
@@ -18,6 +19,8 @@ class CategoryRepositoryImpl(private val categoryDao: CategoryDao) : CategoryRep
     }
 
     override fun getCategories(): Flow<List<Category>> = categoryDao.getCategories()
+
+    override fun getCategoriesByType(type: String): Flow<List<Category>> = categoryDao.getCategoriesByType(type)
 
     override suspend fun deleteCategory(category: Category) = categoryDao.deleteCategory(category)
 

@@ -14,10 +14,14 @@ Date: 14 Jan 2026
 Next Improvements (Urgent):
 - [x] UI add transaction itu tidak bisa scroll
 - [x] Tambahkan line untuk field description di add transaction
-- [] Kategori untuk pemasukan
+- [x] Kategori untuk pemasukan
+- [] Improve beberapa elemen untuk dark mode
+- [] Improve swipe on dismiss di list transaksi
+- [] Emoji picker lebih proper
 - [] Tambahkan fitur search di list transaksi
 - [] Tambahkan fitur filter di list transaksi (filter by kategori, tanggal, nominal)
 - [] Ganti Akun menjadi dompet
+- [] Ada smal device yang tidak bisa scroll di halaman SettingScreen
 
 Next Improvements (Not Urgent):
 - [] Reminder kalo budget exceeded
