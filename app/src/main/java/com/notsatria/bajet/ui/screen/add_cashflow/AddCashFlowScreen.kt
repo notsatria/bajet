@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -46,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -213,10 +215,8 @@ fun AddCashFlowScreen(
                 }
                 if (uiState.expensesCategory) Spacer(modifier = Modifier.height(12.dp))
                 AnimatedVisibility(
-                    visible = uiState.expensesCategory,
-                    modifier = Modifier.clickable {
-                        uiState.shouldShowCategoryDialog.value = true
-                    }) {
+                    visible = uiState.expensesCategory
+                ) {
                     // check if its edit cashflow and category is not income and expenses
                     ClickableTextField(
                         modifier = Modifier.fillMaxWidth(),
@@ -257,7 +257,8 @@ fun AddCashFlowScreen(
                     value = uiState.uiData.note,
                     onValueChange = { note -> onUpdateNote(note) },
                     label = stringResource(R.string.note),
-                    minLines = 1
+                    minLines = 3,
+                    maxLines = 3
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(
@@ -347,8 +348,14 @@ fun AccountListDialog(
 fun CashFlowTypeRadioButton(
     modifier: Modifier = Modifier, type: String, onClick: () -> Unit = {}, selected: Boolean = false
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-        RadioButton(selected = selected, onClick = { onClick() })
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .selectable(selected = selected, onClick = onClick, role = Role.RadioButton)
+    ) {
+        RadioButton(selected = selected, onClick = null)
+        Spacer(modifier = Modifier.padding(4.dp))
         Text(text = type)
     }
 }

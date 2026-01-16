@@ -37,7 +37,7 @@ fun ClickableTextField(
 
             override suspend fun emit(interaction: Interaction) {
                 when (interaction) {
-                    is PressInteraction.Press -> {
+                    is PressInteraction.Release -> {
                         onClick()
                     }
                 }

@@ -9,11 +9,19 @@ Date: 14 Jan 2026
 - [x]  Custom Daily Reminder
   - [x] Update UI untuk setting reminder
   - [x] Implementasi logika reminder harian
-  - [] On boot receiver untuk set ulang reminder
+  - [x] On boot receiver untuk set ulang reminder
 
-Next Improvements: 
+Next Improvements (Urgent):
+- [x] UI add transaction itu tidak bisa scroll
+- [x] Tambahkan line untuk field description di add transaction
+- [] Kategori untuk pemasukan
+- [] Tambahkan fitur search di list transaksi
+- [] Tambahkan fitur filter di list transaksi (filter by kategori, tanggal, nominal)
+- [] Ganti Akun menjadi dompet
+
+Next Improvements (Not Urgent):
 - [] Reminder kalo budget exceeded
-- [] UI add transaction itu tidak bisa scroll
-- [] Tambahkan line untuk field description di add transaction
 - [] Tambahkan fitur export data transaksi ke CSV
 - [] Tambahkan fitur automatic backup data ke google drive
+- [] In App Update
+- [] Ui update
