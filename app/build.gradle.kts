@@ -17,8 +17,8 @@ android {
         applicationId = "com.notsatria.bajet"
         minSdk = 24
         targetSdk = 36
-        versionCode = 6
-        versionName = "1.2.2-beta"
+        versionCode = 7
+        versionName = "1.3.2-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -116,4 +116,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
+
+    // Play In-App Update
+    implementation(libs.app.update)
+    implementation(libs.app.update.ktx)
 }

@@ -29,3 +29,4 @@ Next Improvements (Not Urgent):
 - [] Tambahkan fitur automatic backup data ke google drive
 - [] In App Update
 - [] Ui update
+- [] Tambahkan proguard untuk release build
