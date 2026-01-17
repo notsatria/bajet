@@ -237,3 +237,24 @@ fun HomeScreenEmptyListPreview() {
         )
     }
 }
+
+// dark mode preview
+@Preview()
+@Composable
+fun HomeScreenDarkPreview() {
+    BajetTheme {
+        HomeScreen(
+            uiState = HomeUiState(
+                cashFlowSummary = CashFlowSummary(
+                    income = 20000.0,
+                    expenses = -40000.0,
+                    balance = -20000.0
+                ),
+                groupedCashflowAndCategory = DummyData.cashflowWithCategories.sortedByDescending { it.cashFlow.date }
+                    .groupBy { it.cashFlow.date.formatDateTo(DateUtils.formatDate1) },
+                selectedMonth = Calendar.getInstance()
+            ),
+            snackbarHostState = SnackbarHostState()
+        )
+    }
+}

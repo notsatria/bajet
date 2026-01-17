@@ -1,5 +1,6 @@
 package com.notsatria.bajet.ui.screen.home
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -227,10 +228,11 @@ fun DailyCashFlowItemRow(
             )
             if (cashFlow.cashFlow.note.isNotEmpty()) Text(
                 text = cashFlow.cashFlow.note,
-                color = MaterialTheme.colorScheme.outlineVariant,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                fontSize = 12.sp
+                fontSize = 12.sp,
+                lineHeight = 1.sp
             )
         }
         Text(
@@ -242,7 +244,7 @@ fun DailyCashFlowItemRow(
 }
 
 
-@Preview
+@Preview()
 @Composable
 fun DailyCashFlowCardItemPreview() {
     BajetTheme {
@@ -260,6 +262,19 @@ fun DailyCashFlowCardItemPreview() {
 @Preview
 @Composable
 fun DailyCashFlowItemRowPreview() {
+    BajetTheme {
+        DailyCashFlowItemRow(
+            modifier = Modifier,
+            cashFlow = DummyData.cashflowWithCategories[0].toDomain(),
+            emoji = "💰",
+            categoryColor = Helper.randomColor(alpha = 130).toArgb()
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Composable
+fun DailyCashFlowItemRowDarkPreview() {
     BajetTheme {
         DailyCashFlowItemRow(
             modifier = Modifier,
