@@ -1,6 +1,5 @@
 package com.notsatria.bajet.ui.screen.add_cashflow
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -229,7 +228,7 @@ fun AddCashFlowScreen(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = stringResource(R.string.category),
                     value = if (onEditAndIncomeAndExpensesCategory) "" else uiState.uiData.categoryText,
-                    readOnly = false,
+                    readOnly = true,
                     onClick = {
                         uiState.shouldShowCategoryDialog.value = true
                     },
@@ -245,7 +244,7 @@ fun AddCashFlowScreen(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.uiData.date.formatDateTo(format = DateUtils.formatDate4),
                     placeholder = stringResource(R.string.date),
-                    readOnly = false,
+                    readOnly = true,
                     onClick = {
                         uiState.shouldShowDatePickerDialog.value = true
                     })
@@ -253,7 +252,7 @@ fun AddCashFlowScreen(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.uiData.selectedAccount.name,
                     placeholder = stringResource(R.string.account),
-                    readOnly = false,
+                    readOnly = true,
                     onClick = {
                         uiState.showAccountDialog.value = true
                     }
