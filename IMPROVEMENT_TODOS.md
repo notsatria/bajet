@@ -22,13 +22,14 @@ Next Improvements (Urgent):
 - [x] Improve beberapa elemen untuk dark mode
 - [] Improve swipe on dismiss di list transaksi
 - [] Emoji picker lebih proper
-- [] Tambahkan fitur search di list transaksi
+- [x] Tambahkan fitur search di list transaksi
 - [] Tambahkan fitur filter di list transaksi (filter by kategori, tanggal, nominal)
 - [] Ganti Akun menjadi dompet
 - [] Ada smal device yang tidak bisa scroll di halaman SettingScreen
 - [] Category bisa keubah ke bahasa indonesia
 - [] Add hapus akun
 - [] Contrast text di dark mode analytics
+- [] Ketika permissison untuk alarm manager belum aktif, tolong buat dialog yang menjelaskan kenapa butuh permission itu
 
 Next Improvements (Not Urgent):
 - [] Reminder kalo budget exceeded

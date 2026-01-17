@@ -15,6 +15,7 @@ interface CashFlowRepository {
     fun getCashFlowSummary(startDate: Long, endDate: Long): Flow<CashFlowSummary>
     fun insertCashFlow(cashFlow: CashFlow)
     suspend fun deleteCashFlow(cashFlow: CashFlow)
+    fun searchCashFlows(query: String): Flow<List<CashFlowAndCategory>>
 }
 
 class CashFlowRepositoryImpl(private val dao: CashFlowDao) : CashFlowRepository {
@@ -35,4 +36,7 @@ class CashFlowRepositoryImpl(private val dao: CashFlowDao) : CashFlowRepository 
     override suspend fun deleteCashFlow(cashFlow: CashFlow) {
         dao.deleteCashFlow(cashFlow)
     }
+
+    override fun searchCashFlows(query: String): Flow<List<CashFlowAndCategory>> =
+        dao.searchCashFlows(query)
 }

@@ -82,6 +82,12 @@
     <string name="please_select_a_category">Pilih kategori</string>
     <string name="failed_to_add_cashflow">Gagal menambahkan transaksi</string>
     <string name="failed_to_update_cashflow">Gagal mengubah transaksi</string>
+    <string name="search">Cari</string>
+    <string name="search_by_category_or_note">Cari berdasarkan kategori atau catatan</string>
+    <string name="clear">Bersihkan</string>
+    <string name="start_typing_to_search">Mulai ketik untuk mencari</string>
+    <string name="no_results_found">Hasil tidak ditemukan</string>
+    <string name="results_found">hasil ditemukan</string>
 
     <string-array name="settings_title">
         <item>@string/configuration</item>

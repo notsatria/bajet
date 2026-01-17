@@ -28,6 +28,7 @@ import com.notsatria.bajet.ui.screen.budget.add_budget.AddBudgetRoute
 import com.notsatria.bajet.ui.screen.budget.edit_budget.EditBudgetRoute
 import com.notsatria.bajet.ui.screen.budget.setting.BudgetSettingRoute
 import com.notsatria.bajet.ui.screen.home.HomeRoute
+import com.notsatria.bajet.ui.screen.search.SearchRoute
 import com.notsatria.bajet.ui.screen.settings.SettingRoute
 
 @Composable
@@ -87,8 +88,12 @@ fun BajetApp(
                     modifier = Modifier.padding(innerPadding),
                     navigateToAddCashFlowScreen = {
                         navController.navigate(Screen.AddCashFlow)
-                    }, navigateToEditCashFlowScreen = { cashFlowId ->
+                    }, 
+                    navigateToEditCashFlowScreen = { cashFlowId ->
                         navController.navigate(Screen.EditCashFlow(cashFlowId))
+                    },
+                    navigateToSearchScreen = {
+                        navController.navigate(Screen.Search)
                     }
                 )
             }
@@ -141,6 +146,14 @@ fun BajetApp(
             }
             composable<Screen.Settings> {
                 SettingRoute()
+            }
+            composable<Screen.Search> {
+                SearchRoute(
+                    navigateBack = { navController.navigateUp() },
+                    navigateToEditCashFlow = { cashFlowId ->
+                        navController.navigate(Screen.EditCashFlow(cashFlowId))
+                    }
+                )
             }
         }
 

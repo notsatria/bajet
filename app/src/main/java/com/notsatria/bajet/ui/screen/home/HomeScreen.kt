@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +51,7 @@ fun HomeRoute(
     modifier: Modifier = Modifier,
     navigateToAddCashFlowScreen: () -> Unit = {},
     navigateToEditCashFlowScreen: (Int) -> Unit = {},
+    navigateToSearchScreen: () -> Unit = {},
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scope: CoroutineScope = rememberCoroutineScope(),
     context: Context = LocalContext.current,
@@ -89,6 +91,7 @@ fun HomeRoute(
         modifier = modifier,
         navigateToAddCashFlowScreen = navigateToAddCashFlowScreen,
         navigateToEditCashFlowScreen = navigateToEditCashFlowScreen,
+        navigateToSearchScreen = navigateToSearchScreen,
         snackbarHostState = snackbarHostState,
         uiState = uiState,
         setActions = { action ->
@@ -102,6 +105,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     navigateToAddCashFlowScreen: () -> Unit = {},
     navigateToEditCashFlowScreen: (Int) -> Unit = {},
+    navigateToSearchScreen: () -> Unit = {},
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     uiState: HomeUiState = HomeUiState(),
     setActions: (HomeAction) -> Unit = {},
@@ -140,7 +144,8 @@ fun HomeScreen(
                         },
                         onNextMonthClick = {
                             setActions(HomeAction.NextMonth)
-                        }
+                        },
+                        onSearchClick = navigateToSearchScreen
                     )
                 if (uiState.groupedCashflowAndCategory.isEmpty()) {
                     EmptyView(

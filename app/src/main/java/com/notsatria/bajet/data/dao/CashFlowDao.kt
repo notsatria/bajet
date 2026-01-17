@@ -132,4 +132,16 @@ interface CashFlowDao {
         endDate: Long,
         expenses: String = CashFlowType.EXPENSES
     ): Flow<Double>
+
+    @Transaction
+    @Query(
+        """
+        SELECT cashflow.* FROM cashflow 
+        INNER JOIN category ON cashflow.categoryId = category.id
+        WHERE category.name LIKE '%' || :query || '%' 
+           OR cashflow.note LIKE '%' || :query || '%'
+        ORDER BY cashflow.date DESC
+    """
+    )
+    fun searchCashFlows(query: String): Flow<List<CashFlowAndCategory>>
 }

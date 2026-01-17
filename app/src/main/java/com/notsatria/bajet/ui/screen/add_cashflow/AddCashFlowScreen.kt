@@ -205,9 +205,6 @@ fun AddCashFlowScreen(
         showDialog = uiState.showAccountDialog
     )
 
-    val onEditAndIncomeAndExpensesCategory =
-        (uiState.cashFlowIdExists && uiState.uiData.categoryId == 0) || uiState.uiData.categoryId == 1
-
     Scaffold(modifier, containerColor = MaterialTheme.colorScheme.background, topBar = {
         AddCashFlowTopAppBar(
             navigateBack,
@@ -246,7 +243,7 @@ fun AddCashFlowScreen(
                 ClickableTextField(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = stringResource(R.string.category),
-                    value = if (onEditAndIncomeAndExpensesCategory) "" else uiState.uiData.categoryText,
+                    value = uiState.uiData.categoryText,
                     readOnly = true,
                     onClick = {
                         uiState.shouldShowCategoryDialog.value = true

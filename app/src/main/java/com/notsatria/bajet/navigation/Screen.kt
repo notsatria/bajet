@@ -39,4 +39,7 @@ sealed class Screen() {
 
     @Serializable
     data object AddAccount : Screen()
+
+    @Serializable
+    data object Search : Screen()
 }

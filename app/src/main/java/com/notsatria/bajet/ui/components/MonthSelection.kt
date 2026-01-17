@@ -21,11 +21,12 @@ import java.util.Calendar
 
 @Composable
 fun MonthSelection(
+    modifier: Modifier = Modifier,
     selectedMonth: Calendar,
     onPreviousMonthClick: () -> Unit,
     onNextMonthClick: () -> Unit
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onPreviousMonthClick) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
