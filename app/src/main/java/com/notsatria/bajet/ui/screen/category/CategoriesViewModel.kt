@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.data.repository.CategoryRepository
+import com.notsatria.bajet.utils.CategoryType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,6 +48,12 @@ class CategoriesViewModel @Inject constructor(private val categoryRepository: Ca
 
     private val _uiEvent = Channel<CategoriesUiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
+    
+    // Track current category type for new category insertion
+    private var currentCategoryType: String = CategoryType.EXPENSE.name
+    
+    // Job for cancelling previous category collection
+    private var categoriesJob: Job? = null
 
     fun updateCategoryName(value: String) {
         i("updateCategoryName: $value")
@@ -80,7 +88,11 @@ class CategoriesViewModel @Inject constructor(private val categoryRepository: Ca
                 } else {
                     splittedName.last()
                 }
-                val category = Category(name = cleanedName, emoji = currentEmoji)
+                val category = Category(
+                    name = cleanedName, 
+                    emoji = currentEmoji,
+                    type = currentCategoryType
+                )
 
                 withContext(Dispatchers.IO) {
                     categoryRepository.insertCategory(category)
@@ -134,8 +146,14 @@ class CategoriesViewModel @Inject constructor(private val categoryRepository: Ca
     }
 
     // get categories and filter not income and expenses
+    var getCategoriesJob: Job? = null
     fun getCategories(type: String? = null) {
-        viewModelScope.launch {
+        getCategoriesJob?.cancel()
+        // Store type for new category insertion
+        if (type != null) {
+            currentCategoryType = type
+        }
+        getCategoriesJob = viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
                     val flow = if (type != null) {
@@ -143,7 +161,7 @@ class CategoriesViewModel @Inject constructor(private val categoryRepository: Ca
                     } else {
                         categoryRepository.getCategories()
                     }
-                    
+
                     flow.collect { categories ->
                         withContext(Dispatchers.Main) {
                             _categories.value = categories.filter { category ->

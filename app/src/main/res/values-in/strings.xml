@@ -79,6 +79,9 @@
     <string name="budget_updated_successfully">Anggaran berhasil diperbarui.</string>
     <string name="budget_added_successfully">Anggaran berhasil ditambahkan.</string>
     <string name="failed_to_add_budget_please_try_again">Gagal menambahkan anggaran. Coba lagi.</string>
+    <string name="please_select_a_category">Pilih kategori</string>
+    <string name="failed_to_add_cashflow">Gagal menambahkan transaksi</string>
+    <string name="failed_to_update_cashflow">Gagal mengubah transaksi</string>
 
     <string-array name="settings_title">
         <item>@string/configuration</item>

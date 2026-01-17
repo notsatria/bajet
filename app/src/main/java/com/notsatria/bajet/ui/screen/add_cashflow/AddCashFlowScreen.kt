@@ -1,5 +1,7 @@
 package com.notsatria.bajet.ui.screen.add_cashflow
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +47,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -70,30 +73,47 @@ fun AddCashFlowRoute(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
     viewModel: AddCashFlowViewModel = hiltViewModel(),
-    categoryViewModel: CategoriesViewModel = hiltViewModel()
+    categoryViewModel: CategoriesViewModel = hiltViewModel(),
+    context: Context = LocalContext.current
 ) {
     val shouldShowCategoryDialog = rememberSaveable { mutableStateOf(false) }
     val shouldShowDatePickerDialog = rememberSaveable { mutableStateOf(false) }
     val showAccountDialog = rememberSaveable { mutableStateOf(false) }
+    val uiData = viewModel.addCashFlowData
+    val uiEvent by viewModel.uiEvent.collectAsState(AddCashFlowEvent.Initial)
     val expensesCategory by remember {
-        derivedStateOf { viewModel.addCashFlowData.selectedCashflowTypeIndex == 1 }
+        derivedStateOf { uiData.selectedCashflowTypeIndex == CategoryType.EXPENSE.ordinal }
     }
     val fieldsEmpty by remember {
         derivedStateOf {
-            viewModel.validateFields(expensesCategory)
+            viewModel.validateFields()
         }
     }
-    val uiData = viewModel.addCashFlowData
     val cashFlowIdExists = viewModel.cashFlowId != -1
     val categories by categoryViewModel.categories.collectAsState()
     val accounts by viewModel.accounts.collectAsState()
 
-    LaunchedEffect(categories) {
-        val categoryType = if (viewModel.addCashFlowData.selectedCashflowTypeIndex == 0)
+    LaunchedEffect(uiData.selectedCashflowTypeIndex) {
+        val categoryType = if (uiData.selectedCashflowTypeIndex == CategoryType.INCOME.ordinal)
             CategoryType.INCOME.name
         else
             CategoryType.EXPENSE.name
         categoryViewModel.getCategories(categoryType)
+    }
+
+    LaunchedEffect(uiEvent) {
+        when (uiEvent) {
+            is AddCashFlowEvent.ShowError -> {
+                val messageRes = (uiEvent as AddCashFlowEvent.ShowError).messageRes
+                Toast.makeText(context, messageRes, Toast.LENGTH_SHORT).show()
+            }
+            AddCashFlowEvent.Success -> {
+                navigateBack()
+            }
+            AddCashFlowEvent.Initial -> {
+                // No action needed
+            }
+        }
     }
 
     AddCashFlowScreen(
@@ -129,7 +149,6 @@ fun AddCashFlowRoute(
         onAddCashFlowClicked = {
             if (cashFlowIdExists) viewModel.updateCashFlow(viewModel.cashFlowId)
             else viewModel.insertCashFlow()
-            navigateBack()
         },
         onAccountSelected = { account ->
             viewModel.updateAccountId(account)
@@ -151,11 +170,11 @@ fun AddCashFlowScreen(
     onAccountSelected: (Account) -> Unit = {}
 ) {
     if (uiState.shouldShowCategoryDialog.value) {
-        val categoryType = if (uiState.uiData.selectedCashflowTypeIndex == 0)
+        val categoryType = if (uiState.uiData.selectedCashflowTypeIndex == CategoryType.INCOME.ordinal)
             CategoryType.INCOME.name
         else
             CategoryType.EXPENSE.name
-            
+
         CategoryManagementScreen(
             categories = uiState.categories,
             shouldShowCategoryDialog = uiState.shouldShowCategoryDialog,
@@ -187,7 +206,7 @@ fun AddCashFlowScreen(
     )
 
     val onEditAndIncomeAndExpensesCategory =
-        uiState.cashFlowIdExists && uiState.uiData.categoryId == 0 || uiState.uiData.categoryId == 1
+        (uiState.cashFlowIdExists && uiState.uiData.categoryId == 0) || uiState.uiData.categoryId == 1
 
     Scaffold(modifier, containerColor = MaterialTheme.colorScheme.background, topBar = {
         AddCashFlowTopAppBar(

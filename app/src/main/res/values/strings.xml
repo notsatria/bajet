@@ -79,6 +79,9 @@
     <string name="budget_updated_successfully">Budget updated successfully.</string>
     <string name="budget_added_successfully">Budget added.</string>
     <string name="failed_to_add_budget_please_try_again">Failed to add budget. Please try again.</string>
+    <string name="please_select_a_category">Please select a category</string>
+    <string name="failed_to_add_cashflow">Failed to add cashflow</string>
+    <string name="failed_to_update_cashflow">Failed to update cashflow</string>
 
     <string-array name="settings_title">
         <item>@string/configuration</item>

@@ -12,7 +12,8 @@ Date: 14 Jan 2026
   - [x] On boot receiver untuk set ulang reminder
 
 (Critical) Bug Fixes:
-- [] Fix reset category di add dan edit transaction
+- [x] Fix reset category di add dan edit transaction
+- [x] Handle better ui state di add transaction
 
 Next Improvements (Urgent):
 - [x] UI add transaction itu tidak bisa scroll
