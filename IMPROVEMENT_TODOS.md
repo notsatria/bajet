@@ -38,3 +38,7 @@ Next Improvements (Not Urgent):
 - [] In App Update
 - [] Ui update
 - [] Tambahkan proguard untuk release build
+
+# Agenda Today
+- [] Fix 16kb page size requirements
+- [] Ganti Terms "Akun" menjadi "Dompet"

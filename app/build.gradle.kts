@@ -17,8 +17,8 @@ android {
         applicationId = "com.notsatria.bajet"
         minSdk = 24
         targetSdk = 36
-        versionCode = 7
-        versionName = "1.3.3-beta"
+        versionCode = 10
+        versionName = "0.3.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -53,11 +53,20 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+        dex {
+            useLegacyPackaging = false
+        }
     }
     lint {
         disable += "RememberReturnType"
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
+
 
 dependencies {
 
