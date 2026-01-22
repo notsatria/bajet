@@ -2,12 +2,12 @@ package com.notsatria.bajet.data.repository
 
 import com.notsatria.bajet.data.dao.CashFlowDao
 import com.notsatria.bajet.data.entities.CashFlow
-import com.notsatria.bajet.data.entities.relation.CashFlowWithCategoryAndAccount
+import com.notsatria.bajet.data.entities.relation.CashFlowWithCategoryAndWallet
 
 interface AddCashFlowRepository {
     fun insertCashFlow(cashFlow: CashFlow)
     suspend fun updateCashFlow(cashFlow: CashFlow)
-    suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowWithCategoryAndAccount
+    suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowWithCategoryAndWallet
 }
 
 class AddCashFlowRepositoryImpl(private val cashFlowDao: CashFlowDao) : AddCashFlowRepository {

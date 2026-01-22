@@ -2,11 +2,11 @@ package com.notsatria.bajet.data.entities.relation
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.notsatria.bajet.data.entities.Account
+import com.notsatria.bajet.data.entities.Wallet
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.domain.CashFlowAndCategoryDomain
-import com.notsatria.bajet.ui.domain.CashFlowWithCategoryAndAccountDomain
+import com.notsatria.bajet.ui.domain.CashFlowWithCategoryAndWalletDomain
 
 data class CashFlowAndCategory(
     @Embedded val cashFlow: CashFlow,
@@ -25,7 +25,7 @@ data class CashFlowAndCategory(
     }
 }
 
-data class CashFlowWithCategoryAndAccount(
+data class CashFlowWithCategoryAndWallet(
     @Embedded val cashFlow: CashFlow,
 
     @Relation(
@@ -35,16 +35,16 @@ data class CashFlowWithCategoryAndAccount(
     val category: Category,
 
     @Relation(
-        parentColumn = "accountId",
+        parentColumn = "walletId",
         entityColumn = "id"
     )
-    val account: Account
+    val wallet: Wallet
 ) {
-    fun toDomain(): CashFlowWithCategoryAndAccountDomain {
-        return CashFlowWithCategoryAndAccountDomain(
+    fun toDomain(): CashFlowWithCategoryAndWalletDomain {
+        return CashFlowWithCategoryAndWalletDomain(
             cashFlow = this.cashFlow,
             category = this.category,
-            account = this.account,
+            wallet = this.wallet,
             isOptionsRevealed = false
         )
     }

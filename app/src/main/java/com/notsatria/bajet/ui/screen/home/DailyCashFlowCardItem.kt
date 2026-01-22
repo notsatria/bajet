@@ -48,6 +48,7 @@ import com.notsatria.bajet.ui.domain.CashFlowAndCategoryDomain
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.ui.theme.errorLight
 import com.notsatria.bajet.ui.theme.tertiaryContainerLightMediumContrast
+import com.notsatria.bajet.utils.CashFlowType
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import com.notsatria.bajet.utils.DummyData
 import com.notsatria.bajet.utils.Helper
@@ -238,7 +239,7 @@ fun DailyCashFlowItemRow(
         Text(
             text = cashFlow.cashFlow.amount.formatToRupiah(),
             style = MaterialTheme.typography.titleSmall,
-            color = if (cashFlow.cashFlow.categoryId != 1) errorLight else tertiaryContainerLightMediumContrast
+            color = if (cashFlow.cashFlow.type == CashFlowType.EXPENSES) errorLight else tertiaryContainerLightMediumContrast
         )
     }
 }

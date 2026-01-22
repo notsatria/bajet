@@ -1,6 +1,6 @@
 package com.notsatria.bajet.ui.domain
 
-import com.notsatria.bajet.data.entities.Account
+import com.notsatria.bajet.data.entities.Wallet
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.Category
 
@@ -10,9 +10,9 @@ data class CashFlowAndCategoryDomain(
     val isOptionsRevealed: Boolean,
 )
 
-data class CashFlowWithCategoryAndAccountDomain(
+data class CashFlowWithCategoryAndWalletDomain(
     val cashFlow: CashFlow,
     val category: Category,
-    val account: Account,
+    val wallet: Wallet,
     val isOptionsRevealed: Boolean,
 )

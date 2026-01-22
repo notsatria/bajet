@@ -8,14 +8,14 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.notsatria.bajet.R
-import com.notsatria.bajet.data.dao.AccountDao
-import com.notsatria.bajet.data.dao.AccountGroupDao
+import com.notsatria.bajet.data.dao.WalletDao
+import com.notsatria.bajet.data.dao.WalletGroupDao
 import com.notsatria.bajet.data.dao.BudgetDao
 import com.notsatria.bajet.data.dao.BudgetEntryDao
 import com.notsatria.bajet.data.dao.CashFlowDao
 import com.notsatria.bajet.data.dao.CategoryDao
-import com.notsatria.bajet.data.entities.Account
-import com.notsatria.bajet.data.entities.AccountGroup
+import com.notsatria.bajet.data.entities.Wallet
+import com.notsatria.bajet.data.entities.WalletGroup
 import com.notsatria.bajet.data.entities.Budget
 import com.notsatria.bajet.data.entities.BudgetEntry
 import com.notsatria.bajet.data.entities.CashFlow
@@ -33,10 +33,10 @@ import timber.log.Timber
         Category::class,
         Budget::class,
         BudgetEntry::class,
-        Account::class,
-        AccountGroup::class
+        Wallet::class,
+        WalletGroup::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class CashFlowDatabase : RoomDatabase() {
@@ -45,8 +45,8 @@ abstract class CashFlowDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun budgetDao(): BudgetDao
     abstract fun budgetMonthDao(): BudgetEntryDao
-    abstract fun accountDao(): AccountDao
-    abstract fun accountGroupDao(): AccountGroupDao
+    abstract fun walletDao(): WalletDao
+    abstract fun walletGroupDao(): WalletGroupDao
 
     companion object {
 
@@ -60,7 +60,7 @@ abstract class CashFlowDatabase : RoomDatabase() {
                     CashFlowDatabase::class.java,
                     "cashflow.db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
@@ -76,8 +76,8 @@ abstract class CashFlowDatabase : RoomDatabase() {
         private fun prepopulateData(context: Context) {
             val db = getInstance(context)
             prepopulateCategories(context, db.cashFlowDao())
-            prepopulateAccountGroup(context, db.accountGroupDao())
-            prepopulateDefaultAccount(db.accountDao())
+            prepopulateWalletGroup(context, db.walletGroupDao())
+            prepopulateDefaultWallet(db.walletDao())
         }
 
         private fun prepopulateCategories(context: Context, dao: CashFlowDao) {
@@ -102,14 +102,14 @@ abstract class CashFlowDatabase : RoomDatabase() {
             }
         }
 
-        private fun prepopulateAccountGroup(context: Context, dao: AccountGroupDao) {
-            val jsonArray = Helper.loadJsonArray(context, R.raw.account_group, "account_groups")
+        private fun prepopulateWalletGroup(context: Context, dao: WalletGroupDao) {
+            val jsonArray = Helper.loadJsonArray(context, R.raw.wallet_group, "wallet_groups")
             try {
                 if (jsonArray != null) {
                     for (i in 0 until jsonArray.length()) {
                         val item = jsonArray.getJSONObject(i)
                         dao.insert(
-                            AccountGroup(
+                            WalletGroup(
                                 id = item.getInt("id"),
                                 name = item.getString("name")
                             )
@@ -118,13 +118,13 @@ abstract class CashFlowDatabase : RoomDatabase() {
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
-                Timber.e("Error on populateGroupAccounts ${e.message}")
+                Timber.e("Error on populateWalletGroups ${e.message}")
             }
         }
 
-        private fun prepopulateDefaultAccount(dao: AccountDao) {
+        private fun prepopulateDefaultWallet(dao: WalletDao) {
             try {
-                dao.insert(Account(id = 1, name = "Cash", balance = 0.0, groupId = 1))
+                dao.insert(Wallet(id = 1, name = "Cash", balance = 0.0, groupId = 1))
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -222,6 +222,81 @@ abstract class CashFlowDatabase : RoomDatabase() {
                         Timber.e("Migration 2->3: ${e.message}")
                     }
                 }
+            }
+        }
+
+        /**
+         * Migration from version 3 to 4:
+         * Rename "Account" to "Wallet" terminology across all tables
+         * - account_group -> wallet_group
+         * - account -> wallet
+         * - cashflow.accountId -> cashflow.walletId
+         */
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Step 1: Create new wallet_group table
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS wallet_group (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL
+                    )
+                """.trimIndent())
+
+                // Step 2: Copy data from account_group to wallet_group
+                db.execSQL("""
+                    INSERT INTO wallet_group (id, name)
+                    SELECT id, name FROM account_group
+                """.trimIndent())
+
+                // Step 3: Create new wallet table
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS wallet (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        groupId INTEGER NOT NULL,
+                        name TEXT NOT NULL,
+                        balance REAL NOT NULL,
+                        FOREIGN KEY(groupId) REFERENCES wallet_group(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+
+                // Step 4: Copy data from account to wallet
+                db.execSQL("""
+                    INSERT INTO wallet (id, groupId, name, balance)
+                    SELECT id, groupId, name, balance FROM account
+                """.trimIndent())
+
+                // Step 5: Create new cashflow table with walletId instead of accountId
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS cashflow_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        type TEXT NOT NULL,
+                        amount REAL NOT NULL,
+                        note TEXT NOT NULL,
+                        categoryId INTEGER NOT NULL,
+                        date INTEGER NOT NULL,
+                        walletId INTEGER NOT NULL,
+                        FOREIGN KEY(categoryId) REFERENCES category(id) ON DELETE CASCADE,
+                        FOREIGN KEY(walletId) REFERENCES wallet(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+
+                // Step 6: Copy data from cashflow to cashflow_new (accountId -> walletId)
+                db.execSQL("""
+                    INSERT INTO cashflow_new (id, type, amount, note, categoryId, date, walletId)
+                    SELECT id, type, amount, note, categoryId, date, accountId FROM cashflow
+                """.trimIndent())
+
+                // Step 7: Drop old tables
+                db.execSQL("DROP TABLE cashflow")
+                db.execSQL("DROP TABLE account")
+                db.execSQL("DROP TABLE account_group")
+
+                // Step 8: Rename new cashflow table
+                db.execSQL("ALTER TABLE cashflow_new RENAME TO cashflow")
+
+                // Step 9: Create indexes on the new cashflow table
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_cashflow_categoryId ON cashflow(categoryId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_cashflow_walletId ON cashflow(walletId)")
             }
         }
     }

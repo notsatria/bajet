@@ -1,4 +1,4 @@
-package com.notsatria.bajet.ui.screen.account.add_account
+package com.notsatria.bajet.ui.screen.wallet.add_wallet
 
 import android.content.Context
 import android.widget.Toast
@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.notsatria.bajet.R
-import com.notsatria.bajet.data.entities.AccountGroup
+import com.notsatria.bajet.data.entities.WalletGroup
 import com.notsatria.bajet.ui.components.BajetOutlinedTextField
 import com.notsatria.bajet.ui.components.ClickableTextField
 import com.notsatria.bajet.ui.components.CurrencyTextField
@@ -46,39 +46,39 @@ import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.DummyData
 
 @Composable
-fun AddAccountRoute(
+fun AddWalletRoute(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit = {},
-    viewModel: AddAccountViewModel = hiltViewModel(),
+    viewModel: AddWalletViewModel = hiltViewModel(),
     context: Context = LocalContext.current
 ) {
-    val accountGroups by viewModel.accountGroups.collectAsState()
-    val selectedAccountGroup by viewModel.selectedAccountGroup.collectAsState()
+    val walletGroups by viewModel.walletGroups.collectAsState()
+    val selectedWalletGroup by viewModel.selectedWalletGroup.collectAsState()
 
-    AddAccountScreen(
+    AddWalletScreen(
         modifier,
         navigateBack = navigateBack,
-        accountGroups = accountGroups,
-        onAccountGroupClicked = {
-            viewModel.selectedAccountGroup.value = it
+        walletGroups = walletGroups,
+        onWalletGroupClicked = {
+            viewModel.selectedWalletGroup.value = it
         },
-        selectedAccountGroup = selectedAccountGroup,
-        accountName = viewModel.accountName.value,
-        onAccountNameChange = {
-            viewModel.accountName.value = it
+        selectedWalletGroup = selectedWalletGroup,
+        walletName = viewModel.walletName.value,
+        onWalletNameChange = {
+            viewModel.walletName.value = it
         },
         amount = viewModel.amount.value,
         onAmountChange = {
             viewModel.amount.value = it
         },
         onSaveClicked = {
-            if (viewModel.accountName.value.isEmpty()) {
+            if (viewModel.walletName.value.isEmpty()) {
                 Toast.makeText(
                     context,
                     context.getString(R.string.format_field_is_empty, "Name"),
                     Toast.LENGTH_SHORT
                 ).show()
-                return@AddAccountScreen
+                return@AddWalletScreen
             }
             if (viewModel.amount.value.isEmpty()) {
                 Toast.makeText(
@@ -86,10 +86,10 @@ fun AddAccountRoute(
                     context.getString(R.string.format_field_is_empty, "Amount"),
                     Toast.LENGTH_SHORT
                 ).show()
-                return@AddAccountScreen
+                return@AddWalletScreen
             }
 
-            viewModel.insertAccount()
+            viewModel.insertWallet()
             navigateBack()
         }
     )
@@ -97,29 +97,29 @@ fun AddAccountRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddAccountScreen(
+fun AddWalletScreen(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit = {},
-    accountGroups: List<AccountGroup> = emptyList<AccountGroup>(),
-    onAccountGroupClicked: (AccountGroup) -> Unit = {},
-    selectedAccountGroup: AccountGroup,
-    accountName: String = "",
-    onAccountNameChange: (String) -> Unit = {},
+    walletGroups: List<WalletGroup> = emptyList<WalletGroup>(),
+    onWalletGroupClicked: (WalletGroup) -> Unit = {},
+    selectedWalletGroup: WalletGroup,
+    walletName: String = "",
+    onWalletNameChange: (String) -> Unit = {},
     amount: String = "",
     onAmountChange: (String) -> Unit = {},
     onSaveClicked: () -> Unit = {}
 ) {
-    val showAccountGroupListDialog = rememberSaveable { mutableStateOf(false) }
+    val showWalletGroupListDialog = rememberSaveable { mutableStateOf(false) }
 
-    if (showAccountGroupListDialog.value) AccountGroupListDialog(
-        accountGroups = accountGroups,
-        showAccountGroupListDialog = showAccountGroupListDialog,
-        onItemClicked = onAccountGroupClicked
+    if (showWalletGroupListDialog.value) WalletGroupListDialog(
+        walletGroups = walletGroups,
+        showWalletGroupListDialog = showWalletGroupListDialog,
+        onItemClicked = onWalletGroupClicked
     )
 
     Scaffold(modifier, topBar = {
         TopAppBar(title = {
-            Text(stringResource(R.string.add_account))
+            Text(stringResource(R.string.add_wallet))
         }, navigationIcon = {
             IconButton(onClick = navigateBack) {
                 Icon(Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.back))
@@ -135,17 +135,17 @@ fun AddAccountScreen(
                 ClickableTextField(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = stringResource(R.string.group),
-                    value = selectedAccountGroup.name,
+                    value = selectedWalletGroup.name,
                     readOnly = false,
                     onClick = {
-                        showAccountGroupListDialog.value = true
+                        showWalletGroupListDialog.value = true
                     })
                 BajetOutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = accountName,
-                    onValueChange = onAccountNameChange,
+                    value = walletName,
+                    onValueChange = onWalletNameChange,
                     label = stringResource(R.string.name),
-                    isError = accountName.isEmpty(),
+                    isError = walletName.isEmpty(),
                     supportingText = stringResource(R.string.format_field_is_empty, "Name")
                 )
                 Spacer(Modifier.height(16.dp))
@@ -164,23 +164,23 @@ fun AddAccountScreen(
 }
 
 @Composable
-fun AccountGroupListDialog(
+fun WalletGroupListDialog(
     modifier: Modifier = Modifier,
-    accountGroups: List<AccountGroup>,
-    onItemClicked: (AccountGroup) -> Unit = {},
-    showAccountGroupListDialog: MutableState<Boolean> = mutableStateOf(false)
+    walletGroups: List<WalletGroup>,
+    onItemClicked: (WalletGroup) -> Unit = {},
+    showWalletGroupListDialog: MutableState<Boolean> = mutableStateOf(false)
 ) {
     Dialog(onDismissRequest = {
-        showAccountGroupListDialog.value = false
+        showWalletGroupListDialog.value = false
     }) {
         Card(modifier.clip(RoundedCornerShape(16.dp))) {
             LazyColumn(Modifier.padding(vertical = 16.dp)) {
-                items(accountGroups) {
+                items(walletGroups) {
                     Text(
                         it.name, modifier = Modifier
                             .clickable {
                                 onItemClicked(it)
-                                showAccountGroupListDialog.value = false
+                                showWalletGroupListDialog.value = false
                             }
                             .fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 16.dp)
@@ -193,16 +193,16 @@ fun AccountGroupListDialog(
 
 @Preview
 @Composable
-private fun AccountGroupListDialogPreview() {
+private fun WalletGroupListDialogPreview() {
     BajetTheme {
-        AccountGroupListDialog(accountGroups = DummyData.accountGroups)
+        WalletGroupListDialog(walletGroups = DummyData.walletGroups)
     }
 }
 
 @Preview
 @Composable
-fun AddAccountScreenPreview() {
+fun AddWalletScreenPreview() {
     BajetTheme {
-        AddAccountScreen(selectedAccountGroup = AccountGroup(1, "Cash"))
+        AddWalletScreen(selectedWalletGroup = WalletGroup(1, "Cash"))
     }
 }

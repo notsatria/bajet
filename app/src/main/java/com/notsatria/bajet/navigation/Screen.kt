@@ -35,10 +35,10 @@ sealed class Screen() {
     data class EditCashFlow(val cashFlowId: Int = -1) : Screen()
 
     @Serializable
-    data object Account : Screen()
+    data object Wallet : Screen()
 
     @Serializable
-    data object AddAccount : Screen()
+    data object AddWallet : Screen()
 
     @Serializable
     data object Search : Screen()

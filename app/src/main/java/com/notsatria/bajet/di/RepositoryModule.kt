@@ -1,13 +1,13 @@
 package com.notsatria.bajet.di
 
-import com.notsatria.bajet.data.dao.AccountDao
-import com.notsatria.bajet.data.dao.AccountGroupDao
+import com.notsatria.bajet.data.dao.WalletDao
+import com.notsatria.bajet.data.dao.WalletGroupDao
 import com.notsatria.bajet.data.dao.BudgetDao
 import com.notsatria.bajet.data.dao.BudgetEntryDao
 import com.notsatria.bajet.data.dao.CashFlowDao
 import com.notsatria.bajet.data.dao.CategoryDao
-import com.notsatria.bajet.data.repository.AccountRepository
-import com.notsatria.bajet.data.repository.AccountRepositoryImpl
+import com.notsatria.bajet.data.repository.WalletRepository
+import com.notsatria.bajet.data.repository.WalletRepositoryImpl
 import com.notsatria.bajet.data.repository.AddCashFlowRepository
 import com.notsatria.bajet.data.repository.AddCashFlowRepositoryImpl
 import com.notsatria.bajet.data.repository.AnalyticsRepository
@@ -64,11 +64,11 @@ class RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideAccountRepository(
-        accountDao: AccountDao,
-        accountGroupDao: AccountGroupDao
-    ): AccountRepository {
-        return AccountRepositoryImpl(accountDao, accountGroupDao)
+    fun provideWalletRepository(
+        walletDao: WalletDao,
+        walletGroupDao: WalletGroupDao
+    ): WalletRepository {
+        return WalletRepositoryImpl(walletDao, walletGroupDao)
     }
 
 }

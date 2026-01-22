@@ -19,8 +19,8 @@ import com.notsatria.bajet.navigation.BottomNavigationBar
 import com.notsatria.bajet.navigation.Screen
 import com.notsatria.bajet.ui.components.LoadingScreen
 import com.notsatria.bajet.ui.onboarding.OnBoardingRoute
-import com.notsatria.bajet.ui.screen.account.AccountRoute
-import com.notsatria.bajet.ui.screen.account.add_account.AddAccountRoute
+import com.notsatria.bajet.ui.screen.wallet.WalletRoute
+import com.notsatria.bajet.ui.screen.wallet.add_wallet.AddWalletRoute
 import com.notsatria.bajet.ui.screen.add_cashflow.AddCashFlowRoute
 import com.notsatria.bajet.ui.screen.analytics.AnalyticsRoute
 import com.notsatria.bajet.ui.screen.budget.BudgetRoute
@@ -44,7 +44,7 @@ fun BajetApp(
         Screen.Home::class.qualifiedName,
         Screen.Budget::class.qualifiedName,
         Screen.Analytics::class.qualifiedName,
-        Screen.Account::class.qualifiedName,
+        Screen.Wallet::class.qualifiedName,
         Screen.Settings::class.qualifiedName
     )
 
@@ -135,14 +135,14 @@ fun BajetApp(
             composable<Screen.Analytics> {
                 AnalyticsRoute()
             }
-            composable<Screen.Account> {
-                AccountRoute(
-                    modifier = Modifier.padding(innerPadding), navigateToAddAccountScreen = {
-                        navController.navigate(Screen.AddAccount)
+            composable<Screen.Wallet> {
+                WalletRoute(
+                    modifier = Modifier.padding(innerPadding), navigateToAddWalletScreen = {
+                        navController.navigate(Screen.AddWallet)
                     })
             }
-            composable<Screen.AddAccount> {
-                AddAccountRoute(navigateBack = { navController.navigateUp() })
+            composable<Screen.AddWallet> {
+                AddWalletRoute(navigateBack = { navController.navigateUp() })
             }
             composable<Screen.Settings> {
                 SettingRoute()

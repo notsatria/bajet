@@ -8,10 +8,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.notsatria.bajet.R
-import com.notsatria.bajet.data.entities.Account
 import com.notsatria.bajet.data.entities.CashFlow
-import com.notsatria.bajet.data.repository.AccountRepository
+import com.notsatria.bajet.data.entities.Wallet
 import com.notsatria.bajet.data.repository.AddCashFlowRepository
+import com.notsatria.bajet.data.repository.WalletRepository
 import com.notsatria.bajet.utils.CashFlowType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +35,7 @@ data class AddCashFlowData(
     val date: Long = Date().time,
     val categoryId: Int = -1,
     val categoryText: String = "",
-    val selectedAccount: Account = Account(id = 1, groupId = 1, name = "Cash", balance = 0.0),
+    val selectedWallet: Wallet = Wallet(id = 1, groupId = 1, name = "Cash", balance = 0.0),
 ) {
     fun toCashFlow(): CashFlow {
         val finalAmount = try {
@@ -49,7 +49,7 @@ data class AddCashFlowData(
             note = this.note,
             date = this.date,
             categoryId = categoryId,  // Use selected category for both income and expense
-            accountId = selectedAccount.id
+            walletId = selectedWallet.id
         )
     }
 }
@@ -63,7 +63,7 @@ sealed class AddCashFlowEvent {
 @HiltViewModel
 class AddCashFlowViewModel @Inject constructor(
     private val addCashFlowRepository: AddCashFlowRepository,
-    private val accountRepository: AccountRepository,
+    private val walletRepository: WalletRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -96,6 +96,7 @@ class AddCashFlowViewModel @Inject constructor(
     fun updateSelectedCashFlowType(index: Int) {
         // also reset categorytext and categoryId when type changed
         addCashFlowData = addCashFlowData.copy(
+            addCashFlowType = if (index == 0) CashFlowType.INCOME else CashFlowType.EXPENSES,
             selectedCashflowTypeIndex = index,
             categoryId = -1,
             categoryText = ""
@@ -110,8 +111,8 @@ class AddCashFlowViewModel @Inject constructor(
         addCashFlowData = addCashFlowData.copy(categoryText = value)
     }
 
-    fun updateAccountId(account: Account) {
-        addCashFlowData = addCashFlowData.copy(selectedAccount = account)
+    fun updateWalletId(wallet: Wallet) {
+        addCashFlowData = addCashFlowData.copy(selectedWallet = wallet)
     }
 
     var insertCashflowJob: Job? = null
@@ -127,7 +128,7 @@ class AddCashFlowViewModel @Inject constructor(
                 val cashFlow = addCashFlowData.toCashFlow()
                 withContext(Dispatchers.IO) {
                     addCashFlowRepository.insertCashFlow(cashFlow)
-                    accountRepository.updateAmount(cashFlow.accountId, cashFlow.amount)
+                    walletRepository.updateAmount(cashFlow.walletId, cashFlow.amount)
                 }
                 _uiEvent.send(AddCashFlowEvent.Success)
             } catch (e: Exception) {
@@ -139,11 +140,11 @@ class AddCashFlowViewModel @Inject constructor(
         }
     }
 
-    val accounts = accountRepository.getAllAccounts()
+    val wallets = walletRepository.getAllWallets()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     /**
-     * Get cashflow by id (return cashflow, category and account)
+     * Get cashflow by id (return cashflow, category and wallet)
      */
     private fun getCashFlowById(cashFlowId: Int) {
         viewModelScope.launch {
@@ -164,7 +165,7 @@ class AddCashFlowViewModel @Inject constructor(
                 categoryId = data.cashFlow.categoryId,
                 categoryText = "${data.category.emoji} ${data.category.name}",
                 selectedCashflowTypeIndex = if (data.cashFlow.type == CashFlowType.EXPENSES) 1 else 0,
-                selectedAccount = data.account
+                selectedWallet = data.wallet
             )
         }
     }
@@ -184,7 +185,7 @@ class AddCashFlowViewModel @Inject constructor(
                 i("Update CashFlow: $cashFlow")
                 withContext(Dispatchers.IO) {
                     addCashFlowRepository.updateCashFlow(cashFlow.copy(id = cashFowId))
-                    accountRepository.updateAmount(cashFlow.accountId, cashFlow.amount)
+                    walletRepository.updateAmount(cashFlow.walletId, cashFlow.amount)
                 }
                 _uiEvent.send(AddCashFlowEvent.Success)
             } catch (e: Exception) {
@@ -197,5 +198,5 @@ class AddCashFlowViewModel @Inject constructor(
     }
 
     fun validateFields() =
-        addCashFlowData.amount.isEmpty() || addCashFlowData.amount == "0" || addCashFlowData.categoryId == -1 || addCashFlowData.selectedAccount.id == 0
+        addCashFlowData.amount.isEmpty() || addCashFlowData.amount == "0" || addCashFlowData.categoryId == -1 || addCashFlowData.selectedWallet.id == 0
 }

@@ -1,11 +1,11 @@
-package com.notsatria.bajet.ui.screen.account.add_account
+package com.notsatria.bajet.ui.screen.wallet.add_wallet
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.notsatria.bajet.data.entities.Account
-import com.notsatria.bajet.data.entities.AccountGroup
-import com.notsatria.bajet.data.repository.AccountRepository
+import com.notsatria.bajet.data.entities.Wallet
+import com.notsatria.bajet.data.entities.WalletGroup
+import com.notsatria.bajet.data.repository.WalletRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,29 +16,29 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AddAccountViewModel @Inject constructor(private val accountRepository: AccountRepository) :
+class AddWalletViewModel @Inject constructor(private val walletRepository: WalletRepository) :
     ViewModel() {
 
-    val accountGroups = accountRepository.getAllAccountGroup().stateIn(
+    val walletGroups = walletRepository.getAllWalletGroup().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
         emptyList()
     )
 
-    val selectedAccountGroup = MutableStateFlow<AccountGroup>(AccountGroup(1, "Cash"))
+    val selectedWalletGroup = MutableStateFlow<WalletGroup>(WalletGroup(1, "Cash"))
 
-    var accountName = mutableStateOf("")
+    var walletName = mutableStateOf("")
 
     var amount = mutableStateOf("")
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun insertAccount() {
+    fun insertWallet() {
         viewModelScope.launch(Dispatchers.IO.limitedParallelism(1)) {
-            accountRepository.insertAccount(
-                Account(
-                    name = accountName.value,
+            walletRepository.insertWallet(
+                Wallet(
+                    name = walletName.value,
                     balance = amount.value.toDouble(),
-                    groupId = selectedAccountGroup.value.id,
+                    groupId = selectedWalletGroup.value.id,
                 )
             )
         }

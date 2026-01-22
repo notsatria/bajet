@@ -1,4 +1,4 @@
-package com.notsatria.bajet.ui.screen.account
+package com.notsatria.bajet.ui.screen.wallet
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -33,53 +33,53 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.notsatria.bajet.R
-import com.notsatria.bajet.data.entities.relation.AccountsRaw
+import com.notsatria.bajet.data.entities.relation.WalletsRaw
 import com.notsatria.bajet.ui.theme.BajetTheme
 import com.notsatria.bajet.utils.formatToRupiah
 
 @Composable
-fun AccountRoute(
+fun WalletRoute(
     modifier: Modifier = Modifier,
-    navigateToAddAccountScreen: () -> Unit = {},
-    viewModel: AccountViewModel = hiltViewModel()
+    navigateToAddWalletScreen: () -> Unit = {},
+    viewModel: WalletViewModel = hiltViewModel()
 ) {
-    val accounts by viewModel.groupedAccounts.collectAsState()
-    val accountSums by viewModel.accountSums.collectAsState()
+    val wallets by viewModel.groupedWallets.collectAsState()
+    val walletSums by viewModel.walletSums.collectAsState()
     val totalAmount by viewModel.totalAmount.collectAsState()
 
-    AccountScreen(modifier, navigateToAddAccountScreen, accounts, accountSums, totalAmount)
+    WalletScreen(modifier, navigateToAddWalletScreen, wallets, walletSums, totalAmount)
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun AccountScreen(
+fun WalletScreen(
     modifier: Modifier = Modifier,
-    navigateToAddAccountScreen: () -> Unit = {},
-    accounts: Map<String, List<AccountsRaw>> = emptyMap(),
-    accountSums: Map<String, Double> = emptyMap(),
+    navigateToAddWalletScreen: () -> Unit = {},
+    wallets: Map<String, List<WalletsRaw>> = emptyMap(),
+    walletSums: Map<String, Double> = emptyMap(),
     totalAmount: Double = 0.0
 ) {
     Scaffold(modifier, topBar = {
         TopAppBar(
             title = {
-                Text(stringResource(R.string.accounts))
+                Text(stringResource(R.string.wallets))
             },
         )
     }, floatingActionButton = {
         FloatingActionButton(
             modifier = Modifier,
-            onClick = navigateToAddAccountScreen
+            onClick = navigateToAddWalletScreen
         ) {
             Icon(
                 Icons.Default.Add,
-                "Add account",
+                "Add wallet",
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }) { innerPadding ->
         Box(Modifier.padding(innerPadding)) {
             Column(Modifier.fillMaxSize()) {
-                TotalAccountRow(
+                TotalWalletRow(
                     Modifier
                         .fillMaxWidth()
                         .background(color = MaterialTheme.colorScheme.surfaceContainer)
@@ -89,24 +89,24 @@ fun AccountScreen(
                 HorizontalDivider()
                 Spacer(Modifier.height(8.dp))
                 LazyColumn(Modifier.fillMaxSize()) {
-                    accounts.forEach { (accountGroup, accounts) ->
+                    wallets.forEach { (walletGroup, wallets) ->
                         stickyHeader {
-                            AccountHeader(
+                            WalletHeader(
                                 Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 20.dp, vertical = 8.dp),
-                                accountGroup,
-                                accountSums.getValue(accountGroup)
+                                walletGroup,
+                                walletSums.getValue(walletGroup)
                             )
                             HorizontalDivider()
                         }
-                        items(accounts) {
-                            AccountItem(
+                        items(wallets) {
+                            WalletItem(
                                 Modifier
                                     .fillMaxWidth()
                                     .background(MaterialTheme.colorScheme.surfaceContainer)
                                     .padding(horizontal = 20.dp, vertical = 8.dp),
-                                accountName = it.accountName,
+                                walletName = it.walletName,
                                 amount = it.amount
                             )
                             HorizontalDivider()
@@ -119,29 +119,29 @@ fun AccountScreen(
 }
 
 @Composable
-fun AccountHeader(modifier: Modifier = Modifier, accountGroup: String, totalAmount: Double) {
+fun WalletHeader(modifier: Modifier = Modifier, walletGroup: String, totalAmount: Double) {
     Row(
         modifier,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(accountGroup)
+        Text(walletGroup)
         Text(totalAmount.formatToRupiah())
     }
 }
 
 @Composable
-fun AccountItem(modifier: Modifier = Modifier, accountName: String, amount: Double) {
+fun WalletItem(modifier: Modifier = Modifier, walletName: String, amount: Double) {
     Row(
         modifier,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(accountName)
+        Text(walletName)
         Text(amount.formatToRupiah())
     }
 }
 
 @Composable
-fun TotalAccountRow(modifier: Modifier = Modifier, totalAmount: Double) {
+fun TotalWalletRow(modifier: Modifier = Modifier, totalAmount: Double) {
     Row(modifier, horizontalArrangement = Arrangement.SpaceBetween) {
         Text(
             stringResource(R.string.total),
@@ -158,8 +158,8 @@ fun TotalAccountRow(modifier: Modifier = Modifier, totalAmount: Double) {
 
 @Preview
 @Composable
-fun AccountScreenPreview(modifier: Modifier = Modifier) {
+fun WalletScreenPreview(modifier: Modifier = Modifier) {
     BajetTheme {
-        AccountScreen()
+        WalletScreen()
     }
 }

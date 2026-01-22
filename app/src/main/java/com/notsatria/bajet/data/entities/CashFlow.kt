@@ -15,13 +15,13 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
-            entity = Account::class,
+            entity = Wallet::class,
             parentColumns = ["id"],
-            childColumns = ["accountId"],
+            childColumns = ["walletId"],
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [androidx.room.Index("categoryId"), androidx.room.Index("accountId")]
+    indices = [androidx.room.Index("categoryId"), androidx.room.Index("walletId")]
 )
 data class CashFlow(
     @PrimaryKey(autoGenerate = true)
@@ -42,6 +42,6 @@ data class CashFlow(
     @ColumnInfo("date")
     val date: Long,
 
-    @ColumnInfo("accountId")
-    val accountId: Int
+    @ColumnInfo("walletId")
+    val walletId: Int
 )

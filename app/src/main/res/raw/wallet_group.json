@@ -1,12 +1,12 @@
 {
-  "account_groups": [
+  "wallet_groups": [
     {
       "id": 1,
       "name": "Cash"
     },
     {
       "id": 2,
-      "name": "Accounts"
+      "name": "Wallets"
     },
     {
       "id": 3,

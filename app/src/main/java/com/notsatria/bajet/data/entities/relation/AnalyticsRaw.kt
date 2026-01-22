@@ -24,7 +24,7 @@ data class AnalyticsRaw(
                 amount = this.amount,
                 note = "",
                 date = 0,
-                accountId = 0
+                walletId = 0
             ),
             category = Category(
                 id = this.categoryId,

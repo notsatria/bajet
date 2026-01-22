@@ -40,5 +40,5 @@ Next Improvements (Not Urgent):
 - [] Tambahkan proguard untuk release build
 
 # Agenda Today
-- [] Fix 16kb page size requirements
+- [x] Fix 16kb page size requirements
 - [] Ganti Terms "Akun" menjadi "Dompet"

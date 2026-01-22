@@ -13,7 +13,7 @@ import com.notsatria.bajet.data.entities.relation.AnalyticsRaw
 import com.notsatria.bajet.data.entities.relation.AnalyticsTotalRaw
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.relation.CashFlowSummary
-import com.notsatria.bajet.data.entities.relation.CashFlowWithCategoryAndAccount
+import com.notsatria.bajet.data.entities.relation.CashFlowWithCategoryAndWallet
 import com.notsatria.bajet.utils.CashFlowType
 import kotlinx.coroutines.flow.Flow
 
@@ -55,7 +55,7 @@ interface CashFlowDao {
 
     @Transaction
     @Query("SELECT * FROM cashflow WHERE cashflow.id = :cashFlowId")
-    suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowWithCategoryAndAccount
+    suspend fun getCashFlowAndCategoryById(cashFlowId: Int): CashFlowWithCategoryAndWallet
 
     @Update
     suspend fun updateCashFlow(cashFlow: CashFlow)

@@ -1,8 +1,8 @@
 package com.notsatria.bajet.di
 
 import android.content.Context
-import com.notsatria.bajet.data.dao.AccountDao
-import com.notsatria.bajet.data.dao.AccountGroupDao
+import com.notsatria.bajet.data.dao.WalletDao
+import com.notsatria.bajet.data.dao.WalletGroupDao
 import com.notsatria.bajet.data.dao.BudgetDao
 import com.notsatria.bajet.data.dao.BudgetEntryDao
 import com.notsatria.bajet.data.dao.CashFlowDao
@@ -38,8 +38,8 @@ class DatabaseModule {
     fun provideBudgetMonthDao(db: CashFlowDatabase): BudgetEntryDao = db.budgetMonthDao()
 
     @Provides
-    fun provideAccountDao(db: CashFlowDatabase): AccountDao = db.accountDao()
+    fun provideWalletDao(db: CashFlowDatabase): WalletDao = db.walletDao()
 
     @Provides
-    fun provideAccountGroupDao(db: CashFlowDatabase): AccountGroupDao = db.accountGroupDao()
+    fun provideWalletGroupDao(db: CashFlowDatabase): WalletGroupDao = db.walletGroupDao()
 }

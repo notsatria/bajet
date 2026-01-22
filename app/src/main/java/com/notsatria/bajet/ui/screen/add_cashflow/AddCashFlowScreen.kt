@@ -55,7 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.notsatria.bajet.R
-import com.notsatria.bajet.data.entities.Account
+import com.notsatria.bajet.data.entities.Wallet
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.ui.components.BajetOutlinedTextField
 import com.notsatria.bajet.ui.components.ClickableTextField
@@ -78,7 +78,7 @@ fun AddCashFlowRoute(
 ) {
     val shouldShowCategoryDialog = rememberSaveable { mutableStateOf(false) }
     val shouldShowDatePickerDialog = rememberSaveable { mutableStateOf(false) }
-    val showAccountDialog = rememberSaveable { mutableStateOf(false) }
+    val showWalletDialog = rememberSaveable { mutableStateOf(false) }
     val uiData = viewModel.addCashFlowData
     val uiEvent by viewModel.uiEvent.collectAsState(AddCashFlowEvent.Initial)
     val expensesCategory by remember {
@@ -91,7 +91,7 @@ fun AddCashFlowRoute(
     }
     val cashFlowIdExists = viewModel.cashFlowId != -1
     val categories by categoryViewModel.categories.collectAsState()
-    val accounts by viewModel.accounts.collectAsState()
+    val wallets by viewModel.wallets.collectAsState()
 
     LaunchedEffect(uiData.selectedCashflowTypeIndex) {
         val categoryType = if (uiData.selectedCashflowTypeIndex == CategoryType.INCOME.ordinal)
@@ -121,13 +121,13 @@ fun AddCashFlowRoute(
         uiState = AddCashFlowUiState(
             shouldShowCategoryDialog = shouldShowCategoryDialog,
             shouldShowDatePickerDialog = shouldShowDatePickerDialog,
-            showAccountDialog = showAccountDialog,
+            showWalletDialog = showWalletDialog,
             uiData = uiData,
             expensesCategory = expensesCategory,
             cashFlowIdExists = cashFlowIdExists,
             fieldsEmpty = fieldsEmpty,
             categories = categories,
-            accounts = accounts,
+            wallets = wallets,
         ),
         navigateBack = navigateBack,
         onCategorySelected = { category ->
@@ -150,8 +150,8 @@ fun AddCashFlowRoute(
             if (cashFlowIdExists) viewModel.updateCashFlow(viewModel.cashFlowId)
             else viewModel.insertCashFlow()
         },
-        onAccountSelected = { account ->
-            viewModel.updateAccountId(account)
+        onWalletSelected = { wallet ->
+            viewModel.updateWalletId(wallet)
         }
     )
 }
@@ -167,7 +167,7 @@ fun AddCashFlowScreen(
     onUpdateAmount: (String) -> Unit = {},
     onUpdateNote: (String) -> Unit = {},
     onAddCashFlowClicked: () -> Unit = {},
-    onAccountSelected: (Account) -> Unit = {}
+    onWalletSelected: (Wallet) -> Unit = {}
 ) {
     if (uiState.shouldShowCategoryDialog.value) {
         val categoryType = if (uiState.uiData.selectedCashflowTypeIndex == CategoryType.INCOME.ordinal)
@@ -196,13 +196,13 @@ fun AddCashFlowScreen(
         initialDate = if (uiState.cashFlowIdExists) uiState.uiData.date else Calendar.getInstance().timeInMillis,
     )
 
-    if (uiState.showAccountDialog.value) AccountListDialog(
-        accounts = uiState.accounts,
-        onItemClicked = { account ->
-            onAccountSelected(account)
-            uiState.showAccountDialog.value = false
+    if (uiState.showWalletDialog.value) WalletListDialog(
+        wallets = uiState.wallets,
+        onItemClicked = { wallet ->
+            onWalletSelected(wallet)
+            uiState.showWalletDialog.value = false
         },
-        showDialog = uiState.showAccountDialog
+        showDialog = uiState.showWalletDialog
     )
 
     Scaffold(modifier, containerColor = MaterialTheme.colorScheme.background, topBar = {
@@ -266,11 +266,11 @@ fun AddCashFlowScreen(
                     })
                 ClickableTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = uiState.uiData.selectedAccount.name,
-                    placeholder = stringResource(R.string.account),
+                    value = uiState.uiData.selectedWallet.name,
+                    placeholder = stringResource(R.string.wallet),
                     readOnly = true,
                     onClick = {
-                        uiState.showAccountDialog.value = true
+                        uiState.showWalletDialog.value = true
                     }
                 )
                 BajetOutlinedTextField(
@@ -331,9 +331,9 @@ fun CashFlowDatePickerDialog(
 }
 
 @Composable
-fun AccountListDialog(
-    accounts: List<Account>,
-    onItemClicked: (Account) -> Unit,
+fun WalletListDialog(
+    wallets: List<Wallet>,
+    onItemClicked: (Wallet) -> Unit,
     showDialog: MutableState<Boolean>
 ) {
     Dialog(onDismissRequest = {
@@ -342,14 +342,14 @@ fun AccountListDialog(
         Card(modifier = Modifier.clip(RoundedCornerShape(16.dp))) {
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(
-                    stringResource(R.string.choose_account),
+                    stringResource(R.string.choose_wallet),
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                 )
                 LazyColumn {
-                    items(accounts) {
+                    items(wallets) {
                         Text(
                             text = it.name, modifier = Modifier
                                 .clickable {
@@ -403,13 +403,13 @@ fun AddCashFlowTopAppBar(onNavigateBack: () -> Unit, title: String) {
 data class AddCashFlowUiState(
     val shouldShowCategoryDialog: MutableState<Boolean> = mutableStateOf(false),
     val shouldShowDatePickerDialog: MutableState<Boolean> = mutableStateOf(false),
-    val showAccountDialog: MutableState<Boolean> = mutableStateOf(false),
+    val showWalletDialog: MutableState<Boolean> = mutableStateOf(false),
     val categories: List<Category> = emptyList(),
     val uiData: AddCashFlowData = AddCashFlowData(),
     val expensesCategory: Boolean = false,
     val cashFlowIdExists: Boolean = false,
     val fieldsEmpty: Boolean = false,
-    val accounts: List<Account> = emptyList()
+    val wallets: List<Wallet> = emptyList()
 )
 
 @Preview

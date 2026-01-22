@@ -1,13 +1,13 @@
 package com.notsatria.bajet.utils
 
 import androidx.compose.ui.graphics.toArgb
-import com.notsatria.bajet.data.entities.Account
-import com.notsatria.bajet.data.entities.AccountGroup
+import com.notsatria.bajet.data.entities.Wallet
+import com.notsatria.bajet.data.entities.WalletGroup
 import com.notsatria.bajet.data.entities.BudgetEntry
 import com.notsatria.bajet.data.entities.CashFlow
 import com.notsatria.bajet.data.entities.Category
 import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
-import com.notsatria.bajet.data.entities.relation.CashFlowWithCategoryAndAccount
+import com.notsatria.bajet.data.entities.relation.CashFlowWithCategoryAndWallet
 import com.notsatria.bajet.ui.domain.Analytics
 import java.util.Calendar
 
@@ -20,7 +20,7 @@ object DummyData {
             note = "Jual buku",
             categoryId = 1,
             date = 1732774404029,
-            accountId = 1
+            walletId = 1
         ),
         CashFlow(
             id = 1,
@@ -29,7 +29,7 @@ object DummyData {
             note = "Jual buku",
             categoryId = 3,
             date = 1732640400000,
-            accountId = 1
+            walletId = 1
         ),
         CashFlow(
             id = 3,
@@ -38,7 +38,7 @@ object DummyData {
             note = "Jual buku",
             categoryId = 3,
             date = 1732774404029,
-            accountId = 1
+            walletId = 1
         ),
         CashFlow(
             id = 4,
@@ -47,7 +47,7 @@ object DummyData {
             note = "Makan",
             categoryId = 4,
             date = 1732774404029,
-            accountId = 1
+            walletId = 1
         ),
     )
 
@@ -76,7 +76,7 @@ object DummyData {
                 note = "Salary",
                 date = Calendar.getInstance().timeInMillis,
                 categoryId = 1,
-                accountId = 1
+                walletId = 1
             ),
             category = categories[0],
         ),
@@ -88,7 +88,7 @@ object DummyData {
                 note = "Food",
                 date = Calendar.getInstance().timeInMillis,
                 categoryId = 3,
-                accountId = 1
+                walletId = 1
             ),
             category = categories[1]
         ),
@@ -100,14 +100,14 @@ object DummyData {
                 note = "Something",
                 date = Calendar.getInstance().timeInMillis,
                 categoryId = 4,
-                accountId = 1
+                walletId = 1
             ),
             category = categories[2]
         )
     )
 
-    val cashFlowWithCategoriesAndAccount = listOf(
-        CashFlowWithCategoryAndAccount(
+    val cashFlowWithCategoriesAndWallet = listOf(
+        CashFlowWithCategoryAndWallet(
             cashFlow = CashFlow(
                 id = 1,
                 type = CashFlowType.INCOME,
@@ -115,17 +115,17 @@ object DummyData {
                 note = "Salary",
                 date = Calendar.getInstance().timeInMillis,
                 categoryId = 1,
-                accountId = 1
+                walletId = 1
             ),
             category = categories[0],
-            account = Account(
+            wallet = Wallet(
                 id = 1,
                 name = "Cash",
                 groupId = 1,
                 balance = 10000.0
             )
         ),
-        CashFlowWithCategoryAndAccount(
+        CashFlowWithCategoryAndWallet(
             cashFlow = CashFlow(
                 id = 2,
                 type = CashFlowType.EXPENSES,
@@ -133,17 +133,17 @@ object DummyData {
                 note = "Food",
                 date = Calendar.getInstance().timeInMillis,
                 categoryId = 3,
-                accountId = 1
+                walletId = 1
             ),
             category = categories[1],
-            account = Account(
+            wallet = Wallet(
                 id = 1,
                 name = "Cash",
                 groupId = 1,
                 balance = 10000.0
             )
         ),
-        CashFlowWithCategoryAndAccount(
+        CashFlowWithCategoryAndWallet(
             cashFlow = CashFlow(
                 id = 3,
                 type = CashFlowType.EXPENSES,
@@ -151,10 +151,10 @@ object DummyData {
                 note = "Something",
                 date = Calendar.getInstance().timeInMillis,
                 categoryId = 4,
-                accountId = 1
+                walletId = 1
             ),
             category = categories[2],
-            account = Account(
+            wallet = Wallet(
                 id = 1,
                 name = "Cash",
                 groupId = 1,
@@ -184,20 +184,20 @@ object DummyData {
         ),
     )
 
-    val accountGroups = listOf<AccountGroup>(
-        AccountGroup(
+    val walletGroups = listOf<WalletGroup>(
+        WalletGroup(
             id = 1,
             name = "Cash",
         ),
-        AccountGroup(
+        WalletGroup(
             id = 2,
             name = "Bank",
         ),
-        AccountGroup(
+        WalletGroup(
             id = 3,
             name = "Credit Card",
         ),
-        AccountGroup(
+        WalletGroup(
             id = 4,
             name = "Other",
         ),

@@ -39,6 +39,7 @@ import com.notsatria.bajet.data.entities.relation.CashFlowAndCategory
 import com.notsatria.bajet.data.entities.relation.CashFlowSummary
 import com.notsatria.bajet.ui.components.EmptyView
 import com.notsatria.bajet.ui.theme.BajetTheme
+import com.notsatria.bajet.utils.CashFlowType
 import com.notsatria.bajet.utils.DateUtils
 import com.notsatria.bajet.utils.DateUtils.formatDateTo
 import com.notsatria.bajet.utils.DummyData
@@ -179,9 +180,9 @@ fun GroupedCashFlowList(
             item {
                 DailyCashFlowCardItem(
                     date = entry.key,
-                    totalIncome = entry.value.filter { it.category.id == 1 }
+                    totalIncome = entry.value.filter { it.cashFlow.type == CashFlowType.INCOME }
                         .sumOf { it.cashFlow.amount },
-                    totalExpenses = entry.value.filter { it.category.id != 1 }
+                    totalExpenses = entry.value.filter { it.cashFlow.type == CashFlowType.EXPENSES }
                         .sumOf { it.cashFlow.amount },
                     cashFlowList = entry.value,
                     onDeleteCashFlow = onDeleteCashFlow,
